@@ -147,14 +147,13 @@ export async function saveProductsToCloud(products: Product[]): Promise<void> {
     console.log("📝 [STORAGE] JSON gerado, tamanho:", jsonData.length, "caracteres")
     console.log("🔍 [STORAGE] Primeiros 200 chars do JSON:", jsonData.substring(0, 200))
 
-    // Salvar na Blob com allowOverwrite: true
+    // Salvar na Blob - remover allowOverwrite
     console.log("☁️ [STORAGE] Enviando para Vercel Blob...")
     console.log("📁 [STORAGE] Nome do arquivo:", PRODUCTS_FILE)
 
     const blob = await put(PRODUCTS_FILE, jsonData, {
       access: "public",
       contentType: "application/json",
-      allowOverwrite: true, // ✅ Permite sobrescrever o arquivo existente
     })
 
     console.log("✅ [STORAGE] === SALVAMENTO CONCLUÍDO ===")
@@ -187,7 +186,7 @@ export async function uploadImageToCloud(file: File): Promise<string> {
 
     console.log("📁 [STORAGE] Nome do arquivo:", filename)
 
-    // Upload para Blob
+    // Upload para Blob - ajustar opções
     const blob = await put(filename, file, {
       access: "public",
       addRandomSuffix: true, // ✅ Gera nome único para evitar conflitos

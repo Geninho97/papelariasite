@@ -3,21 +3,29 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Lock, Eye, EyeOff } from 'lucide-react'
+import { Lock, Eye, EyeOff, Loader2 } from "lucide-react"
 import Link from "next/link"
 
 interface LoginFormProps {
-  onLogin: (password: string) => void
+  onLogin: (password: string) => Promise<boolean>
   error?: string
+  loading?: boolean
 }
 
-export default function LoginForm({ onLogin, error }: LoginFormProps) {
+export default function LoginForm({ onLogin, error, loading }: LoginFormProps) {
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    onLogin(password)
+    setIsSubmitting(true)
+
+    try {
+      await onLogin(password)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -48,11 +56,13 @@ export default function LoginForm({ onLogin, error }: LoginFormProps) {
                   className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent pr-12"
                   placeholder="Digite a palavra-passe"
                   required
+                  disabled={isSubmitting}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  disabled={isSubmitting}
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -67,9 +77,17 @@ export default function LoginForm({ onLogin, error }: LoginFormProps) {
 
             <button
               type="submit"
-              className="w-full bg-red-600 text-white py-4 px-6 rounded-lg hover:bg-red-700 transition-colors font-medium text-lg"
+              disabled={isSubmitting}
+              className="w-full bg-red-600 text-white py-4 px-6 rounded-lg hover:bg-red-700 transition-colors font-medium text-lg disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
             >
-              Entrar no Painel
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <span>Verificando...</span>
+                </>
+              ) : (
+                <span>Entrar no Painel</span>
+              )}
             </button>
           </form>
 

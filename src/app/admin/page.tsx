@@ -2,21 +2,18 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useProducts, type Product } from "../hooks/useProducts"
+import { useAuth } from "../hooks/useAuth"
 import { Plus, Edit, Trash2, Save, X, ArrowUp, ArrowDown, Eye, LogOut, RefreshCw, Cloud } from "lucide-react"
 import Link from "next/link"
 import LoginForm from "./components/LoginForm"
 import ImageUpload from "./components/ImageUpload"
 
-// Palavra-passe do administrador
-const ADMIN_PASSWORD = "Papelaria2025"
-
 export default function AdminPage() {
+  const { isAuthenticated, loading: authLoading, error: authError, login, logout } = useAuth()
   const { products, getFeaturedProducts, addProduct, updateProduct, deleteProduct, loading, saving, refreshProducts } =
     useProducts()
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [loginError, setLoginError] = useState("")
   const [isAddingProduct, setIsAddingProduct] = useState(false)
   const [editingProduct, setEditingProduct] = useState<string | null>(null)
   const [formData, setFormData] = useState<Partial<Product>>({})
@@ -25,38 +22,24 @@ export default function AdminPage() {
 
   const categories = ["Escolar", "Escritório", "Escrita", "Papel", "Eletrônicos", "Brinquedos", "Diversão"]
 
-  // Verificar se já está autenticado (sessão)
-  useEffect(() => {
-    const authStatus = sessionStorage.getItem("admin-authenticated")
-    if (authStatus === "true") {
-      setIsAuthenticated(true)
-    }
-  }, [])
-
-  const handleLogin = (password: string) => {
-    if (password === ADMIN_PASSWORD) {
-      setIsAuthenticated(true)
-      setLoginError("")
-      sessionStorage.setItem("admin-authenticated", "true")
-    } else {
-      setLoginError("Palavra-passe incorreta. Tente novamente.")
-    }
-  }
-
-  const handleLogout = () => {
-    setIsAuthenticated(false)
-    sessionStorage.removeItem("admin-authenticated")
-    setIsAddingProduct(false)
-    setEditingProduct(null)
-    setFormData({})
+  // Se ainda está verificando autenticação
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-red-600 mx-auto mb-4"></div>
+          <p className="text-xl text-gray-600">Verificando autenticação...</p>
+        </div>
+      </div>
+    )
   }
 
   // Se não estiver autenticado, mostrar formulário de login
   if (!isAuthenticated) {
-    return <LoginForm onLogin={handleLogin} error={loginError} />
+    return <LoginForm onLogin={login} error={authError || undefined} loading={authLoading} />
   }
 
-  // Loading inicial
+  // Loading inicial dos produtos
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -152,7 +135,7 @@ export default function AdminPage() {
               <div className="flex items-center space-x-2 mt-2">
                 <div className="flex items-center space-x-1 text-sm text-green-600">
                   <Cloud className="h-4 w-4" />
-                  <span>Dados sincronizados na nuvem</span>
+                  <span>Autenticação segura ativa</span>
                 </div>
                 {saving && (
                   <div className="flex items-center space-x-1 text-sm text-blue-600">
@@ -179,7 +162,7 @@ export default function AdminPage() {
                 <span>Ver Site</span>
               </Link>
               <button
-                onClick={handleLogout}
+                onClick={logout}
                 className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
               >
                 <LogOut className="h-4 w-4" />
