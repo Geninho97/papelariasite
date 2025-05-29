@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { useProducts, type Product } from "../hooks/useProducts"
-import { Plus, Edit, Trash2, Save, X, ArrowUp, ArrowDown, Eye, LogOut } from "lucide-react"
+import { Plus, Edit, Trash2, Save, X, ArrowUp, ArrowDown, Eye, LogOut, RefreshCw, Cloud } from "lucide-react"
 import Link from "next/link"
 import LoginForm from "./components/LoginForm"
 import ImageUpload from "./components/ImageUpload"
@@ -13,7 +13,8 @@ import ImageUpload from "./components/ImageUpload"
 const ADMIN_PASSWORD = "Papelaria2025"
 
 export default function AdminPage() {
-  const { products, getFeaturedProducts, addProduct, updateProduct, deleteProduct } = useProducts()
+  const { products, getFeaturedProducts, addProduct, updateProduct, deleteProduct, loading, saving, refreshProducts } =
+    useProducts()
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loginError, setLoginError] = useState("")
   const [isAddingProduct, setIsAddingProduct] = useState(false)
@@ -36,7 +37,6 @@ export default function AdminPage() {
     if (password === ADMIN_PASSWORD) {
       setIsAuthenticated(true)
       setLoginError("")
-      // Salvar estado de autenticação na sessão (expira quando fechar o browser)
       sessionStorage.setItem("admin-authenticated", "true")
     } else {
       setLoginError("Palavra-passe incorreta. Tente novamente.")
@@ -56,27 +56,43 @@ export default function AdminPage() {
     return <LoginForm onLogin={handleLogin} error={loginError} />
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Loading inicial
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-xl text-gray-600">Carregando dados da nuvem...</p>
+        </div>
+      </div>
+    )
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.name || !formData.description || !formData.price || !formData.category) {
       alert("Por favor, preencha todos os campos obrigatórios")
       return
     }
 
-    if (editingProduct) {
-      updateProduct(editingProduct, formData)
-      setEditingProduct(null)
-    } else {
-      const maxOrder = Math.max(...featuredProducts.map((p) => p.order), 0)
-      addProduct({
-        ...formData,
-        featured: true,
-        order: maxOrder + 1,
-        image: formData.image || "/placeholder.svg?height=300&width=300",
-      } as Omit<Product, "id">)
-      setIsAddingProduct(false)
+    try {
+      if (editingProduct) {
+        await updateProduct(editingProduct, formData)
+        setEditingProduct(null)
+      } else {
+        const maxOrder = Math.max(...featuredProducts.map((p) => p.order), 0)
+        await addProduct({
+          ...formData,
+          featured: true,
+          order: maxOrder + 1,
+          image: formData.image || "/placeholder.svg?height=300&width=300",
+        } as Omit<Product, "id">)
+        setIsAddingProduct(false)
+      }
+      setFormData({})
+    } catch (error) {
+      console.error("Erro ao salvar produto:", error)
     }
-    setFormData({})
   }
 
   const handleEdit = (product: Product) => {
@@ -91,7 +107,7 @@ export default function AdminPage() {
     setFormData({})
   }
 
-  const moveProduct = (index: number, direction: "up" | "down") => {
+  const moveProduct = async (index: number, direction: "up" | "down") => {
     const newProducts = [...featuredProducts]
     const targetIndex = direction === "up" ? index - 1 : index + 1
 
@@ -99,23 +115,21 @@ export default function AdminPage() {
       ;[newProducts[index], newProducts[targetIndex]] = [newProducts[targetIndex], newProducts[index]]
 
       // Atualizar as ordens
-      newProducts.forEach((product, idx) => {
-        updateProduct(product.id, { order: idx + 1 })
-      })
+      for (let i = 0; i < newProducts.length; i++) {
+        await updateProduct(newProducts[i].id, { order: i + 1 })
+      }
     }
   }
 
-  const toggleFeatured = (productId: string) => {
+  const toggleFeatured = async (productId: string) => {
     const product = products.find((p) => p.id === productId)
     if (product) {
       if (product.featured) {
-        // Remover dos destaques
-        updateProduct(productId, { featured: false })
+        await updateProduct(productId, { featured: false })
       } else {
-        // Adicionar aos destaques (máximo 6)
         if (featuredProducts.length < 6) {
           const maxOrder = Math.max(...featuredProducts.map((p) => p.order), 0)
-          updateProduct(productId, { featured: true, order: maxOrder + 1 })
+          await updateProduct(productId, { featured: true, order: maxOrder + 1 })
         } else {
           alert("Máximo de 6 produtos em destaque permitidos")
         }
@@ -130,10 +144,33 @@ export default function AdminPage() {
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800">Painel de Administração</h1>
-              <p className="text-gray-600 mt-2">Gerir produtos em destaque da Papelaria Coutyfil</p>
+              <h1 className="text-3xl font-bold text-gray-800 flex items-center space-x-3">
+                <span>Painel de Administração</span>
+                <Cloud className="h-8 w-8 text-green-600" />
+              </h1>
+              <p className="text-gray-600 mt-2">Gerir produtos na nuvem - Papelaria Coutyfil</p>
+              <div className="flex items-center space-x-2 mt-2">
+                <div className="flex items-center space-x-1 text-sm text-green-600">
+                  <Cloud className="h-4 w-4" />
+                  <span>Dados sincronizados na nuvem</span>
+                </div>
+                {saving && (
+                  <div className="flex items-center space-x-1 text-sm text-blue-600">
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    <span>Salvando...</span>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="flex items-center space-x-4">
+              <button
+                onClick={refreshProducts}
+                className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                disabled={loading}
+              >
+                <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+                <span>Atualizar</span>
+              </button>
               <Link
                 href="/"
                 className="flex items-center space-x-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
@@ -172,7 +209,7 @@ export default function AdminPage() {
         <div className="mb-6">
           <button
             onClick={() => setIsAddingProduct(true)}
-            disabled={featuredProducts.length >= 6}
+            disabled={featuredProducts.length >= 6 || saving}
             className="flex items-center space-x-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             <Plus className="h-5 w-5" />
@@ -200,6 +237,7 @@ export default function AdminPage() {
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     required
+                    disabled={saving}
                   />
                 </div>
                 <div>
@@ -211,6 +249,7 @@ export default function AdminPage() {
                     onChange={(e) => setFormData({ ...formData, price: Number.parseFloat(e.target.value) })}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     required
+                    disabled={saving}
                   />
                 </div>
               </div>
@@ -222,6 +261,7 @@ export default function AdminPage() {
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   required
+                  disabled={saving}
                 >
                   <option value="">Selecionar categoria</option>
                   {categories.map((category) => (
@@ -240,6 +280,7 @@ export default function AdminPage() {
                   rows={3}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   required
+                  disabled={saving}
                 />
               </div>
 
@@ -256,15 +297,17 @@ export default function AdminPage() {
               <div className="flex space-x-4 pt-4">
                 <button
                   type="submit"
-                  className="flex items-center space-x-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
+                  disabled={saving}
+                  className="flex items-center space-x-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400"
                 >
-                  <Save className="h-4 w-4" />
-                  <span>{editingProduct ? "Atualizar" : "Adicionar"}</span>
+                  {saving ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                  <span>{saving ? "Salvando..." : editingProduct ? "Atualizar" : "Adicionar"}</span>
                 </button>
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="flex items-center space-x-2 bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
+                  disabled={saving}
+                  className="flex items-center space-x-2 bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors disabled:bg-gray-400"
                 >
                   <X className="h-4 w-4" />
                   <span>Cancelar</span>
@@ -294,22 +337,30 @@ export default function AdminPage() {
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={() => moveProduct(index, "up")}
-                    disabled={index === 0}
+                    disabled={index === 0 || saving}
                     className="p-2 text-gray-600 hover:text-gray-800 disabled:text-gray-300 disabled:cursor-not-allowed"
                   >
                     <ArrowUp className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => moveProduct(index, "down")}
-                    disabled={index === featuredProducts.length - 1}
+                    disabled={index === featuredProducts.length - 1 || saving}
                     className="p-2 text-gray-600 hover:text-gray-800 disabled:text-gray-300 disabled:cursor-not-allowed"
                   >
                     <ArrowDown className="h-4 w-4" />
                   </button>
-                  <button onClick={() => handleEdit(product)} className="p-2 text-blue-600 hover:text-blue-800">
+                  <button
+                    onClick={() => handleEdit(product)}
+                    disabled={saving}
+                    className="p-2 text-blue-600 hover:text-blue-800 disabled:text-gray-400"
+                  >
                     <Edit className="h-4 w-4" />
                   </button>
-                  <button onClick={() => deleteProduct(product.id)} className="p-2 text-red-600 hover:text-red-800">
+                  <button
+                    onClick={() => deleteProduct(product.id)}
+                    disabled={saving}
+                    className="p-2 text-red-600 hover:text-red-800 disabled:text-gray-400"
+                  >
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
@@ -343,7 +394,8 @@ export default function AdminPage() {
                   </span>
                   <button
                     onClick={() => toggleFeatured(product.id)}
-                    className={`px-3 py-1 rounded text-xs font-medium ${
+                    disabled={saving}
+                    className={`px-3 py-1 rounded text-xs font-medium disabled:opacity-50 ${
                       product.featured
                         ? "bg-red-100 text-red-800 hover:bg-red-200"
                         : "bg-green-100 text-green-800 hover:bg-green-200"

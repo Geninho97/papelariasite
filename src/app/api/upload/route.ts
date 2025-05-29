@@ -1,71 +1,58 @@
-import { put } from "@vercel/blob"
 import { NextResponse } from "next/server"
+import { uploadImageToCloud } from "@/app/lib/storage"
 
 export async function POST(request: Request) {
   try {
-    console.log("Iniciando upload para Vercel Blob...")
+    console.log("=== UPLOAD API INICIADA ===")
 
     const formData = await request.formData()
     const file = formData.get("file") as File
 
     if (!file) {
-      console.log("Erro: Nenhum arquivo enviado")
-      return NextResponse.json({ error: "Nenhum arquivo enviado" }, { status: 400 })
-    }
-
-    // Verificar se é uma imagem
-    if (!file.type.startsWith("image/")) {
-      console.log("Erro: O arquivo não é uma imagem")
-      return NextResponse.json({ error: "O arquivo deve ser uma imagem" }, { status: 400 })
-    }
-
-    // Limitar tamanho (5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      console.log("Erro: Arquivo muito grande")
-      return NextResponse.json({ error: "A imagem deve ter no máximo 5MB" }, { status: 400 })
-    }
-
-    // Gerar um nome de arquivo único baseado no timestamp e nome original
-    const timestamp = Date.now()
-    const originalName = file.name.replace(/[^a-zA-Z0-9.]/g, "-")
-    const filename = `produtos/${timestamp}-${originalName}`
-
-    console.log(`Tentando fazer upload do arquivo: ${filename}`)
-
-    // Verificar se o token está disponível
-    if (!process.env.BLOB_READ_WRITE_TOKEN) {
-      console.error("ERRO CRÍTICO: Token do Vercel Blob não encontrado!")
       return NextResponse.json(
-        { error: "Configuração do servidor incompleta. Contate o administrador." },
-        { status: 500 },
+        { error: "Nenhum arquivo enviado", success: false },
+        { status: 400 }
       )
     }
 
-    // Fazer upload para o Vercel Blob
-    const blob = await put(filename, file, {
-      access: "public",
-    })
+    console.log(`📁 Arquivo: ${file.name} (${file.size} bytes, ${file.type})`)
 
-    console.log("Upload concluído com sucesso:", blob.url)
+    // Validações
+    if (!file.type.startsWith("image/")) {
+      return NextResponse.json(
+        { error: "Apenas imagens são permitidas", success: false },
+        { status: 400 }
+      )
+    }
 
-    // Retornar a URL da imagem
+    if (file.size > 5 * 1024 * 1024) { // 5MB
+      return NextResponse.json(
+        { error: "Imagem muito grande (máximo 5MB)", success: false },
+        { status: 400 }
+      )
+    }
+
+    // Upload para a nuvem
+    const imageUrl = await uploadImageToCloud(file)
+
     return NextResponse.json({
-      url: blob.url,
+      url: imageUrl,
       success: true,
+      method: "vercel-blob",
+      filename: file.name,
+      size: file.size,
     })
-  } catch (error) {
-    // Log detalhado do erro
-    console.error("Erro detalhado no upload:", error)
 
-    // Verificar se é um erro específico do Vercel Blob
-    const errorMessage = error instanceof Error ? error.message : "Erro desconhecido ao processar o upload"
+  } catch (error) {
+    console.error("💥 ERRO na API:", error)
 
     return NextResponse.json(
       {
-        error: errorMessage,
-        details: "Verifique os logs do servidor para mais informações",
+        error: "Erro ao fazer upload",
+        details: error instanceof Error ? error.message : "Erro desconhecido",
+        success: false,
       },
-      { status: 500 },
+      { status: 500 }
     )
   }
 }
