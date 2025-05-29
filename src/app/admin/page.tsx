@@ -5,6 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useProducts, type Product } from "../hooks/useProducts"
 import { Plus, Edit, Trash2, Save, X, ArrowUp, ArrowDown, Eye, LogOut } from "lucide-react"
+import Link from "next/link"
 import LoginForm from "./components/LoginForm"
 import ImageUpload from "./components/ImageUpload"
 
@@ -133,13 +134,13 @@ export default function AdminPage() {
               <p className="text-gray-600 mt-2">Gerir produtos em destaque da Papelaria Coutyfil</p>
             </div>
             <div className="flex items-center space-x-4">
-              <a
+              <Link
                 href="/"
                 className="flex items-center space-x-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
               >
                 <Eye className="h-4 w-4" />
                 <span>Ver Site</span>
-              </a>
+              </Link>
               <button
                 onClick={handleLogout}
                 className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"

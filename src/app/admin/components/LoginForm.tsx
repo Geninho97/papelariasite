@@ -3,7 +3,8 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Lock, Eye, EyeOff } from "lucide-react"
+import { Lock, Eye, EyeOff } from 'lucide-react'
+import Link from "next/link"
 
 interface LoginFormProps {
   onLogin: (password: string) => void
@@ -80,9 +81,9 @@ export default function LoginForm({ onLogin, error }: LoginFormProps) {
 
         {/* Back to site */}
         <div className="text-center mt-6">
-          <a href="/" className="text-gray-600 hover:text-red-600 transition-colors text-sm font-medium">
+          <Link href="/" className="text-gray-600 hover:text-red-600 transition-colors text-sm font-medium">
             ← Voltar ao site
-          </a>
+          </Link>
         </div>
       </div>
     </div>
