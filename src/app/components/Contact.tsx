@@ -11,7 +11,7 @@ export default function Contact() {
       <div className="container mx-auto px-4 max-w-6xl">
         {/* Header - Compacto */}
         <div className="text-center mb-10">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Entre em Contato</h2>
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4 pt-8">Entre em Contato</h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
             Estamos aqui para ajudar! Entre em contato conosco através dos canais abaixo ou visite nossa loja física.
           </p>
