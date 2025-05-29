@@ -2,6 +2,7 @@
 
 import { Heart, ChevronDown } from "lucide-react"
 import { useProducts } from "../hooks/useProducts"
+import Link from "next/link"
 
 const categoryColors = {
   Escolar: "bg-green-600 text-white",
@@ -49,7 +50,8 @@ export default function Products() {
         {/* Products Grid - Compacto */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
           {products.map((product) => (
-            <div
+            <Link
+              href={`/produtos/${product.id}`}
               key={product.id}
               className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-100 hover:border-red-200 transform hover:-translate-y-1"
             >
@@ -61,7 +63,13 @@ export default function Products() {
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute top-2 right-2">
-                  <button className="bg-white p-1.5 rounded-full shadow-md hover:bg-red-50 hover:text-red-600 transition-colors">
+                  <button
+                    className="bg-white p-1.5 rounded-full shadow-md hover:bg-red-50 hover:text-red-600 transition-colors"
+                    onClick={(e) => {
+                      e.preventDefault() // Evita navegação para a página de detalhes
+                      // Aqui você pode adicionar lógica para favoritar
+                    }}
+                  >
                     <Heart className="h-3 w-3 text-gray-600" />
                   </button>
                 </div>
@@ -82,9 +90,10 @@ export default function Products() {
                 <p className="text-gray-600 mb-3 text-sm line-clamp-2">{product.description}</p>
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-bold text-green-600">€{product.price.toFixed(2)}</span>
+                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">Ver detalhes</span>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 
