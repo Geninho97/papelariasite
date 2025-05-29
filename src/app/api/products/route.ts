@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server"
 import { loadProductsFromCloud, saveProductsToCloud } from "@/app/lib/storage"
 
+// Configuração para forçar execução dinâmica
+export const dynamic = "force-dynamic"
+
 // GET - Carregar produtos
 export async function GET() {
   try {

@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server"
 import { uploadImageToCloud } from "@/app/lib/storage"
 
+// Configuração para forçar execução dinâmica
+export const dynamic = "force-dynamic"
+
 export async function POST(request: Request) {
   try {
     console.log("=== UPLOAD API INICIADA ===")
@@ -9,27 +12,19 @@ export async function POST(request: Request) {
     const file = formData.get("file") as File
 
     if (!file) {
-      return NextResponse.json(
-        { error: "Nenhum arquivo enviado", success: false },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: "Nenhum arquivo enviado", success: false }, { status: 400 })
     }
 
     console.log(`📁 Arquivo: ${file.name} (${file.size} bytes, ${file.type})`)
 
     // Validações
     if (!file.type.startsWith("image/")) {
-      return NextResponse.json(
-        { error: "Apenas imagens são permitidas", success: false },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: "Apenas imagens são permitidas", success: false }, { status: 400 })
     }
 
-    if (file.size > 5 * 1024 * 1024) { // 5MB
-      return NextResponse.json(
-        { error: "Imagem muito grande (máximo 5MB)", success: false },
-        { status: 400 }
-      )
+    if (file.size > 5 * 1024 * 1024) {
+      // 5MB
+      return NextResponse.json({ error: "Imagem muito grande (máximo 5MB)", success: false }, { status: 400 })
     }
 
     // Upload para a nuvem
@@ -42,7 +37,6 @@ export async function POST(request: Request) {
       filename: file.name,
       size: file.size,
     })
-
   } catch (error) {
     console.error("💥 ERRO na API:", error)
 
@@ -52,7 +46,7 @@ export async function POST(request: Request) {
         details: error instanceof Error ? error.message : "Erro desconhecido",
         success: false,
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
