@@ -28,22 +28,30 @@ export default function Footer() {
             <h4 className="text-lg font-semibold mb-4 text-primary-400">Links Rápidos</h4>
             <ul className="space-y-2">
               <li>
-                <a href="#inicio" className="text-gray-300 hover:text-white transition-colors hover:text-primary-400">
+                <a href="/#inicio" className="text-gray-300 hover:text-white transition-colors hover:text-primary-400">
                   Início
                 </a>
               </li>
               <li>
-                <a href="#produtos" className="text-gray-300 hover:text-white transition-colors hover:text-primary-400">
+                <a
+                  href="/#novidades"
+                  className="text-gray-300 hover:text-white transition-colors hover:text-primary-400"
+                >
+                  Novidades
+                </a>
+              </li>
+              <li>
+                <a href="/produtos" className="text-gray-300 hover:text-white transition-colors hover:text-primary-400">
                   Produtos
                 </a>
               </li>
               <li>
-                <a href="#sobre" className="text-gray-300 hover:text-white transition-colors hover:text-primary-400">
+                <a href="/#sobre" className="text-gray-300 hover:text-white transition-colors hover:text-primary-400">
                   Sobre Nós
                 </a>
               </li>
               <li>
-                <a href="#contato" className="text-gray-300 hover:text-white transition-colors hover:text-primary-400">
+                <a href="/#contato" className="text-gray-300 hover:text-white transition-colors hover:text-primary-400">
                   Contato
                 </a>
               </li>

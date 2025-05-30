@@ -1,6 +1,6 @@
 "use client"
 
-import { Heart, ChevronDown } from "lucide-react"
+import { Heart, ChevronDown, ArrowRight } from "lucide-react"
 import { useProducts } from "../hooks/useProducts"
 import Link from "next/link"
 
@@ -21,12 +21,12 @@ export default function Products() {
   if (loading) {
     return (
       <section
-        id="produtos"
+        id="novidades"
         className="min-h-screen bg-gradient-to-br from-white via-red-50 to-green-50 py-8 flex flex-col justify-center"
       >
         <div className="container mx-auto px-4 text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-red-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando produtos...</p>
+          <p className="mt-4 text-gray-600">Carregando novidades...</p>
         </div>
       </section>
     )
@@ -34,28 +34,28 @@ export default function Products() {
 
   return (
     <section
-      id="produtos"
+      id="novidades"
       className="min-h-screen bg-gradient-to-br from-white via-red-50 to-green-50 py-8 flex flex-col justify-center"
     >
       <div className="container mx-auto px-4">
-        {/* Header - Compacto */}
+        {/* Header - Atualizado para "Novidades" */}
         <div className="text-center mb-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-3">Nossos Produtos</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-3">Novidades</h2>
           <p className="text-base text-gray-600 max-w-2xl mx-auto">
-            Descubra nossa ampla variedade de produtos de papelaria, material escolar e suprimentos para escritório
+            Descubra os nossos produtos mais recentes e populares em destaque
           </p>
           <div className="w-20 h-1 bg-gradient-to-r from-red-500 to-green-500 mx-auto mt-3 rounded-full"></div>
         </div>
 
-        {/* Products Grid - Compacto */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
+        {/* Products Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto mb-8">
           {products.map((product) => (
             <Link
               href={`/produtos/${product.id}`}
               key={product.id}
               className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-100 hover:border-red-200 transform hover:-translate-y-1"
             >
-              {/* Product Image - Menor */}
+              {/* Product Image */}
               <div className="relative overflow-hidden h-36">
                 <img
                   src={product.image || "/placeholder.svg?height=300&width=300"}
@@ -66,8 +66,7 @@ export default function Products() {
                   <button
                     className="bg-white p-1.5 rounded-full shadow-md hover:bg-red-50 hover:text-red-600 transition-colors"
                     onClick={(e) => {
-                      e.preventDefault() // Evita navegação para a página de detalhes
-                      // Aqui você pode adicionar lógica para favoritar
+                      e.preventDefault()
                     }}
                   >
                     <Heart className="h-3 w-3 text-gray-600" />
@@ -82,7 +81,7 @@ export default function Products() {
                 </div>
               </div>
 
-              {/* Product Info - Compacto */}
+              {/* Product Info */}
               <div className="p-4">
                 <h3 className="text-base font-bold text-gray-800 mb-2 group-hover:text-red-600 transition-colors line-clamp-1">
                   {product.name}
@@ -97,14 +96,26 @@ export default function Products() {
           ))}
         </div>
 
+        {/* Ver Todos os Produtos Button */}
+        <div className="text-center mb-8">
+          <Link
+            href="/produtos"
+            className="inline-flex items-center space-x-3 bg-gradient-to-r from-red-600 to-green-600 hover:from-red-700 hover:to-green-700 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+          >
+            <span>Ver Todos os Produtos</span>
+            <ArrowRight className="h-5 w-5" />
+          </Link>
+          <p className="text-sm text-gray-600 mt-2">Explore todo o nosso catálogo</p>
+        </div>
+
         {products.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-600 text-lg">Nenhum produto em destaque no momento.</p>
+            <p className="text-gray-600 text-lg">Nenhuma novidade no momento.</p>
           </div>
         )}
       </div>
 
-      {/* Scroll indicator - Menor */}
+      {/* Scroll indicator */}
       <div className="flex justify-center mt-6">
         <ChevronDown className="h-5 w-5 text-gray-600 animate-bounce" />
       </div>

@@ -21,16 +21,19 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
-            <a href="#inicio" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
+            <a href="/#inicio" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
               Início
             </a>
-            <a href="#produtos" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
+            <a href="/#novidades" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
+              Novidades
+            </a>
+            <a href="/produtos" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
               Produtos
             </a>
-            <a href="#sobre" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
+            <a href="/#sobre" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
               Sobre Nós
             </a>
-            <a href="#contato" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
+            <a href="/#contato" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
               Contato
             </a>
           </nav>
@@ -48,28 +51,35 @@ export default function Header() {
           <nav className="md:hidden mt-4 pb-4 border-t border-primary-100 pt-4">
             <div className="flex flex-col space-y-4">
               <a
-                href="#inicio"
+                href="/#inicio"
                 className="text-gray-700 hover:text-primary-600 transition-colors font-medium"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Início
               </a>
               <a
-                href="#produtos"
+                href="/#novidades"
+                className="text-gray-700 hover:text-primary-600 transition-colors font-medium"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Novidades
+              </a>
+              <a
+                href="/produtos"
                 className="text-gray-700 hover:text-primary-600 transition-colors font-medium"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Produtos
               </a>
               <a
-                href="#sobre"
+                href="/#sobre"
                 className="text-gray-700 hover:text-primary-600 transition-colors font-medium"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Sobre Nós
               </a>
               <a
-                href="#contato"
+                href="/#contato"
                 className="text-gray-700 hover:text-primary-600 transition-colors font-medium"
                 onClick={() => setIsMenuOpen(false)}
               >

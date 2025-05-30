@@ -1,6 +1,7 @@
 import { put, list } from "@vercel/blob"
 
 const PRODUCTS_FILE = "products.json"
+const SETTINGS_FILE = "site-settings.json"
 
 export interface Product {
   id: string
@@ -11,6 +12,12 @@ export interface Product {
   category: string
   featured: boolean
   order: number
+}
+
+export interface SiteSettings {
+  heroImage: string
+  heroTitle: string
+  heroSubtitle: string
 }
 
 // Produtos padrão (caso não existam dados na nuvem)
@@ -77,6 +84,14 @@ const defaultProducts: Product[] = [
   },
 ]
 
+// Configurações padrão do site
+const defaultSettings: SiteSettings = {
+  heroImage: "/images/principal.jpg",
+  heroTitle: "Tudo para seu escritório e escola",
+  heroSubtitle:
+    "Na Papelaria você encontra os melhores produtos para escritório, escola e casa com preços imbatíveis e atendimento de qualidade excepcional.",
+}
+
 // Carregar produtos da nuvem
 export async function loadProductsFromCloud(): Promise<Product[]> {
   try {
@@ -120,15 +135,10 @@ export async function saveProductsToCloud(products: Product[]): Promise<void> {
   try {
     console.log("💾 [STORAGE] === INICIANDO SALVAMENTO ===")
     console.log("📊 [STORAGE] Número de produtos a salvar:", products.length)
-    console.log("🔍 [STORAGE] Primeiro produto:", products[0] ? JSON.stringify(products[0], null, 2) : "Nenhum")
 
     // Validar dados básicos
     if (!Array.isArray(products)) {
       throw new Error("Dados de produtos inválidos - não é um array")
-    }
-
-    if (products.length === 0) {
-      console.warn("⚠️ [STORAGE] Array de produtos está vazio")
     }
 
     // Validar estrutura dos produtos
@@ -145,12 +155,8 @@ export async function saveProductsToCloud(products: Product[]): Promise<void> {
     // Converter para JSON
     const jsonData = JSON.stringify(products, null, 2)
     console.log("📝 [STORAGE] JSON gerado, tamanho:", jsonData.length, "caracteres")
-    console.log("🔍 [STORAGE] Primeiros 200 chars do JSON:", jsonData.substring(0, 200))
 
-    // Salvar na Blob - remover allowOverwrite
-    console.log("☁️ [STORAGE] Enviando para Vercel Blob...")
-    console.log("📁 [STORAGE] Nome do arquivo:", PRODUCTS_FILE)
-
+    // Salvar na Blob
     const blob = await put(PRODUCTS_FILE, jsonData, {
       access: "public",
       contentType: "application/json",
@@ -158,18 +164,56 @@ export async function saveProductsToCloud(products: Product[]): Promise<void> {
 
     console.log("✅ [STORAGE] === SALVAMENTO CONCLUÍDO ===")
     console.log("🔗 [STORAGE] URL do arquivo:", blob.url)
-    console.log("📏 [STORAGE] Tamanho do JSON:", jsonData.length, "caracteres")
   } catch (error) {
     console.error("❌ [STORAGE] === ERRO NO SALVAMENTO ===")
-    console.error("📋 [STORAGE] Tipo do erro:", typeof error)
     console.error("📋 [STORAGE] Erro completo:", error)
+    throw error
+  }
+}
 
-    if (error instanceof Error) {
-      console.error("📋 [STORAGE] Mensagem:", error.message)
-      console.error("📋 [STORAGE] Stack:", error.stack)
+// Carregar configurações do site
+export async function loadSiteSettings(): Promise<SiteSettings> {
+  try {
+    console.log("🔄 [STORAGE] Carregando configurações do site...")
+
+    const { blobs } = await list()
+    const settingsFile = blobs.find((blob) => blob.pathname === SETTINGS_FILE)
+
+    if (!settingsFile) {
+      console.log("📝 [STORAGE] Arquivo de configurações não encontrado, criando com dados padrão...")
+      await saveSiteSettings(defaultSettings)
+      return defaultSettings
     }
 
-    // Re-throw para que a API possa capturar
+    const response = await fetch(settingsFile.url)
+    if (!response.ok) {
+      throw new Error(`Erro ao carregar configurações: ${response.status}`)
+    }
+
+    const settings = await response.json()
+    console.log("✅ [STORAGE] Configurações carregadas da nuvem")
+    return settings
+  } catch (error) {
+    console.error("❌ [STORAGE] Erro ao carregar configurações:", error)
+    return defaultSettings
+  }
+}
+
+// Salvar configurações do site
+export async function saveSiteSettings(settings: SiteSettings): Promise<void> {
+  try {
+    console.log("💾 [STORAGE] Salvando configurações do site...")
+
+    const jsonData = JSON.stringify(settings, null, 2)
+
+    const blob = await put(SETTINGS_FILE, jsonData, {
+      access: "public",
+      contentType: "application/json",
+    })
+
+    console.log("✅ [STORAGE] Configurações salvas:", blob.url)
+  } catch (error) {
+    console.error("❌ [STORAGE] Erro ao salvar configurações:", error)
     throw error
   }
 }
@@ -186,10 +230,10 @@ export async function uploadImageToCloud(file: File): Promise<string> {
 
     console.log("📁 [STORAGE] Nome do arquivo:", filename)
 
-    // Upload para Blob - ajustar opções
+    // Upload para Blob
     const blob = await put(filename, file, {
       access: "public",
-      addRandomSuffix: true, // ✅ Gera nome único para evitar conflitos
+      addRandomSuffix: true,
     })
 
     console.log("✅ [STORAGE] Imagem salva na nuvem:", blob.url)
