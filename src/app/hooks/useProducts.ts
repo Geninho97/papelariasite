@@ -20,13 +20,29 @@ export function useProducts() {
   const [error, setError] = useState<string | null>(null)
   const [lastUpdate, setLastUpdate] = useState<number>(Date.now())
 
-  // Referência para o intervalo de polling
+  // Referências para controle de polling e proteção contra loops
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const isLoadingRef = useRef(false)
+  const lastLoadRef = useRef(0)
 
-  // Carregar produtos da nuvem
+  // Carregar produtos da nuvem com proteção contra loops
   const loadProducts = useCallback(
     async (silent = false) => {
+      // Evitar múltiplas chamadas simultâneas
+      if (isLoadingRef.current) {
+        return
+      }
+
+      // Evitar chamadas muito frequentes (mínimo 2 segundos entre carregamentos)
+      const now = Date.now()
+      if (now - lastLoadRef.current < 2000) {
+        return
+      }
+
       try {
+        isLoadingRef.current = true
+        lastLoadRef.current = now
+
         if (!silent) setLoading(true)
         setError(null)
 
@@ -56,13 +72,19 @@ export function useProducts() {
         }
       } finally {
         if (!silent) setLoading(false)
+        isLoadingRef.current = false
       }
     },
     [products.length],
   )
 
-  // Verificar atualizações
+  // Verificar atualizações com proteção
   const checkForUpdates = useCallback(async () => {
+    // Não verificar se já está carregando
+    if (isLoadingRef.current) {
+      return
+    }
+
     try {
       const response = await fetch("/api/products/last-modified", {
         cache: "no-store",
@@ -121,12 +143,12 @@ export function useProducts() {
     [loadProducts],
   )
 
-  // Iniciar polling para sincronização
+  // Iniciar polling para sincronização com intervalo maior
   useEffect(() => {
-    // Iniciar polling para verificar atualizações a cada 10 segundos
+    // Polling menos frequente - a cada 30 segundos em vez de 10
     pollingIntervalRef.current = setInterval(() => {
       checkForUpdates()
-    }, 10000)
+    }, 30000)
 
     // Limpar intervalo ao desmontar
     return () => {
@@ -136,20 +158,27 @@ export function useProducts() {
     }
   }, [checkForUpdates])
 
-  // Carregar produtos ao inicializar
+  // Carregar produtos ao inicializar - apenas uma vez
   useEffect(() => {
     loadProducts()
-  }, [loadProducts])
+  }, []) // Array vazio - executa apenas uma vez
 
-  // Sincronizar ao focar na janela
+  // Sincronizar ao focar na janela com throttling
   useEffect(() => {
+    let focusTimeout: NodeJS.Timeout
+
     const handleFocus = () => {
-      checkForUpdates()
+      // Debounce para evitar múltiplas chamadas
+      clearTimeout(focusTimeout)
+      focusTimeout = setTimeout(() => {
+        checkForUpdates()
+      }, 1000)
     }
 
     window.addEventListener("focus", handleFocus)
     return () => {
       window.removeEventListener("focus", handleFocus)
+      clearTimeout(focusTimeout)
     }
   }, [checkForUpdates])
 

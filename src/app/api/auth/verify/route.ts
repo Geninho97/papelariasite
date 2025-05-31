@@ -23,7 +23,7 @@ export async function GET(request: Request) {
       return NextResponse.json(
         {
           authenticated: false,
-          error: "Nenhum cookie encontrado",
+          error: "Não autenticado",
         },
         { status: 401 },
       )
@@ -43,7 +43,7 @@ export async function GET(request: Request) {
       return NextResponse.json(
         {
           authenticated: false,
-          error: "Token não encontrado ou inválido",
+          error: "Não autenticado",
         },
         { status: 401 },
       )
@@ -57,7 +57,7 @@ export async function GET(request: Request) {
         return NextResponse.json(
           {
             authenticated: false,
-            error: "Token expirado",
+            error: "Sessão expirada",
           },
           { status: 401 },
         )
@@ -71,7 +71,7 @@ export async function GET(request: Request) {
       return NextResponse.json(
         {
           authenticated: false,
-          error: "Token inválido ou expirado",
+          error: "Token inválido",
         },
         { status: 401 },
       )
