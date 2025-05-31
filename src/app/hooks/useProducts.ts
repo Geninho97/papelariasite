@@ -19,48 +19,47 @@ export function useProducts() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [lastUpdate, setLastUpdate] = useState<number>(Date.now())
-  
+
   // Referência para o intervalo de polling
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   // Carregar produtos da nuvem
-  const loadProducts = useCallback(async (silent: boolean = false) => {
-    try {
-      if (!silent) setLoading(true)
-      setError(null)
-      console.log("🔄 [HOOK] Carregando produtos da API...")
+  const loadProducts = useCallback(
+    async (silent = false) => {
+      try {
+        if (!silent) setLoading(true)
+        setError(null)
 
-      const response = await fetch("/api/products", {
-        cache: "no-store",
-        headers: {
-          "Cache-Control": "no-cache",
-        },
-      })
+        const response = await fetch("/api/products", {
+          cache: "no-store",
+          headers: {
+            "Cache-Control": "no-cache",
+          },
+        })
 
-      if (!response.ok) {
-        throw new Error(`Erro HTTP: ${response.status}`)
+        if (!response.ok) {
+          throw new Error(`Erro HTTP: ${response.status}`)
+        }
+
+        const data = await response.json()
+
+        if (data.success) {
+          setProducts(data.products || [])
+          setLastUpdate(Date.now())
+        } else {
+          throw new Error(data.error || "Erro desconhecido")
+        }
+      } catch (error) {
+        setError(error instanceof Error ? error.message : "Erro ao carregar produtos")
+        if (products.length === 0) {
+          setProducts([])
+        }
+      } finally {
+        if (!silent) setLoading(false)
       }
-
-      const data = await response.json()
-
-      if (data.success) {
-        setProducts(data.products || [])
-        setLastUpdate(Date.now())
-        console.log("✅ [HOOK] Produtos carregados:", data.products?.length || 0)
-      } else {
-        throw new Error(data.error || "Erro desconhecido")
-      }
-    } catch (error) {
-      console.error("❌ [HOOK] Erro ao carregar produtos:", error)
-      setError(error instanceof Error ? error.message : "Erro ao carregar produtos")
-      // Em caso de erro, não alterar os produtos existentes
-      if (products.length === 0) {
-        setProducts([])
-      }
-    } finally {
-      if (!silent) setLoading(false)
-    }
-  }, [products.length])
+    },
+    [products.length],
+  )
 
   // Verificar atualizações
   const checkForUpdates = useCallback(async () => {
@@ -75,24 +74,22 @@ export function useProducts() {
       if (!response.ok) return
 
       const data = await response.json()
-      
+
       // Se o timestamp do servidor for mais recente que nosso último update, recarregar
       if (data.lastModified && data.lastModified > lastUpdate) {
-        console.log("🔄 [SYNC] Detectada atualização remota, recarregando produtos...")
         loadProducts(true) // Carregar silenciosamente
       }
     } catch (error) {
-      console.error("❌ [SYNC] Erro ao verificar atualizações:", error)
+      // Silencioso - não mostrar erro de sincronização
     }
   }, [lastUpdate, loadProducts])
 
-  // Salvar produtos na nuvem - OTIMIZADO
+  // Salvar produtos na nuvem
   const saveProducts = useCallback(
     async (newProducts: Product[]) => {
       try {
         setSaving(true)
         setError(null)
-        console.log("💾 [HOOK] Salvando produtos na nuvem...")
 
         // ATUALIZAÇÃO OTIMISTA: Atualizar UI imediatamente
         setProducts(newProducts)
@@ -115,9 +112,7 @@ export function useProducts() {
 
         // Atualizar timestamp após salvamento bem-sucedido
         setLastUpdate(Date.now())
-        console.log("✅ [HOOK] Produtos salvos na nuvem")
       } catch (error) {
-        console.error("❌ [HOOK] Erro ao salvar produtos:", error)
         setError(error instanceof Error ? error.message : "Erro ao salvar produtos")
       } finally {
         setSaving(false)
@@ -146,16 +141,15 @@ export function useProducts() {
     loadProducts()
   }, [loadProducts])
 
-  // Sincronizar ao focar na janela (quando o usuário volta à aba)
+  // Sincronizar ao focar na janela
   useEffect(() => {
     const handleFocus = () => {
-      console.log("🔄 [SYNC] Janela focada, verificando atualizações...")
       checkForUpdates()
     }
 
-    window.addEventListener('focus', handleFocus)
+    window.addEventListener("focus", handleFocus)
     return () => {
-      window.removeEventListener('focus', handleFocus)
+      window.removeEventListener("focus", handleFocus)
     }
   }, [checkForUpdates])
 
@@ -166,8 +160,7 @@ export function useProducts() {
       .slice(0, 6)
   }, [products])
 
-  // OPERAÇÕES OTIMIZADAS - Atualização local imediata + salvamento em background
-
+  // OPERAÇÕES OTIMIZADAS
   const addProduct = useCallback(
     async (product: Omit<Product, "id">) => {
       const newProduct: Product = {
@@ -175,8 +168,6 @@ export function useProducts() {
         id: Date.now().toString(),
       }
       const newProducts = [...products, newProduct]
-
-      // Salvar em background sem bloquear UI
       saveProducts(newProducts)
     },
     [products, saveProducts],
@@ -185,8 +176,6 @@ export function useProducts() {
   const updateProduct = useCallback(
     async (id: string, updates: Partial<Product>) => {
       const newProducts = products.map((product) => (product.id === id ? { ...product, ...updates } : product))
-
-      // Salvar em background sem bloquear UI
       saveProducts(newProducts)
     },
     [products, saveProducts],
@@ -195,8 +184,6 @@ export function useProducts() {
   const deleteProduct = useCallback(
     async (id: string) => {
       const newProducts = products.filter((product) => product.id !== id)
-
-      // Salvar em background sem bloquear UI
       saveProducts(newProducts)
     },
     [products, saveProducts],
@@ -212,14 +199,11 @@ export function useProducts() {
           order: newOrder !== -1 ? newOrder + 1 : product.order,
         }
       })
-
-      // Salvar em background sem bloquear UI
       saveProducts(newProducts)
     },
     [products, saveProducts],
   )
 
-  // Função para toggle featured otimizada
   const toggleFeatured = useCallback(
     async (productId: string) => {
       const product = products.find((p) => p.id === productId)

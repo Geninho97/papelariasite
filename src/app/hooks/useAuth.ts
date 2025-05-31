@@ -13,38 +13,23 @@ export function useAuth() {
       setLoading(true)
       setError(null)
 
-      console.log("🔍 [AUTH HOOK] Verificando autenticação...")
-
       const response = await fetch("/api/auth/verify", {
         method: "GET",
-        credentials: "include", // Incluir cookies
+        credentials: "include",
         headers: {
           "Cache-Control": "no-cache",
-          "Pragma": "no-cache", // Forçar não usar cache
+          Pragma: "no-cache",
         },
       })
 
-      console.log("📡 [AUTH HOOK] Response status:", response.status)
-      console.log("📡 [AUTH HOOK] Response ok:", response.ok)
-
       const data = await response.json()
-      console.log("📋 [AUTH HOOK] Response data:", data)
 
       if (response.ok && data.authenticated) {
         setIsAuthenticated(true)
-        console.log("✅ [AUTH HOOK] Usuário autenticado")
       } else {
         setIsAuthenticated(false)
-        console.log("❌ [AUTH HOOK] Usuário não autenticado:", data.error)
-        console.log("🔍 [AUTH HOOK] Debug info:", data.debug)
-
-        // Se há informações de debug, mostrar no erro
-        if (data.debug) {
-          setError(`${data.error} (${data.debug})`)
-        }
       }
     } catch (error) {
-      console.error("❌ [AUTH HOOK] Erro ao verificar autenticação:", error)
       setIsAuthenticated(false)
       setError("Erro de conexão")
     } finally {
@@ -56,7 +41,6 @@ export function useAuth() {
   const login = async (password: string): Promise<boolean> => {
     try {
       setError(null)
-      console.log("🔐 [AUTH HOOK] Tentando login...")
 
       const response = await fetch("/api/auth/login", {
         method: "POST",
@@ -67,77 +51,42 @@ export function useAuth() {
         body: JSON.stringify({ password }),
       })
 
-      console.log("📡 [AUTH HOOK] Login response status:", response.status)
-
       const data = await response.json()
-      console.log("📋 [AUTH HOOK] Login response data:", data)
 
       if (data.success) {
         setIsAuthenticated(true)
-        console.log("✅ [AUTH HOOK] Login bem-sucedido")
         return true
       } else {
-        console.log("❌ [AUTH HOOK] Login falhou:", data.error)
-        setError(data.debug ? `${data.error} (${data.debug})` : data.error)
+        setError(data.error || "Erro no login")
         return false
       }
     } catch (error) {
-      console.error("❌ [AUTH HOOK] Erro no login:", error)
       setError("Erro de conexão")
       return false
     }
   }
 
-  // Logout MELHORADO
+  // Logout
   const logout = async () => {
     try {
-      console.log("🚪 [AUTH HOOK] === LOGOUT INICIADO ===")
-
-      // 1. Atualizar estado imediatamente
       setIsAuthenticated(false)
       setError(null)
 
-      // 2. Chamar API de logout
-      const response = await fetch("/api/auth/logout", {
+      await fetch("/api/auth/logout", {
         method: "POST",
         credentials: "include",
-        headers: {
-          "Cache-Control": "no-cache",
-        },
       })
 
-      const data = await response.json()
-      console.log("📋 [AUTH HOOK] Logout response:", data)
+      // Limpar cookie via JavaScript como backup
+      document.cookie = "admin-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/"
 
-      // 3. Limpar cookies do lado do cliente também (fallback)
-      if (typeof document !== "undefined") {
-        // Remover cookie via JavaScript como backup
-        document.cookie = "admin-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax"
-        console.log("🍪 [AUTH HOOK] Cookie removido via JavaScript")
-      }
-
-      // 4. Forçar recarregamento da página para limpar qualquer estado
-      if (typeof window !== "undefined") {
-        console.log("🔄 [AUTH HOOK] Recarregando página...")
-        window.location.href = "/admin"
-      }
-
-      console.log("✅ [AUTH HOOK] === LOGOUT CONCLUÍDO ===")
+      // Redirecionar para página de login
+      window.location.href = "/admin"
     } catch (error) {
-      console.error("❌ [AUTH HOOK] Erro no logout:", error)
-      
-      // Mesmo com erro, garantir que o usuário seja deslogado localmente
+      // Mesmo com erro, garantir logout local
       setIsAuthenticated(false)
-      
-      // Limpar cookie via JavaScript como fallback
-      if (typeof document !== "undefined") {
-        document.cookie = "admin-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax"
-      }
-      
-      // Recarregar página mesmo com erro
-      if (typeof window !== "undefined") {
-        window.location.href = "/admin"
-      }
+      document.cookie = "admin-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/"
+      window.location.href = "/admin"
     }
   }
 
