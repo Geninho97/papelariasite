@@ -1,6 +1,6 @@
 "use client"
 
-import { Heart, ChevronDown, ArrowRight } from "lucide-react"
+import { Heart, ChevronDown, ArrowRight, Plus } from "lucide-react"
 import { useProducts } from "../hooks/useProducts"
 import Link from "next/link"
 
@@ -26,7 +26,52 @@ export default function Products() {
       >
         <div className="container mx-auto px-4 text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-red-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando novidades...</p>
+          <p className="mt-4 text-gray-600">Carregando novidades da nuvem...</p>
+        </div>
+      </section>
+    )
+  }
+
+  // Se não há produtos, mostrar mensagem para adicionar
+  if (products.length === 0) {
+    return (
+      <section
+        id="novidades"
+        className="min-h-screen bg-gradient-to-br from-white via-red-50 to-green-50 py-8 flex flex-col justify-center"
+      >
+        <div className="container mx-auto px-4 text-center">
+          {/* Header */}
+          <div className="mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-3">Novidades</h2>
+            <p className="text-base text-gray-600 max-w-2xl mx-auto">
+              Descubra os nossos produtos mais recentes e populares em destaque
+            </p>
+            <div className="w-20 h-1 bg-gradient-to-r from-red-500 to-green-500 mx-auto mt-3 rounded-full"></div>
+          </div>
+
+          {/* Empty State */}
+          <div className="bg-white rounded-xl shadow-lg p-12 max-w-2xl mx-auto">
+            <div className="text-gray-400 mb-6">
+              <Plus className="h-24 w-24 mx-auto" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-4">Nenhum produto em destaque</h3>
+            <p className="text-gray-600 mb-8 text-lg">
+              Os produtos são carregados diretamente da base de dados na nuvem. Use o painel de administração para
+              adicionar produtos em destaque.
+            </p>
+            <Link
+              href="/admin"
+              className="inline-flex items-center space-x-3 bg-gradient-to-r from-red-600 to-green-600 hover:from-red-700 hover:to-green-700 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            >
+              <Plus className="h-5 w-5" />
+              <span>Ir para o Painel Admin</span>
+            </Link>
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="flex justify-center mt-8">
+          <ChevronDown className="h-5 w-5 text-gray-600 animate-bounce" />
         </div>
       </section>
     )
@@ -38,7 +83,7 @@ export default function Products() {
       className="min-h-screen bg-gradient-to-br from-white via-red-50 to-green-50 py-8 flex flex-col justify-center"
     >
       <div className="container mx-auto px-4">
-        {/* Header - Atualizado para "Novidades" */}
+        {/* Header */}
         <div className="text-center mb-8">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-3">Novidades</h2>
           <p className="text-base text-gray-600 max-w-2xl mx-auto">
@@ -107,12 +152,6 @@ export default function Products() {
           </Link>
           <p className="text-sm text-gray-600 mt-2">Explore todo o nosso catálogo</p>
         </div>
-
-        {products.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-600 text-lg">Nenhuma novidade no momento.</p>
-          </div>
-        )}
       </div>
 
       {/* Scroll indicator */}

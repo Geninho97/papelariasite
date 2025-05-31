@@ -20,71 +20,7 @@ export interface SiteSettings {
   heroSubtitle: string
 }
 
-// Produtos padrão (caso não existam dados na nuvem)
-const defaultProducts: Product[] = [
-  {
-    id: "1",
-    name: "Puzzle 3D",
-    description: "Cria figuras de diferentes animais marinhos com puzzles 3D!",
-    price: 45.9,
-    image: "/images/3d.jpg",
-    category: "Brinquedos",
-    featured: true,
-    order: 1,
-  },
-  {
-    id: "2",
-    name: "X-Ato Colorido",
-    description: "X-ato colorido para cortes precisos!",
-    price: 32.5,
-    image: "/images/xato.jpg",
-    category: "Escritório",
-    featured: true,
-    order: 2,
-  },
-  {
-    id: "3",
-    name: "Canetas com Glitter",
-    description: "Canetas com Glitter coloridas de alta qualidade!",
-    price: 18.9,
-    image: "/images/caneta.jpg",
-    category: "Escrita",
-    featured: true,
-    order: 3,
-  },
-  {
-    id: "4",
-    name: "Caneta de 5 Cores",
-    description: "Caneta onde a escolha da cor é toda sua!",
-    price: 22.9,
-    image: "/images/5caneta.jpg",
-    category: "Diversão",
-    featured: true,
-    order: 4,
-  },
-  {
-    id: "5",
-    name: "PEN Kingston 32Gb",
-    description: "Leve, rápida e com espaço para tudo! Os teus ficheiros vão adorar esta viagem.",
-    price: 89.9,
-    image: "/images/pen.jpg",
-    category: "Eletrônicos",
-    featured: true,
-    order: 5,
-  },
-  {
-    id: "6",
-    name: "Mochila Escolar",
-    description: "Mochila Escolar do Stich, de certeza que vais adorar!",
-    price: 25.9,
-    image: "/images/bag.jpg",
-    category: "Escolar",
-    featured: true,
-    order: 6,
-  },
-]
-
-// Configurações padrão do site
+// Configurações padrão do site (apenas para fallback)
 const defaultSettings: SiteSettings = {
   heroImage: "/images/principal.jpg",
   heroTitle: "Tudo para seu escritório e escola",
@@ -92,7 +28,7 @@ const defaultSettings: SiteSettings = {
     "Na Papelaria você encontra os melhores produtos para escritório, escola e casa com preços imbatíveis e atendimento de qualidade excepcional.",
 }
 
-// Carregar produtos da nuvem
+// Carregar produtos da nuvem - SEM produtos padrão
 export async function loadProductsFromCloud(): Promise<Product[]> {
   try {
     console.log("🔄 [STORAGE] Carregando produtos da nuvem...")
@@ -107,9 +43,9 @@ export async function loadProductsFromCloud(): Promise<Product[]> {
     const productsFile = blobs.find((blob) => blob.pathname === PRODUCTS_FILE)
 
     if (!productsFile) {
-      console.log("📝 [STORAGE] Arquivo de produtos não encontrado, criando com dados padrão...")
-      await saveProductsToCloud(defaultProducts)
-      return defaultProducts
+      console.log("📝 [STORAGE] Arquivo de produtos não encontrado na nuvem")
+      console.log("🔄 [STORAGE] Retornando array vazio - produtos devem ser adicionados via admin")
+      return []
     }
 
     console.log("📁 [STORAGE] Arquivo encontrado:", productsFile.url)
@@ -125,8 +61,8 @@ export async function loadProductsFromCloud(): Promise<Product[]> {
     return products
   } catch (error) {
     console.error("❌ [STORAGE] Erro ao carregar produtos da nuvem:", error)
-    console.log("🔄 [STORAGE] Usando produtos padrão...")
-    return defaultProducts
+    console.log("🔄 [STORAGE] Retornando array vazio devido ao erro")
+    return []
   }
 }
 
@@ -240,6 +176,27 @@ export async function uploadImageToCloud(file: File): Promise<string> {
     return blob.url
   } catch (error) {
     console.error("❌ [STORAGE] Erro ao fazer upload da imagem:", error)
+    throw error
+  }
+}
+
+// Função para inicializar a base de dados com produtos de exemplo (apenas para primeira vez)
+export async function initializeDatabase(): Promise<void> {
+  try {
+    console.log("🔄 [STORAGE] Verificando se base de dados precisa ser inicializada...")
+
+    const { blobs } = await list()
+    const productsFile = blobs.find((blob) => blob.pathname === PRODUCTS_FILE)
+
+    if (!productsFile) {
+      console.log("📝 [STORAGE] Base de dados vazia, criando arquivo inicial...")
+      await saveProductsToCloud([])
+      console.log("✅ [STORAGE] Base de dados inicializada com array vazio")
+    } else {
+      console.log("✅ [STORAGE] Base de dados já existe")
+    }
+  } catch (error) {
+    console.error("❌ [STORAGE] Erro ao inicializar base de dados:", error)
     throw error
   }
 }

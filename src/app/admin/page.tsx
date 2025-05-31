@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import { useProducts, type Product } from "../hooks/useProducts"
 import { useAuth } from "../hooks/useAuth"
-import { Plus, Edit, Trash2, Save, X, ArrowUp, ArrowDown, Eye, LogOut, RefreshCw, Cloud } from "lucide-react"
+import { Plus, Edit, Trash2, Save, X, ArrowUp, ArrowDown, Eye, LogOut, RefreshCw, Cloud, Database } from "lucide-react"
 import Link from "next/link"
 import LoginForm from "./components/LoginForm"
 import ImageUpload from "./components/ImageUpload"
@@ -46,6 +46,7 @@ export default function AdminPage() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600 mx-auto mb-4"></div>
           <p className="text-xl text-gray-600">Carregando dados da nuvem...</p>
+          <p className="text-sm text-gray-500 mt-2">Todos os produtos são carregados da base de dados</p>
         </div>
       </div>
     )
@@ -129,16 +130,20 @@ export default function AdminPage() {
             <div>
               <h1 className="text-3xl font-bold text-gray-800 flex items-center space-x-3">
                 <span>Painel de Administração</span>
-                <Cloud className="h-8 w-8 text-green-600" />
+                <Database className="h-8 w-8 text-green-600" />
               </h1>
-              <p className="text-gray-600 mt-2">Gerir produtos na nuvem - Papelaria Coutyfil</p>
-              <div className="flex items-center space-x-2 mt-2">
+              <p className="text-gray-600 mt-2">Gerir produtos na base de dados - Papelaria Coutyfil</p>
+              <div className="flex items-center space-x-4 mt-2">
                 <div className="flex items-center space-x-1 text-sm text-green-600">
                   <Cloud className="h-4 w-4" />
-                  <span>Autenticação segura ativa</span>
+                  <span>100% Base de Dados na Nuvem</span>
+                </div>
+                <div className="flex items-center space-x-1 text-sm text-blue-600">
+                  <Database className="h-4 w-4" />
+                  <span>{products.length} produtos na base</span>
                 </div>
                 {saving && (
-                  <div className="flex items-center space-x-1 text-sm text-blue-600">
+                  <div className="flex items-center space-x-1 text-sm text-orange-600">
                     <RefreshCw className="h-4 w-4 animate-spin" />
                     <span>Salvando...</span>
                   </div>
@@ -177,14 +182,17 @@ export default function AdminPage() {
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-lg font-semibold text-gray-700">Total de Produtos</h3>
             <p className="text-3xl font-bold text-blue-600">{products.length}</p>
+            <p className="text-sm text-gray-500 mt-1">Carregados da base de dados</p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-lg font-semibold text-gray-700">Produtos em Destaque</h3>
             <p className="text-3xl font-bold text-green-600">{featuredProducts.length}/6</p>
+            <p className="text-sm text-gray-500 mt-1">Visíveis na página inicial</p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-lg font-semibold text-gray-700">Categorias</h3>
             <p className="text-3xl font-bold text-purple-600">{categories.length}</p>
+            <p className="text-sm text-gray-500 mt-1">Disponíveis para produtos</p>
           </div>
         </div>
 
@@ -192,15 +200,15 @@ export default function AdminPage() {
         <div className="mb-6">
           <button
             onClick={() => setIsAddingProduct(true)}
-            disabled={featuredProducts.length >= 6 || saving}
+            disabled={saving}
             className="flex items-center space-x-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             <Plus className="h-5 w-5" />
-            <span>Adicionar Produto</span>
+            <span>Adicionar Produto à Base de Dados</span>
           </button>
-          {featuredProducts.length >= 6 && (
-            <p className="text-sm text-gray-500 mt-2">Máximo de 6 produtos em destaque atingido</p>
-          )}
+          <p className="text-sm text-gray-500 mt-2">
+            Todos os produtos são salvos diretamente na base de dados na nuvem
+          </p>
         </div>
 
         {/* Add/Edit Product Form */}
@@ -284,7 +292,7 @@ export default function AdminPage() {
                   className="flex items-center space-x-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400"
                 >
                   {saving ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                  <span>{saving ? "Salvando..." : editingProduct ? "Atualizar" : "Adicionar"}</span>
+                  <span>{saving ? "Salvando na Base..." : editingProduct ? "Atualizar" : "Adicionar"}</span>
                 </button>
                 <button
                   type="button"
@@ -303,93 +311,117 @@ export default function AdminPage() {
         {/* Featured Products */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
           <h2 className="text-xl font-bold text-gray-800 mb-4">Produtos em Destaque (Ordem de Exibição)</h2>
-          <div className="space-y-4">
-            {featuredProducts.map((product, index) => (
-              <div key={product.id} className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg">
-                <img
-                  src={product.image || "/placeholder.svg?height=80&width=80"}
-                  alt={product.name}
-                  className="w-16 h-16 object-cover rounded-lg"
-                />
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-800">{product.name}</h3>
-                  <p className="text-sm text-gray-600">
-                    {product.category} • €{product.price.toFixed(2)}
-                  </p>
+          {featuredProducts.length === 0 ? (
+            <div className="text-center py-8">
+              <Database className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600 text-lg">Nenhum produto em destaque na base de dados</p>
+              <p className="text-gray-500 text-sm mt-2">Adicione produtos e marque-os como destaque</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {featuredProducts.map((product, index) => (
+                <div key={product.id} className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg">
+                  <img
+                    src={product.image || "/placeholder.svg?height=80&width=80"}
+                    alt={product.name}
+                    className="w-16 h-16 object-cover rounded-lg"
+                  />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-800">{product.name}</h3>
+                    <p className="text-sm text-gray-600">
+                      {product.category} • €{product.price.toFixed(2)}
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => moveProduct(index, "up")}
+                      disabled={index === 0 || saving}
+                      className="p-2 text-gray-600 hover:text-gray-800 disabled:text-gray-300 disabled:cursor-not-allowed"
+                    >
+                      <ArrowUp className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => moveProduct(index, "down")}
+                      disabled={index === featuredProducts.length - 1 || saving}
+                      className="p-2 text-gray-600 hover:text-gray-800 disabled:text-gray-300 disabled:cursor-not-allowed"
+                    >
+                      <ArrowDown className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => handleEdit(product)}
+                      disabled={saving}
+                      className="p-2 text-blue-600 hover:text-blue-800 disabled:text-gray-400"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => deleteProduct(product.id)}
+                      disabled={saving}
+                      className="p-2 text-red-600 hover:text-red-800 disabled:text-gray-400"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => moveProduct(index, "up")}
-                    disabled={index === 0 || saving}
-                    className="p-2 text-gray-600 hover:text-gray-800 disabled:text-gray-300 disabled:cursor-not-allowed"
-                  >
-                    <ArrowUp className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => moveProduct(index, "down")}
-                    disabled={index === featuredProducts.length - 1 || saving}
-                    className="p-2 text-gray-600 hover:text-gray-800 disabled:text-gray-300 disabled:cursor-not-allowed"
-                  >
-                    <ArrowDown className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => handleEdit(product)}
-                    disabled={saving}
-                    className="p-2 text-blue-600 hover:text-blue-800 disabled:text-gray-400"
-                  >
-                    <Edit className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => deleteProduct(product.id)}
-                    disabled={saving}
-                    className="p-2 text-red-600 hover:text-red-800 disabled:text-gray-400"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* All Products */}
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Todos os Produtos</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {products.map((product) => (
-              <div key={product.id} className="border border-gray-200 rounded-lg p-4">
-                <img
-                  src={product.image || "/placeholder.svg?height=150&width=150"}
-                  alt={product.name}
-                  className="w-full h-32 object-cover rounded-lg mb-3"
-                />
-                <h3 className="font-semibold text-gray-800 mb-1">{product.name}</h3>
-                <p className="text-sm text-gray-600 mb-2">
-                  {product.category} • €{product.price.toFixed(2)}
-                </p>
-                <div className="flex justify-between items-center">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      product.featured ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    {product.featured ? "Em Destaque" : "Normal"}
-                  </span>
-                  <button
-                    onClick={() => toggleFeatured(product.id)}
-                    disabled={saving}
-                    className={`px-3 py-1 rounded text-xs font-medium disabled:opacity-50 ${
-                      product.featured
-                        ? "bg-red-100 text-red-800 hover:bg-red-200"
-                        : "bg-green-100 text-green-800 hover:bg-green-200"
-                    }`}
-                  >
-                    {product.featured ? "Remover" : "Destacar"}
-                  </button>
+          <h2 className="text-xl font-bold text-gray-800 mb-4">Todos os Produtos na Base de Dados</h2>
+          {products.length === 0 ? (
+            <div className="text-center py-12">
+              <Database className="h-24 w-24 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">Base de dados vazia</h3>
+              <p className="text-gray-600 mb-4">
+                Não há produtos armazenados na base de dados. Adicione o primeiro produto para começar.
+              </p>
+              <button
+                onClick={() => setIsAddingProduct(true)}
+                className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
+              >
+                Adicionar Primeiro Produto
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {products.map((product) => (
+                <div key={product.id} className="border border-gray-200 rounded-lg p-4">
+                  <img
+                    src={product.image || "/placeholder.svg?height=150&width=150"}
+                    alt={product.name}
+                    className="w-full h-32 object-cover rounded-lg mb-3"
+                  />
+                  <h3 className="font-semibold text-gray-800 mb-1">{product.name}</h3>
+                  <p className="text-sm text-gray-600 mb-2">
+                    {product.category} • €{product.price.toFixed(2)}
+                  </p>
+                  <div className="flex justify-between items-center">
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        product.featured ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {product.featured ? "Em Destaque" : "Normal"}
+                    </span>
+                    <button
+                      onClick={() => toggleFeatured(product.id)}
+                      disabled={saving}
+                      className={`px-3 py-1 rounded text-xs font-medium disabled:opacity-50 ${
+                        product.featured
+                          ? "bg-red-100 text-red-800 hover:bg-red-200"
+                          : "bg-green-100 text-green-800 hover:bg-green-200"
+                      }`}
+                    >
+                      {product.featured ? "Remover" : "Destacar"}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
