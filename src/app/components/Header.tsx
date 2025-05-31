@@ -16,7 +16,7 @@ export default function Header() {
         <div className="flex justify-between items-center">
           {/* Logo */}
           <div className="flex items-center space-x-3">
-            <a href="/#inicio">
+            <a href="/#inicio" className="transition-transform duration-300 hover:scale-110">
               <img src="/images/logo.png" alt="Papelaria Coutyfil Logo" className="h-12 w-auto" />
             </a>
           </div>
