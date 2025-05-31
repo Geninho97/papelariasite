@@ -3,13 +3,23 @@ import { SignJWT } from "jose"
 
 export const dynamic = "force-dynamic"
 
-// Senha segura no backend (variável de ambiente)
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "Papelaria2025"
-const JWT_SECRET = process.env.JWT_SECRET || "papelaria-secret-key-super-segura-2025"
-
 export async function POST(request: Request) {
   try {
     console.log("🔐 [AUTH] Tentativa de login...")
+
+    // Verificar se as variáveis de ambiente estão configuradas
+    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
+    const JWT_SECRET = process.env.JWT_SECRET
+
+    if (!ADMIN_PASSWORD) {
+      console.error("❌ [AUTH] ADMIN_PASSWORD não configurado")
+      return NextResponse.json({ error: "Configuração de segurança não encontrada", success: false }, { status: 500 })
+    }
+
+    if (!JWT_SECRET) {
+      console.error("❌ [AUTH] JWT_SECRET não configurado")
+      return NextResponse.json({ error: "Configuração de segurança não encontrada", success: false }, { status: 500 })
+    }
 
     const { password } = await request.json()
 
@@ -17,7 +27,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Senha é obrigatória", success: false }, { status: 400 })
     }
 
-    // Verificar senha
+    // Verificar senha usando apenas a variável de ambiente
     if (password !== ADMIN_PASSWORD) {
       console.log("❌ [AUTH] Senha incorreta")
       return NextResponse.json({ error: "Senha incorreta", success: false }, { status: 401 })
@@ -25,8 +35,14 @@ export async function POST(request: Request) {
 
     console.log("✅ [AUTH] Login bem-sucedido")
 
-    // Criar JWT token
-    const token = await new SignJWT({ admin: true, timestamp: Date.now() })
+    // Criar JWT token usando a chave secreta da variável de ambiente
+    const token = await new SignJWT({
+      admin: true,
+      timestamp: Date.now(),
+      // Adicionar mais informações de segurança
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + 24 * 60 * 60, // 24 horas
+    })
       .setProtectedHeader({ alg: "HS256" })
       .setExpirationTime("24h")
       .sign(new TextEncoder().encode(JWT_SECRET))
@@ -34,14 +50,15 @@ export async function POST(request: Request) {
     // Retornar token
     const response = NextResponse.json({ success: true, message: "Login bem-sucedido" })
 
-    // Definir cookie seguro com configurações mais específicas
+    // Definir cookie seguro
     response.cookies.set("admin-token", token, {
       httpOnly: true, // Não acessível via JavaScript
       secure: process.env.NODE_ENV === "production", // HTTPS em produção
-      sameSite: "lax", // Mudança de "strict" para "lax" para melhor compatibilidade
+      sameSite: "lax",
       maxAge: 24 * 60 * 60, // 24 horas
       path: "/",
-      domain: process.env.NODE_ENV === "production" ? ".vercel.app" : undefined, // Domain para produção
+      // Adicionar domain apenas em produção se necessário
+      ...(process.env.NODE_ENV === "production" && { domain: process.env.VERCEL_URL }),
     })
 
     return response

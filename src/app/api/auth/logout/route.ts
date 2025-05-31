@@ -8,13 +8,15 @@ export async function POST() {
 
     const response = NextResponse.json({ success: true, message: "Logout bem-sucedido" })
 
-    // Remover cookie
+    // Remover cookie de forma segura
     response.cookies.set("admin-token", "", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: 0, // Expira imediatamente
       path: "/",
+      // Adicionar domain apenas em produção se necessário
+      ...(process.env.NODE_ENV === "production" && { domain: process.env.VERCEL_URL }),
     })
 
     return response
