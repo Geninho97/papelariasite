@@ -5,10 +5,25 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useProducts, type Product } from "../hooks/useProducts"
 import { useAuth } from "../hooks/useAuth"
-import { Plus, Edit, Trash2, Save, X, ArrowUp, ArrowDown, Eye, LogOut, RefreshCw, Database, Check, AlertCircle, Clock } from 'lucide-react'
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Save,
+  X,
+  ArrowUp,
+  ArrowDown,
+  Eye,
+  RefreshCw,
+  Database,
+  Check,
+  AlertCircle,
+  Clock,
+} from "lucide-react"
 import Link from "next/link"
 import LoginForm from "./components/LoginForm"
 import ImageUpload from "./components/ImageUpload"
+import LogoutButton from "./components/LogoutButton"
 
 export default function AdminPage() {
   const { isAuthenticated, loading: authLoading, error: authError, login, logout } = useAuth()
@@ -23,7 +38,7 @@ export default function AdminPage() {
     saving,
     refreshProducts,
     error,
-    lastUpdate
+    lastUpdate,
   } = useProducts()
   const [isAddingProduct, setIsAddingProduct] = useState(false)
   const [editingProduct, setEditingProduct] = useState<string | null>(null)
@@ -42,9 +57,7 @@ export default function AdminPage() {
   useEffect(() => {
     if (lastUpdate) {
       const date = new Date(lastUpdate)
-      setLastUpdateFormatted(
-        `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`
-      )
+      setLastUpdateFormatted(`${date.toLocaleDateString()} ${date.toLocaleTimeString()}`)
     }
   }, [lastUpdate])
 
@@ -111,7 +124,6 @@ export default function AdminPage() {
       }
       setFormData({})
     } catch (error) {
-      console.error("Erro ao salvar produto:", error)
       showStatus("error", "Erro ao salvar produto")
     }
   }
@@ -133,10 +145,8 @@ export default function AdminPage() {
     const targetIndex = direction === "up" ? index - 1 : index + 1
 
     if (targetIndex >= 0 && targetIndex < newProducts.length) {
-      // Trocar posições
       ;[newProducts[index], newProducts[targetIndex]] = [newProducts[targetIndex], newProducts[index]]
 
-      // Atualizar as ordens de forma otimizada
       try {
         for (let i = 0; i < newProducts.length; i++) {
           await updateProduct(newProducts[i].id, { order: i + 1 })
@@ -235,30 +245,9 @@ export default function AdminPage() {
                 <Eye className="h-4 w-4" />
                 <span>Ver Site</span>
               </Link>
-              <button
-                onClick={logout}
-                className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
-              >
-                <LogOut className="h-4 w-4" />
-                <span>Sair</span>
-              </button>
+              <LogoutButton onLogout={logout} />
             </div>
           </div>
-        </div>
-
-        {/* Sincronização Info */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
-          <h3 className="text-lg font-semibold text-blue-800 flex items-center">
-            <RefreshCw className="h-5 w-5 mr-2" />
-            Sincronização Automática
-          </h3>
-          <p className="text-blue-700 mt-1">
-            O sistema verifica automaticamente por atualizações a cada 10 segundos. Quando alguém fizer alterações em outro dispositivo, 
-            elas serão sincronizadas automaticamente. Também sincronizamos quando você volta a esta aba.
-          </p>
-          <p className="text-blue-600 text-sm mt-2">
-            Última sincronização: {lastUpdateFormatted}
-          </p>
         </div>
 
         {/* Stats */}
@@ -292,7 +281,6 @@ export default function AdminPage() {
             <Plus className="h-5 w-5" />
             <span>Adicionar Produto à Base de Dados</span>
           </button>
-          <p className="text-sm text-gray-500 mt-2">Operações são instantâneas na interface e sincronizadas automaticamente</p>
         </div>
 
         {/* Add/Edit Product Form */}
