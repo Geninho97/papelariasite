@@ -1,13 +1,73 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 
 export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false) // Começar como false
   const [error, setError] = useState<string | null>(null)
 
-  // Verificar se está autenticado - SEM useCallback para evitar loops
+  // Login
+  const login = async (password: string): Promise<boolean> => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ password }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setIsAuthenticated(true)
+        setLoading(false)
+        return true
+      } else {
+        setError(data.error || "Erro no login")
+        setLoading(false)
+        return false
+      }
+    } catch (error) {
+      setError("Erro de conexão")
+      setLoading(false)
+      return false
+    }
+  }
+
+  // Logout
+  const logout = async () => {
+    try {
+      setIsAuthenticated(false)
+      setError(null)
+
+      // Limpar cookie via JavaScript
+      document.cookie = "admin-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/"
+
+      // Tentar chamar API de logout (mas não esperar)
+      fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      }).catch(() => {
+        // Ignorar erros
+      })
+
+      // Redirecionar imediatamente
+      window.location.href = "/admin"
+    } catch (error) {
+      // Mesmo com erro, garantir logout local
+      setIsAuthenticated(false)
+      document.cookie = "admin-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/"
+      window.location.href = "/admin"
+    }
+  }
+
+  // Verificação manual apenas quando necessário
   const checkAuth = async () => {
     try {
       setLoading(true)
@@ -18,7 +78,6 @@ export function useAuth() {
         credentials: "include",
         headers: {
           "Cache-Control": "no-cache",
-          Pragma: "no-cache",
         },
       })
 
@@ -37,66 +96,12 @@ export function useAuth() {
     }
   }
 
-  // Login
-  const login = async (password: string): Promise<boolean> => {
-    try {
-      setError(null)
-
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ password }),
-      })
-
-      const data = await response.json()
-
-      if (data.success) {
-        setIsAuthenticated(true)
-        return true
-      } else {
-        setError(data.error || "Erro no login")
-        return false
-      }
-    } catch (error) {
-      setError("Erro de conexão")
-      return false
-    }
-  }
-
-  // Logout
-  const logout = async () => {
-    try {
-      setIsAuthenticated(false)
-      setError(null)
-
-      await fetch("/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      })
-
-      document.cookie = "admin-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/"
-      window.location.href = "/admin"
-    } catch (error) {
-      setIsAuthenticated(false)
-      document.cookie = "admin-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/"
-      window.location.href = "/admin"
-    }
-  }
-
-  // Executar verificação APENAS uma vez ao montar
-  useEffect(() => {
-    checkAuth()
-  }, []) // IMPORTANTE: Array vazio - executa apenas uma vez
-
   return {
     isAuthenticated,
     loading,
     error,
     login,
     logout,
-    checkAuth,
+    checkAuth, // Expor para uso manual
   }
 }

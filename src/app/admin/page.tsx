@@ -26,7 +26,7 @@ import ImageUpload from "./components/ImageUpload"
 import LogoutButton from "./components/LogoutButton"
 
 export default function AdminPage() {
-  const { isAuthenticated, loading: authLoading, error: authError, login, logout } = useAuth()
+  const { isAuthenticated, loading: authLoading, error: authError, login, logout, checkAuth } = useAuth()
   const {
     products,
     getFeaturedProducts,
@@ -48,10 +48,20 @@ export default function AdminPage() {
     message: "",
   })
   const [lastUpdateFormatted, setLastUpdateFormatted] = useState<string>("")
+  const [authChecked, setAuthChecked] = useState(false)
 
   const featuredProducts = getFeaturedProducts()
 
   const categories = ["Escolar", "Escritório", "Escrita", "Papel", "Eletrônicos", "Brinquedos", "Diversão"]
+
+  // Verificar autenticação APENAS uma vez ao carregar a página
+  useEffect(() => {
+    if (!authChecked) {
+      checkAuth().finally(() => {
+        setAuthChecked(true)
+      })
+    }
+  }, [authChecked, checkAuth])
 
   // Formatar a data da última atualização
   useEffect(() => {
@@ -67,6 +77,18 @@ export default function AdminPage() {
     setTimeout(() => {
       setOperationStatus({ type: null, message: "" })
     }, 3000)
+  }
+
+  // Se ainda não verificou autenticação
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-red-600 mx-auto mb-4"></div>
+          <p className="text-xl text-gray-600">Carregando...</p>
+        </div>
+      </div>
+    )
   }
 
   // Se ainda está verificando autenticação
