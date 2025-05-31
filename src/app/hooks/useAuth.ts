@@ -11,15 +11,34 @@ export function useAuth() {
   const checkAuth = async () => {
     try {
       setLoading(true)
+      setError(null)
+
+      console.log("🔍 [AUTH] Verificando autenticação...")
+
       const response = await fetch("/api/auth/verify", {
+        method: "GET",
         credentials: "include", // Incluir cookies
+        headers: {
+          "Cache-Control": "no-cache",
+        },
       })
 
+      console.log("📡 [AUTH] Response status:", response.status)
+
       const data = await response.json()
-      setIsAuthenticated(data.authenticated)
+      console.log("📋 [AUTH] Response data:", data)
+
+      if (response.ok && data.authenticated) {
+        setIsAuthenticated(true)
+        console.log("✅ [AUTH] Usuário autenticado")
+      } else {
+        setIsAuthenticated(false)
+        console.log("❌ [AUTH] Usuário não autenticado:", data.error)
+      }
     } catch (error) {
-      console.error("Erro ao verificar autenticação:", error)
+      console.error("❌ [AUTH] Erro ao verificar autenticação:", error)
       setIsAuthenticated(false)
+      setError("Erro de conexão")
     } finally {
       setLoading(false)
     }

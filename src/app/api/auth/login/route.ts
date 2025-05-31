@@ -34,13 +34,14 @@ export async function POST(request: Request) {
     // Retornar token
     const response = NextResponse.json({ success: true, message: "Login bem-sucedido" })
 
-    // Definir cookie seguro
+    // Definir cookie seguro com configurações mais específicas
     response.cookies.set("admin-token", token, {
       httpOnly: true, // Não acessível via JavaScript
       secure: process.env.NODE_ENV === "production", // HTTPS em produção
-      sameSite: "strict", // Proteção CSRF
+      sameSite: "lax", // Mudança de "strict" para "lax" para melhor compatibilidade
       maxAge: 24 * 60 * 60, // 24 horas
       path: "/",
+      domain: process.env.NODE_ENV === "production" ? ".vercel.app" : undefined, // Domain para produção
     })
 
     return response
