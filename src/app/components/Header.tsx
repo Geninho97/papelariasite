@@ -16,14 +16,13 @@ export default function Header() {
         <div className="flex justify-between items-center">
           {/* Logo */}
           <div className="flex items-center space-x-3">
-            <img src="/images/logo.png" alt="Papelaria Coutyfil Logo" className="h-12 w-auto" />
+            <a href="/#inicio">
+              <img src="/images/logo.png" alt="Papelaria Coutyfil Logo" className="h-12 w-auto" />
+            </a>
           </div>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation - removido "Início" */}
           <nav className="hidden md:flex space-x-8">
-            <a href="/#inicio" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
-              Início
-            </a>
             <a href="/#novidades" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
               Novidades
             </a>
@@ -46,17 +45,10 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Navigation - removido "Início" */}
         {isMenuOpen && (
           <nav className="md:hidden mt-4 pb-4 border-t border-primary-100 pt-4">
             <div className="flex flex-col space-y-4">
-              <a
-                href="/#inicio"
-                className="text-gray-700 hover:text-primary-600 transition-colors font-medium"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Início
-              </a>
               <a
                 href="/#novidades"
                 className="text-gray-700 hover:text-primary-600 transition-colors font-medium"
