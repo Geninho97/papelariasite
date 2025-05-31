@@ -56,13 +56,14 @@ export async function GET(request: Request) {
     console.log("🔑 [AUTH] Token admin-token encontrado:", !!token)
     console.log("🔑 [AUTH] Tamanho do token:", token?.length || 0)
 
-    if (!token) {
-      console.log("❌ [AUTH] Token admin-token não encontrado nos cookies")
+    // Verificar se o token não é "deleted" ou vazio
+    if (!token || token === "deleted" || token === "") {
+      console.log("❌ [AUTH] Token inválido ou removido")
       return NextResponse.json(
         {
           authenticated: false,
-          error: "Token não encontrado",
-          debug: "admin-token cookie missing",
+          error: "Token não encontrado ou inválido",
+          debug: `Token value: ${token}`,
           availableCookies: Object.keys(cookies),
         },
         { status: 401 },
