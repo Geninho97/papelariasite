@@ -1,19 +1,9 @@
 "use client"
 
-import { Heart, ChevronDown, ArrowRight, Plus, RefreshCw } from "lucide-react"
+import { Heart, ChevronDown, ArrowRight, Plus, RefreshCw } from 'lucide-react'
 import { useProducts } from "../hooks/useProducts"
 import Link from "next/link"
 import { useEffect, useState } from "react"
-
-const categoryColors = {
-  Escolar: "bg-green-600 text-white",
-  Escritório: "bg-green-600 text-white",
-  Escrita: "bg-red-500 text-white",
-  Papel: "bg-green-600 text-white",
-  Eletrônicos: "bg-red-500 text-white",
-  Brinquedos: "bg-red-500 text-white",
-  Diversão: "bg-green-600 text-white",
-}
 
 export default function Products() {
   const { getFeaturedProducts, loading, lastUpdate } = useProducts()
@@ -112,7 +102,7 @@ export default function Products() {
             <Link
               href={`/produtos/${product.id}`}
               key={product.id}
-              className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-100 hover:border-red-200 transform hover:-translate-y-1"
+              className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group border-2 border-red-500 transform hover:-translate-y-1"
             >
               {/* Product Image */}
               <div className="relative overflow-hidden h-36">
@@ -132,9 +122,7 @@ export default function Products() {
                   </button>
                 </div>
                 <div className="absolute top-2 left-2">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-bold ${categoryColors[product.category as keyof typeof categoryColors] || "bg-gray-500 text-white"}`}
-                  >
+                  <span className="px-2 py-1 rounded-full text-xs font-bold bg-green-600 text-white">
                     {product.category}
                   </span>
                 </div>

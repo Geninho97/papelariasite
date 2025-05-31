@@ -1,21 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, Grid, List, ArrowLeft } from "lucide-react"
+import { Search, Grid, List, ArrowLeft } from 'lucide-react'
 import Link from "next/link"
 import { useProducts, type Product } from "@/app/hooks/useProducts"
 import Header from "@/app/components/Header"
 import Footer from "@/app/components/Footer"
-
-const categoryColors = {
-  Escolar: "bg-green-600 text-white",
-  Escritório: "bg-green-600 text-white",
-  Escrita: "bg-red-500 text-white",
-  Papel: "bg-green-600 text-white",
-  Eletrônicos: "bg-red-500 text-white",
-  Brinquedos: "bg-red-500 text-white",
-  Diversão: "bg-green-600 text-white",
-}
 
 export default function ProductsPage() {
   const { products, loading } = useProducts()
@@ -185,7 +175,7 @@ export default function ProductsPage() {
                 <Link
                   href={`/produtos/${product.id}`}
                   key={product.id}
-                  className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden group"
+                  className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden group border-2 border-red-500"
                 >
                   <div className="relative h-48 overflow-hidden">
                     <img
@@ -194,9 +184,7 @@ export default function ProductsPage() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute top-2 left-2">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-bold ${categoryColors[product.category as keyof typeof categoryColors] || "bg-gray-500 text-white"}`}
-                      >
+                      <span className="px-2 py-1 rounded-full text-xs font-bold bg-green-600 text-white">
                         {product.category}
                       </span>
                     </div>
@@ -227,7 +215,7 @@ export default function ProductsPage() {
                 <Link
                   href={`/produtos/${product.id}`}
                   key={product.id}
-                  className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden group"
+                  className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden group border-2 border-red-500"
                 >
                   <div className="flex">
                     <div className="w-32 h-32 flex-shrink-0">
@@ -248,9 +236,7 @@ export default function ProductsPage() {
                               Destaque
                             </span>
                           )}
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs font-bold ${categoryColors[product.category as keyof typeof categoryColors] || "bg-gray-500 text-white"}`}
-                          >
+                          <span className="px-2 py-1 rounded-full text-xs font-bold bg-green-600 text-white">
                             {product.category}
                           </span>
                         </div>
