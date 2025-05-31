@@ -22,7 +22,7 @@ export interface SiteSettings {
 
 // Configurações padrão do site (apenas para fallback)
 const defaultSettings: SiteSettings = {
-  heroImage: "/images/principal.jpg",
+  heroImage: "/placeholder.svg?height=500&width=600&text=Produtos+Papelaria",
   heroTitle: "Tudo para seu escritório e escola",
   heroSubtitle:
     "Na Papelaria você encontra os melhores produtos para escritório, escola e casa com preços imbatíveis e atendimento de qualidade excepcional.",
@@ -33,7 +33,14 @@ export async function loadProductsFromCloud(): Promise<Product[]> {
   try {
     console.log("🔄 [STORAGE] Carregando produtos da nuvem...")
 
+    // Verificar se o token existe
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      console.log("⚠️ [STORAGE] BLOB_READ_WRITE_TOKEN não configurado")
+      return []
+    }
+
     // Listar arquivos para verificar se products.json existe
+    console.log("📋 [STORAGE] Listando arquivos na Blob...")
     const { blobs } = await list()
     console.log(
       "📋 [STORAGE] Arquivos encontrados na Blob:",
@@ -51,16 +58,35 @@ export async function loadProductsFromCloud(): Promise<Product[]> {
     console.log("📁 [STORAGE] Arquivo encontrado:", productsFile.url)
 
     // Carregar dados do arquivo
-    const response = await fetch(productsFile.url)
+    console.log("📖 [STORAGE] Fazendo fetch do arquivo...")
+    const response = await fetch(productsFile.url, {
+      cache: "no-store", // Evitar cache
+    })
+
     if (!response.ok) {
       throw new Error(`Erro ao carregar: ${response.status} - ${response.statusText}`)
     }
 
+    console.log("📄 [STORAGE] Arquivo carregado, fazendo parse JSON...")
     const products = await response.json()
+
+    // Validar se é um array
+    if (!Array.isArray(products)) {
+      console.error("❌ [STORAGE] Dados carregados não são um array:", typeof products)
+      return []
+    }
+
     console.log("✅ [STORAGE] Produtos carregados da nuvem:", products.length)
     return products
   } catch (error) {
     console.error("❌ [STORAGE] Erro ao carregar produtos da nuvem:", error)
+
+    // Log mais detalhado do erro
+    if (error instanceof Error) {
+      console.error("📋 [STORAGE] Mensagem do erro:", error.message)
+      console.error("📋 [STORAGE] Stack do erro:", error.stack)
+    }
+
     console.log("🔄 [STORAGE] Retornando array vazio devido ao erro")
     return []
   }
@@ -71,6 +97,11 @@ export async function saveProductsToCloud(products: Product[]): Promise<void> {
   try {
     console.log("💾 [STORAGE] === INICIANDO SALVAMENTO ===")
     console.log("📊 [STORAGE] Número de produtos a salvar:", products.length)
+
+    // Verificar se o token existe
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      throw new Error("BLOB_READ_WRITE_TOKEN não configurado")
+    }
 
     // Validar dados básicos
     if (!Array.isArray(products)) {
@@ -92,10 +123,12 @@ export async function saveProductsToCloud(products: Product[]): Promise<void> {
     const jsonData = JSON.stringify(products, null, 2)
     console.log("📝 [STORAGE] JSON gerado, tamanho:", jsonData.length, "caracteres")
 
-    // Salvar na Blob
+    // Salvar na Blob - ADICIONADO allowOverwrite: true
+    console.log("☁️ [STORAGE] Fazendo upload para Blob com allowOverwrite: true...")
     const blob = await put(PRODUCTS_FILE, jsonData, {
       access: "public",
       contentType: "application/json",
+      allowOverwrite: true, // Permite sobrescrever o arquivo existente
     })
 
     console.log("✅ [STORAGE] === SALVAMENTO CONCLUÍDO ===")
@@ -103,6 +136,13 @@ export async function saveProductsToCloud(products: Product[]): Promise<void> {
   } catch (error) {
     console.error("❌ [STORAGE] === ERRO NO SALVAMENTO ===")
     console.error("📋 [STORAGE] Erro completo:", error)
+
+    // Log mais detalhado
+    if (error instanceof Error) {
+      console.error("📋 [STORAGE] Mensagem:", error.message)
+      console.error("📋 [STORAGE] Stack:", error.stack)
+    }
+
     throw error
   }
 }
@@ -111,6 +151,12 @@ export async function saveProductsToCloud(products: Product[]): Promise<void> {
 export async function loadSiteSettings(): Promise<SiteSettings> {
   try {
     console.log("🔄 [STORAGE] Carregando configurações do site...")
+
+    // Verificar se o token existe
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      console.log("⚠️ [STORAGE] BLOB_READ_WRITE_TOKEN não configurado, usando configurações padrão")
+      return defaultSettings
+    }
 
     const { blobs } = await list()
     const settingsFile = blobs.find((blob) => blob.pathname === SETTINGS_FILE)
@@ -121,7 +167,10 @@ export async function loadSiteSettings(): Promise<SiteSettings> {
       return defaultSettings
     }
 
-    const response = await fetch(settingsFile.url)
+    const response = await fetch(settingsFile.url, {
+      cache: "no-store",
+    })
+
     if (!response.ok) {
       throw new Error(`Erro ao carregar configurações: ${response.status}`)
     }
@@ -140,11 +189,18 @@ export async function saveSiteSettings(settings: SiteSettings): Promise<void> {
   try {
     console.log("💾 [STORAGE] Salvando configurações do site...")
 
+    // Verificar se o token existe
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      throw new Error("BLOB_READ_WRITE_TOKEN não configurado")
+    }
+
     const jsonData = JSON.stringify(settings, null, 2)
 
+    // ADICIONADO allowOverwrite: true
     const blob = await put(SETTINGS_FILE, jsonData, {
       access: "public",
       contentType: "application/json",
+      allowOverwrite: true, // Permite sobrescrever o arquivo existente
     })
 
     console.log("✅ [STORAGE] Configurações salvas:", blob.url)
@@ -159,6 +215,11 @@ export async function uploadImageToCloud(file: File): Promise<string> {
   try {
     console.log("📸 [STORAGE] Fazendo upload da imagem para a nuvem...")
 
+    // Verificar se o token existe
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      throw new Error("BLOB_READ_WRITE_TOKEN não configurado")
+    }
+
     // Gerar nome único para a imagem
     const timestamp = Date.now()
     const extension = file.name.split(".").pop()
@@ -166,10 +227,10 @@ export async function uploadImageToCloud(file: File): Promise<string> {
 
     console.log("📁 [STORAGE] Nome do arquivo:", filename)
 
-    // Upload para Blob
+    // Upload para Blob - Já usa addRandomSuffix: true para evitar sobrescrever imagens
     const blob = await put(filename, file, {
       access: "public",
-      addRandomSuffix: true,
+      addRandomSuffix: true, // Já está configurado para adicionar sufixo aleatório
     })
 
     console.log("✅ [STORAGE] Imagem salva na nuvem:", blob.url)
@@ -185,18 +246,24 @@ export async function initializeDatabase(): Promise<void> {
   try {
     console.log("🔄 [STORAGE] Verificando se base de dados precisa ser inicializada...")
 
+    // Verificar se o token existe
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      console.log("⚠️ [STORAGE] BLOB_READ_WRITE_TOKEN não configurado, pulando inicialização")
+      return
+    }
+
     const { blobs } = await list()
     const productsFile = blobs.find((blob) => blob.pathname === PRODUCTS_FILE)
 
     if (!productsFile) {
       console.log("📝 [STORAGE] Base de dados vazia, criando arquivo inicial...")
-      await saveProductsToCloud([])
+      await saveProductsToCloud([]) // Já vai usar allowOverwrite: true
       console.log("✅ [STORAGE] Base de dados inicializada com array vazio")
     } else {
       console.log("✅ [STORAGE] Base de dados já existe")
     }
   } catch (error) {
     console.error("❌ [STORAGE] Erro ao inicializar base de dados:", error)
-    throw error
+    // Não fazer throw aqui para não quebrar a aplicação
   }
 }
