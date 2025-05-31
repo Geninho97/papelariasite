@@ -1,8 +1,9 @@
 "use client"
 
-import { Heart, ChevronDown, ArrowRight, Plus } from "lucide-react"
+import { Heart, ChevronDown, ArrowRight, Plus, RefreshCw } from "lucide-react"
 import { useProducts } from "../hooks/useProducts"
 import Link from "next/link"
+import { useEffect, useState } from "react"
 
 const categoryColors = {
   Escolar: "bg-green-600 text-white",
@@ -15,8 +16,17 @@ const categoryColors = {
 }
 
 export default function Products() {
-  const { getFeaturedProducts, loading } = useProducts()
+  const { getFeaturedProducts, loading, lastUpdate } = useProducts()
   const products = getFeaturedProducts()
+  const [lastSyncTime, setLastSyncTime] = useState<string>("")
+
+  // Atualizar o tempo da última sincronização
+  useEffect(() => {
+    if (lastUpdate) {
+      const date = new Date(lastUpdate)
+      setLastSyncTime(`${date.toLocaleDateString()} ${date.toLocaleTimeString()}`)
+    }
+  }, [lastUpdate])
 
   if (loading) {
     return (
@@ -90,6 +100,10 @@ export default function Products() {
             Descubra os nossos produtos mais recentes e populares em destaque
           </p>
           <div className="w-20 h-1 bg-gradient-to-r from-red-500 to-green-500 mx-auto mt-3 rounded-full"></div>
+          <div className="flex items-center justify-center mt-2 text-xs text-gray-500">
+            <RefreshCw className="h-3 w-3 mr-1" />
+            <span>Última sincronização: {lastSyncTime}</span>
+          </div>
         </div>
 
         {/* Products Grid */}

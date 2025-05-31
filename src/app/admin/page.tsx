@@ -2,25 +2,59 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useProducts, type Product } from "../hooks/useProducts"
 import { useAuth } from "../hooks/useAuth"
-import { Plus, Edit, Trash2, Save, X, ArrowUp, ArrowDown, Eye, LogOut, RefreshCw, Cloud, Database } from "lucide-react"
+import { Plus, Edit, Trash2, Save, X, ArrowUp, ArrowDown, Eye, LogOut, RefreshCw, Database, Check, AlertCircle, Clock } from 'lucide-react'
 import Link from "next/link"
 import LoginForm from "./components/LoginForm"
 import ImageUpload from "./components/ImageUpload"
 
 export default function AdminPage() {
   const { isAuthenticated, loading: authLoading, error: authError, login, logout } = useAuth()
-  const { products, getFeaturedProducts, addProduct, updateProduct, deleteProduct, loading, saving, refreshProducts } =
-    useProducts()
+  const {
+    products,
+    getFeaturedProducts,
+    addProduct,
+    updateProduct,
+    deleteProduct,
+    toggleFeatured,
+    loading,
+    saving,
+    refreshProducts,
+    error,
+    lastUpdate
+  } = useProducts()
   const [isAddingProduct, setIsAddingProduct] = useState(false)
   const [editingProduct, setEditingProduct] = useState<string | null>(null)
   const [formData, setFormData] = useState<Partial<Product>>({})
+  const [operationStatus, setOperationStatus] = useState<{ type: "success" | "error" | null; message: string }>({
+    type: null,
+    message: "",
+  })
+  const [lastUpdateFormatted, setLastUpdateFormatted] = useState<string>("")
 
   const featuredProducts = getFeaturedProducts()
 
   const categories = ["Escolar", "Escritório", "Escrita", "Papel", "Eletrônicos", "Brinquedos", "Diversão"]
+
+  // Formatar a data da última atualização
+  useEffect(() => {
+    if (lastUpdate) {
+      const date = new Date(lastUpdate)
+      setLastUpdateFormatted(
+        `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`
+      )
+    }
+  }, [lastUpdate])
+
+  // Função para mostrar status temporário
+  const showStatus = (type: "success" | "error", message: string) => {
+    setOperationStatus({ type, message })
+    setTimeout(() => {
+      setOperationStatus({ type: null, message: "" })
+    }, 3000)
+  }
 
   // Se ainda está verificando autenticação
   if (authLoading) {
@@ -55,7 +89,7 @@ export default function AdminPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.name || !formData.description || !formData.price || !formData.category) {
-      alert("Por favor, preencha todos os campos obrigatórios")
+      showStatus("error", "Por favor, preencha todos os campos obrigatórios")
       return
     }
 
@@ -63,6 +97,7 @@ export default function AdminPage() {
       if (editingProduct) {
         await updateProduct(editingProduct, formData)
         setEditingProduct(null)
+        showStatus("success", "Produto atualizado com sucesso!")
       } else {
         const maxOrder = Math.max(...featuredProducts.map((p) => p.order), 0)
         await addProduct({
@@ -72,10 +107,12 @@ export default function AdminPage() {
           image: formData.image || "/placeholder.svg?height=300&width=300",
         } as Omit<Product, "id">)
         setIsAddingProduct(false)
+        showStatus("success", "Produto adicionado com sucesso!")
       }
       setFormData({})
     } catch (error) {
       console.error("Erro ao salvar produto:", error)
+      showStatus("error", "Erro ao salvar produto")
     }
   }
 
@@ -96,27 +133,37 @@ export default function AdminPage() {
     const targetIndex = direction === "up" ? index - 1 : index + 1
 
     if (targetIndex >= 0 && targetIndex < newProducts.length) {
+      // Trocar posições
       ;[newProducts[index], newProducts[targetIndex]] = [newProducts[targetIndex], newProducts[index]]
 
-      // Atualizar as ordens
-      for (let i = 0; i < newProducts.length; i++) {
-        await updateProduct(newProducts[i].id, { order: i + 1 })
+      // Atualizar as ordens de forma otimizada
+      try {
+        for (let i = 0; i < newProducts.length; i++) {
+          await updateProduct(newProducts[i].id, { order: i + 1 })
+        }
+        showStatus("success", "Ordem atualizada!")
+      } catch (error) {
+        showStatus("error", "Erro ao reordenar produtos")
       }
     }
   }
 
-  const toggleFeatured = async (productId: string) => {
-    const product = products.find((p) => p.id === productId)
-    if (product) {
-      if (product.featured) {
-        await updateProduct(productId, { featured: false })
-      } else {
-        if (featuredProducts.length < 6) {
-          const maxOrder = Math.max(...featuredProducts.map((p) => p.order), 0)
-          await updateProduct(productId, { featured: true, order: maxOrder + 1 })
-        } else {
-          alert("Máximo de 6 produtos em destaque permitidos")
-        }
+  const handleToggleFeatured = async (productId: string) => {
+    try {
+      await toggleFeatured(productId)
+      showStatus("success", "Status de destaque atualizado!")
+    } catch (error) {
+      showStatus("error", error instanceof Error ? error.message : "Erro ao alterar destaque")
+    }
+  }
+
+  const handleDeleteProduct = async (productId: string) => {
+    if (window.confirm("Tem certeza que deseja apagar este produto?")) {
+      try {
+        await deleteProduct(productId)
+        showStatus("success", "Produto apagado com sucesso!")
+      } catch (error) {
+        showStatus("error", "Erro ao apagar produto")
       }
     }
   }
@@ -124,6 +171,18 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4 max-w-6xl">
+        {/* Status Bar */}
+        {operationStatus.type && (
+          <div
+            className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg flex items-center space-x-2 ${
+              operationStatus.type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+            }`}
+          >
+            {operationStatus.type === "success" ? <Check className="h-5 w-5" /> : <AlertCircle className="h-5 w-5" />}
+            <span>{operationStatus.message}</span>
+          </div>
+        )}
+
         {/* Header */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
           <div className="flex justify-between items-center">
@@ -135,12 +194,16 @@ export default function AdminPage() {
               <p className="text-gray-600 mt-2">Gerir produtos na base de dados - Papelaria Coutyfil</p>
               <div className="flex items-center space-x-4 mt-2">
                 <div className="flex items-center space-x-1 text-sm text-green-600">
-                  <Cloud className="h-4 w-4" />
+                  <Database className="h-4 w-4" />
                   <span>100% Base de Dados na Nuvem</span>
                 </div>
                 <div className="flex items-center space-x-1 text-sm text-blue-600">
                   <Database className="h-4 w-4" />
                   <span>{products.length} produtos na base</span>
+                </div>
+                <div className="flex items-center space-x-1 text-sm text-gray-600">
+                  <Clock className="h-4 w-4" />
+                  <span>Última atualização: {lastUpdateFormatted}</span>
                 </div>
                 {saving && (
                   <div className="flex items-center space-x-1 text-sm text-orange-600">
@@ -148,16 +211,22 @@ export default function AdminPage() {
                     <span>Salvando...</span>
                   </div>
                 )}
+                {error && (
+                  <div className="flex items-center space-x-1 text-sm text-red-600">
+                    <AlertCircle className="h-4 w-4" />
+                    <span>Erro na sincronização</span>
+                  </div>
+                )}
               </div>
             </div>
             <div className="flex items-center space-x-4">
               <button
-                onClick={refreshProducts}
+                onClick={() => refreshProducts()}
                 className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                 disabled={loading}
               >
                 <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-                <span>Atualizar</span>
+                <span>Atualizar Agora</span>
               </button>
               <Link
                 href="/"
@@ -177,6 +246,21 @@ export default function AdminPage() {
           </div>
         </div>
 
+        {/* Sincronização Info */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+          <h3 className="text-lg font-semibold text-blue-800 flex items-center">
+            <RefreshCw className="h-5 w-5 mr-2" />
+            Sincronização Automática
+          </h3>
+          <p className="text-blue-700 mt-1">
+            O sistema verifica automaticamente por atualizações a cada 10 segundos. Quando alguém fizer alterações em outro dispositivo, 
+            elas serão sincronizadas automaticamente. Também sincronizamos quando você volta a esta aba.
+          </p>
+          <p className="text-blue-600 text-sm mt-2">
+            Última sincronização: {lastUpdateFormatted}
+          </p>
+        </div>
+
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white p-6 rounded-lg shadow-md">
@@ -190,9 +274,11 @@ export default function AdminPage() {
             <p className="text-sm text-gray-500 mt-1">Visíveis na página inicial</p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold text-gray-700">Categorias</h3>
-            <p className="text-3xl font-bold text-purple-600">{categories.length}</p>
-            <p className="text-sm text-gray-500 mt-1">Disponíveis para produtos</p>
+            <h3 className="text-lg font-semibold text-gray-700">Status</h3>
+            <p className={`text-3xl font-bold ${saving ? "text-orange-600" : "text-green-600"}`}>
+              {saving ? "Salvando" : "Sincronizado"}
+            </p>
+            <p className="text-sm text-gray-500 mt-1">{saving ? "Atualizando dados..." : "Dados atualizados"}</p>
           </div>
         </div>
 
@@ -206,9 +292,7 @@ export default function AdminPage() {
             <Plus className="h-5 w-5" />
             <span>Adicionar Produto à Base de Dados</span>
           </button>
-          <p className="text-sm text-gray-500 mt-2">
-            Todos os produtos são salvos diretamente na base de dados na nuvem
-          </p>
+          <p className="text-sm text-gray-500 mt-2">Operações são instantâneas na interface e sincronizadas automaticamente</p>
         </div>
 
         {/* Add/Edit Product Form */}
@@ -228,7 +312,6 @@ export default function AdminPage() {
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     required
-                    disabled={saving}
                   />
                 </div>
                 <div>
@@ -240,7 +323,6 @@ export default function AdminPage() {
                     onChange={(e) => setFormData({ ...formData, price: Number.parseFloat(e.target.value) })}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     required
-                    disabled={saving}
                   />
                 </div>
               </div>
@@ -252,7 +334,6 @@ export default function AdminPage() {
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   required
-                  disabled={saving}
                 >
                   <option value="">Selecionar categoria</option>
                   {categories.map((category) => (
@@ -271,7 +352,6 @@ export default function AdminPage() {
                   rows={3}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   required
-                  disabled={saving}
                 />
               </div>
 
@@ -288,17 +368,15 @@ export default function AdminPage() {
               <div className="flex space-x-4 pt-4">
                 <button
                   type="submit"
-                  disabled={saving}
-                  className="flex items-center space-x-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400"
+                  className="flex items-center space-x-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
                 >
-                  {saving ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                  <span>{saving ? "Salvando na Base..." : editingProduct ? "Atualizar" : "Adicionar"}</span>
+                  <Save className="h-4 w-4" />
+                  <span>{editingProduct ? "Atualizar" : "Adicionar"}</span>
                 </button>
                 <button
                   type="button"
                   onClick={handleCancel}
-                  disabled={saving}
-                  className="flex items-center space-x-2 bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors disabled:bg-gray-400"
+                  className="flex items-center space-x-2 bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
                 >
                   <X className="h-4 w-4" />
                   <span>Cancelar</span>
@@ -335,29 +413,24 @@ export default function AdminPage() {
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => moveProduct(index, "up")}
-                      disabled={index === 0 || saving}
+                      disabled={index === 0}
                       className="p-2 text-gray-600 hover:text-gray-800 disabled:text-gray-300 disabled:cursor-not-allowed"
                     >
                       <ArrowUp className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => moveProduct(index, "down")}
-                      disabled={index === featuredProducts.length - 1 || saving}
+                      disabled={index === featuredProducts.length - 1}
                       className="p-2 text-gray-600 hover:text-gray-800 disabled:text-gray-300 disabled:cursor-not-allowed"
                     >
                       <ArrowDown className="h-4 w-4" />
                     </button>
-                    <button
-                      onClick={() => handleEdit(product)}
-                      disabled={saving}
-                      className="p-2 text-blue-600 hover:text-blue-800 disabled:text-gray-400"
-                    >
+                    <button onClick={() => handleEdit(product)} className="p-2 text-blue-600 hover:text-blue-800">
                       <Edit className="h-4 w-4" />
                     </button>
                     <button
-                      onClick={() => deleteProduct(product.id)}
-                      disabled={saving}
-                      className="p-2 text-red-600 hover:text-red-800 disabled:text-gray-400"
+                      onClick={() => handleDeleteProduct(product.id)}
+                      className="p-2 text-red-600 hover:text-red-800"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -407,9 +480,8 @@ export default function AdminPage() {
                       {product.featured ? "Em Destaque" : "Normal"}
                     </span>
                     <button
-                      onClick={() => toggleFeatured(product.id)}
-                      disabled={saving}
-                      className={`px-3 py-1 rounded text-xs font-medium disabled:opacity-50 ${
+                      onClick={() => handleToggleFeatured(product.id)}
+                      className={`px-3 py-1 rounded text-xs font-medium ${
                         product.featured
                           ? "bg-red-100 text-red-800 hover:bg-red-200"
                           : "bg-green-100 text-green-800 hover:bg-green-200"
