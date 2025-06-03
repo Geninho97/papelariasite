@@ -57,7 +57,7 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* PDF Preview - Tablet Style (Tamanho Original) */}
+          {/* PDF Preview - Tablet Style */}
           <div className="relative flex justify-center">
             {loading ? (
               <div className="w-[400px] h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl border-8 border-gray-300 shadow-2xl">
@@ -94,7 +94,7 @@ export default function Hero() {
                   </div>
                 </div>
 
-                {/* Tablet Container (Tamanho Original) */}
+                {/* Tablet Container */}
                 <div className="relative">
                   {/* Tablet Frame */}
                   <div
@@ -111,7 +111,7 @@ export default function Hero() {
                         className="block relative group h-full w-full"
                       >
                         {/* PDF Display Area */}
-                        <div className="relative bg-white rounded-xl shadow-lg overflow-hidden h-full w-full">
+                        <div className="relative bg-white rounded-xl shadow-lg h-full w-full overflow-hidden">
                           {/* PDF Object */}
                           <object
                             data={`${latestPdf.url}#page=1&view=FitH&toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&zoom=page-fit`}
@@ -122,6 +122,8 @@ export default function Hero() {
                               pointerEvents: "none",
                               border: "none",
                               outline: "none",
+                              msOverflowStyle: "none" /* IE and Edge */,
+                              scrollbarWidth: "none" /* Firefox */,
                             }}
                           >
                             <div className="w-full h-full flex items-center justify-center bg-gray-100">
@@ -129,15 +131,8 @@ export default function Hero() {
                             </div>
                           </object>
 
-                          {/* Overlay para esconder qualquer barra de scroll */}
-                          <div className="absolute top-0 right-0 bottom-0 w-8 bg-white" style={{ zIndex: 10 }}></div>
-                          <div className="absolute bottom-0 left-0 right-0 h-8 bg-white" style={{ zIndex: 10 }}></div>
-
                           {/* Hover overlay */}
-                          <div
-                            className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 flex items-center justify-center rounded-xl"
-                            style={{ zIndex: 15 }}
-                          >
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 flex items-center justify-center rounded-xl">
                             <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg">
                               <div className="flex items-center space-x-2 text-gray-800 font-medium text-sm">
                                 <FileText className="h-4 w-4" />
