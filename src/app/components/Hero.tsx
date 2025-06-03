@@ -2,9 +2,21 @@
 
 import { Star, ChevronDown, FileText, Calendar } from "lucide-react"
 import { useWeeklyPdfs } from "@/app/hooks/useWeeklyPdfs"
+import { useState, useEffect } from "react"
 
 export default function Hero() {
   const { latestPdf, loading } = useWeeklyPdfs()
+  const [pdfImageUrl, setPdfImageUrl] = useState<string | null>(null)
+
+  // Quando o PDF mais recente é carregado, gerar uma imagem da primeira página
+  useEffect(() => {
+    if (latestPdf?.url) {
+      // Usamos a URL do PDF diretamente, já que não podemos renderizar a primeira página como imagem no cliente
+      setPdfImageUrl(latestPdf.url)
+    } else {
+      setPdfImageUrl(null)
+    }
+  }, [latestPdf])
 
   return (
     <section
@@ -58,10 +70,10 @@ export default function Hero() {
           </div>
 
           {/* PDF Preview */}
-          <div className="relative">
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-4 border border-gray-200 hover:shadow-3xl transition-all duration-500">
+          <div className="relative flex justify-center">
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-6 border border-gray-200 hover:shadow-3xl transition-all duration-500">
               {loading ? (
-                <div className="h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl">
+                <div className="h-[600px] w-[424px] flex items-center justify-center bg-gray-100 rounded-2xl">
                   <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
                     <p className="text-gray-600">Carregando catálogo semanal...</p>
@@ -94,46 +106,47 @@ export default function Hero() {
                   </div>
 
                   {/* PDF First Page Preview - Clickable */}
-                  <div className="relative group cursor-pointer" onClick={() => window.open(latestPdf.url, "_blank")}>
-                    {/* PDF Preview Container */}
-                    <div className="h-[600px] rounded-2xl overflow-hidden border-2 border-gray-200 bg-white relative">
-                      {/* PDF as background iframe for preview */}
-                      <iframe
-                        src={`${latestPdf.url}#toolbar=0&navpanes=0&scrollbar=0&page=1&zoom=page-fit`}
-                        className="w-full h-full pointer-events-none"
-                        title={`Preview de ${latestPdf.name}`}
+                  <a href={latestPdf.url} target="_blank" rel="noopener noreferrer" className="block relative group">
+                    {/* Usando object tag para mostrar o PDF sem barras de rolagem */}
+                    <div
+                      className="relative bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300"
+                      style={{ width: "424px", height: "600px" }}
+                    >
+                      <object
+                        data={`${latestPdf.url}#page=1&view=FitH`}
+                        type="application/pdf"
+                        className="w-full h-full"
                         style={{
-                          transform: "scale(1.0)",
-                          transformOrigin: "top left",
+                          overflow: "hidden",
+                          pointerEvents: "none",
                         }}
-                      />
+                      >
+                        <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                          <p className="text-gray-600">Seu navegador não suporta visualização de PDF.</p>
+                        </div>
+                      </object>
+
+                      {/* Overlay para esconder a barra de rolagem */}
+                      <div className="absolute top-0 right-0 bottom-0 w-4 bg-white" style={{ zIndex: 10 }}></div>
 
                       {/* Hover overlay */}
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 flex items-center justify-center">
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg">
-                          <div className="flex items-center space-x-2 text-gray-800 font-medium">
-                            <FileText className="h-5 w-5" />
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg">
+                          <div className="flex items-center space-x-2 text-gray-800 font-medium text-sm">
+                            <FileText className="h-4 w-4" />
                             <span>Clique para abrir PDF completo</span>
                           </div>
                         </div>
                       </div>
                     </div>
 
-                    {/* Click indicator */}
-                    <div className="absolute top-3 right-3 bg-green-500 text-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                        />
-                      </svg>
-                    </div>
-                  </div>
+                    {/* A4 Paper Effect */}
+                    <div className="absolute -bottom-1 -right-1 w-full h-full bg-gray-200 rounded-lg -z-10"></div>
+                    <div className="absolute -bottom-2 -right-2 w-full h-full bg-gray-300 rounded-lg -z-20"></div>
+                  </a>
                 </div>
               ) : (
-                <div className="h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl">
+                <div className="h-[600px] w-[424px] flex items-center justify-center bg-gray-100 rounded-2xl">
                   <div className="text-center">
                     <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-xl font-bold text-gray-800 mb-2">Nenhum catálogo disponível</h3>

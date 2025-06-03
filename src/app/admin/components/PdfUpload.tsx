@@ -23,7 +23,7 @@ export default function PdfUpload({ onUpload, isUploading = false, className = "
     const day = now.getDate()
     const month = now.getMonth() + 1
     const year = now.getFullYear()
-    return `Catálogo Semanal ${day}/${month}/${year}`
+    return `Folheto ${day}/${month} a ${day + 7}/${month}`
   }
 
   const handleFileSelect = (file: File) => {
@@ -114,7 +114,7 @@ export default function PdfUpload({ onUpload, isUploading = false, className = "
             type="text"
             value={pdfName}
             onChange={(e) => setPdfName(e.target.value)}
-            placeholder="Ex: Catálogo Semanal 15/1/2025"
+            placeholder="Ex: Folheto 15/1 a 22/1"
             className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
             disabled={isUploading}
           />
