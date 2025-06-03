@@ -90,13 +90,6 @@ export default function Contact() {
             </div>
           </div>
         </div>
-
-        {/* Mapa */}
-        <div className="mt-16 flex justify-center">
-          <div className="bg-gray-200 h-64 rounded-xl flex items-center justify-center shadow-lg max-w-4xl w-full">
-            <p className="text-gray-500 text-lg">Mapa da localização</p>
-          </div>
-        </div>
       </div>
     </section>
   )
