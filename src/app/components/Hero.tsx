@@ -57,10 +57,10 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* PDF Preview - Tablet Style */}
+          {/* PDF Preview - Tablet Style (Tamanho Reduzido) */}
           <div className="relative flex justify-center">
             {loading ? (
-              <div className="w-[400px] h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl border-8 border-gray-300 shadow-2xl">
+              <div className="w-[320px] h-[480px] flex items-center justify-center bg-gray-100 rounded-2xl border-8 border-gray-300 shadow-2xl">
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
                   <p className="text-gray-600">Carregando catálogo semanal...</p>
@@ -69,14 +69,14 @@ export default function Hero() {
             ) : latestPdf ? (
               <div className="relative">
                 {/* Header flutuante separado */}
-                <div className="bg-gradient-to-r from-red-500 to-green-500 text-white p-3 rounded-xl mb-4 shadow-lg relative z-20">
+                <div className="bg-gradient-to-r from-red-500 to-green-500 text-white p-2.5 rounded-xl mb-3 shadow-lg relative z-20">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <FileText className="h-5 w-5" />
+                    <div className="flex items-center space-x-2">
+                      <FileText className="h-4 w-4" />
                       <div>
-                        <h3 className="font-bold text-base">{latestPdf.name}</h3>
-                        <div className="flex items-center space-x-2 text-sm opacity-90">
-                          <Calendar className="h-4 w-4" />
+                        <h3 className="font-bold text-sm">{latestPdf.name}</h3>
+                        <div className="flex items-center space-x-2 text-xs opacity-90">
+                          <Calendar className="h-3 w-3" />
                           <span>
                             Semana {latestPdf.week}/{latestPdf.year}
                           </span>
@@ -87,22 +87,22 @@ export default function Hero() {
                       href={latestPdf.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-white/20 hover:bg-white/30 px-3 py-2 rounded-lg transition-colors text-sm font-medium"
+                      className="bg-white/20 hover:bg-white/30 px-2.5 py-1.5 rounded-lg transition-colors text-xs font-medium"
                     >
                       Abrir PDF
                     </a>
                   </div>
                 </div>
 
-                {/* Tablet Container */}
+                {/* Tablet Container (Tamanho Reduzido) */}
                 <div className="relative">
                   {/* Tablet Frame */}
                   <div
-                    className="bg-gradient-to-b from-gray-200 to-gray-400 rounded-3xl p-6 shadow-2xl border-2 border-gray-300"
-                    style={{ width: "400px", height: "600px" }}
+                    className="bg-gradient-to-b from-gray-200 to-gray-400 rounded-2xl p-4 shadow-2xl border-2 border-gray-300"
+                    style={{ width: "320px", height: "480px" }}
                   >
                     {/* Tablet Screen */}
-                    <div className="bg-black rounded-2xl p-1 h-full w-full relative overflow-hidden">
+                    <div className="bg-black rounded-xl p-1 h-full w-full relative overflow-hidden">
                       {/* PDF Container */}
                       <a
                         href={latestPdf.url}
@@ -111,27 +111,36 @@ export default function Hero() {
                         className="block relative group h-full w-full"
                       >
                         {/* PDF Display Area */}
-                        <div className="relative bg-white rounded-xl shadow-lg overflow-hidden h-full w-full">
+                        <div className="relative bg-white rounded-lg shadow-lg overflow-hidden h-full w-full">
                           {/* PDF Object */}
                           <object
-                            data={`${latestPdf.url}#page=1&view=FitH&toolbar=0&navpanes=0&scrollbar=0`}
+                            data={`${latestPdf.url}#page=1&view=FitH&toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&zoom=page-fit`}
                             type="application/pdf"
                             className="w-full h-full"
                             style={{
                               overflow: "hidden",
                               pointerEvents: "none",
+                              border: "none",
+                              outline: "none",
                             }}
                           >
                             <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                              <p className="text-gray-600">Seu navegador não suporta visualização de PDF.</p>
+                              <p className="text-gray-600 text-sm">Seu navegador não suporta visualização de PDF.</p>
                             </div>
                           </object>
 
+                          {/* Overlay para esconder qualquer barra de scroll */}
+                          <div className="absolute top-0 right-0 bottom-0 w-6 bg-white" style={{ zIndex: 10 }}></div>
+                          <div className="absolute bottom-0 left-0 right-0 h-6 bg-white" style={{ zIndex: 10 }}></div>
+
                           {/* Hover overlay */}
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 flex items-center justify-center rounded-xl">
-                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg">
-                              <div className="flex items-center space-x-2 text-gray-800 font-medium text-sm">
-                                <FileText className="h-4 w-4" />
+                          <div
+                            className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 flex items-center justify-center rounded-lg"
+                            style={{ zIndex: 15 }}
+                          >
+                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/95 backdrop-blur-sm px-3 py-2 rounded-lg shadow-lg">
+                              <div className="flex items-center space-x-2 text-gray-800 font-medium text-xs">
+                                <FileText className="h-3 w-3" />
                                 <span>Clique para abrir PDF completo</span>
                               </div>
                             </div>
@@ -141,26 +150,26 @@ export default function Hero() {
                     </div>
 
                     {/* Tablet Home Button */}
-                    <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-gray-600 rounded-full"></div>
+                    <div className="absolute bottom-1.5 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-gray-600 rounded-full"></div>
                   </div>
 
                   {/* Tablet Shadow/Stand Effect */}
-                  <div className="absolute -bottom-4 -right-4 w-full h-full bg-gray-400/30 rounded-3xl -z-10 blur-sm"></div>
-                  <div className="absolute -bottom-6 -right-6 w-full h-full bg-gray-500/20 rounded-3xl -z-20 blur-md"></div>
+                  <div className="absolute -bottom-3 -right-3 w-full h-full bg-gray-400/30 rounded-2xl -z-10 blur-sm"></div>
+                  <div className="absolute -bottom-5 -right-5 w-full h-full bg-gray-500/20 rounded-2xl -z-20 blur-md"></div>
                 </div>
               </div>
             ) : (
-              <div className="w-[400px] h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl border-8 border-gray-300 shadow-2xl">
+              <div className="w-[320px] h-[480px] flex items-center justify-center bg-gray-100 rounded-2xl border-8 border-gray-300 shadow-2xl">
                 <div className="text-center">
-                  <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">Nenhum catálogo disponível</h3>
-                  <p className="text-gray-600">O catálogo semanal será carregado em breve</p>
+                  <FileText className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                  <h3 className="text-lg font-bold text-gray-800 mb-2">Nenhum catálogo disponível</h3>
+                  <p className="text-gray-600 text-sm">O catálogo semanal será carregado em breve</p>
                 </div>
               </div>
             )}
 
             {/* Additional floating element */}
-            <div className="absolute top-1/2 -left-8 bg-gradient-to-r from-red-400 to-pink-400 text-white px-6 py-3 rounded-full font-semibold shadow-lg transform -rotate-45 animate-pulse delay-700">
+            <div className="absolute top-1/2 -left-8 bg-gradient-to-r from-red-400 to-pink-400 text-white px-4 py-2 rounded-full font-semibold shadow-lg transform -rotate-45 animate-pulse delay-700 text-sm">
               Novo!
             </div>
           </div>
