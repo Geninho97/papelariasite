@@ -2,21 +2,9 @@
 
 import { Star, ChevronDown, FileText, Calendar } from "lucide-react"
 import { useWeeklyPdfs } from "@/app/hooks/useWeeklyPdfs"
-import { useState, useEffect } from "react"
 
 export default function Hero() {
   const { latestPdf, loading } = useWeeklyPdfs()
-  const [pdfImageUrl, setPdfImageUrl] = useState<string | null>(null)
-
-  // Quando o PDF mais recente é carregado, gerar uma imagem da primeira página
-  useEffect(() => {
-    if (latestPdf?.url) {
-      // Usamos a URL do PDF diretamente, já que não podemos renderizar a primeira página como imagem no cliente
-      setPdfImageUrl(latestPdf.url)
-    } else {
-      setPdfImageUrl(null)
-    }
-  }, [latestPdf])
 
   return (
     <section
@@ -80,40 +68,17 @@ export default function Hero() {
                   </div>
                 </div>
               ) : latestPdf ? (
-                <div className="space-y-3">
-                  {/* PDF Header */}
-                  <div className="flex items-center justify-between bg-gradient-to-r from-red-500 to-green-500 text-white p-3 rounded-xl">
-                    <div className="flex items-center space-x-3">
-                      <FileText className="h-5 w-5" />
-                      <div>
-                        <h3 className="font-bold text-base">{latestPdf.name}</h3>
-                        <div className="flex items-center space-x-2 text-sm opacity-90">
-                          <Calendar className="h-4 w-4" />
-                          <span>
-                            Semana {latestPdf.week}/{latestPdf.year}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <a
-                      href={latestPdf.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-white/20 hover:bg-white/30 px-3 py-2 rounded-lg transition-colors text-sm font-medium"
-                    >
-                      Abrir PDF
-                    </a>
-                  </div>
-
-                  {/* PDF First Page Preview - Clickable */}
+                <div className="space-y-0">
+                  {/* PDF Container com header sobreposto */}
                   <a href={latestPdf.url} target="_blank" rel="noopener noreferrer" className="block relative group">
-                    {/* Usando object tag para mostrar o PDF sem barras de rolagem */}
+                    {/* Container principal do PDF */}
                     <div
                       className="relative bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300"
                       style={{ width: "424px", height: "600px" }}
                     >
+                      {/* PDF Object */}
                       <object
-                        data={`${latestPdf.url}#page=1&view=FitH`}
+                        data={`${latestPdf.url}#page=1&view=FitH&toolbar=0`}
                         type="application/pdf"
                         className="w-full h-full"
                         style={{
@@ -126,11 +91,44 @@ export default function Hero() {
                         </div>
                       </object>
 
-                      {/* Overlay para esconder a barra de rolagem */}
+                      {/* Overlay para esconder a barra de rolagem direita */}
                       <div className="absolute top-0 right-0 bottom-0 w-4 bg-white" style={{ zIndex: 10 }}></div>
 
+                      {/* Header personalizado que cobre a barra do PDF */}
+                      <div
+                        className="absolute top-0 left-0 right-0 bg-gradient-to-r from-red-500 to-green-500 text-white p-3 rounded-t-lg"
+                        style={{ zIndex: 20 }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <FileText className="h-5 w-5" />
+                            <div>
+                              <h3 className="font-bold text-base">{latestPdf.name}</h3>
+                              <div className="flex items-center space-x-2 text-sm opacity-90">
+                                <Calendar className="h-4 w-4" />
+                                <span>
+                                  Semana {latestPdf.week}/{latestPdf.year}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            className="bg-white/20 hover:bg-white/30 px-3 py-2 rounded-lg transition-colors text-sm font-medium"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              window.open(latestPdf.url, "_blank")
+                            }}
+                          >
+                            Abrir PDF
+                          </div>
+                        </div>
+                      </div>
+
                       {/* Hover overlay */}
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 flex items-center justify-center">
+                      <div
+                        className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 flex items-center justify-center"
+                        style={{ zIndex: 15 }}
+                      >
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg">
                           <div className="flex items-center space-x-2 text-gray-800 font-medium text-sm">
                             <FileText className="h-4 w-4" />
