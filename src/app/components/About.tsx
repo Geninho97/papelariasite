@@ -16,13 +16,14 @@ export default function About() {
               <h2 className="text-5xl md:text-6xl font-bold text-gray-800 mb-8">Sobre a Papelaria</h2>
               <div className="w-32 h-2 bg-gradient-to-r from-red-500 to-green-500 mb-8 rounded-full"></div>
               <p className="text-2xl text-gray-600 leading-relaxed mb-8">
-                Há mais de 10 anos no mercado, nossa papelaria é referência em material escolar, produtos para
-                escritório e suprimentos para a sua casa. Nossa missão é oferecer produtos de qualidade com preços
-                justos e atendimento excepcional.
+                A Coutyfil é uma empresa familiar, sediada em Penafiel e dedicada à venda ao retalho desde 1964.
+                Ao longo dos mais de 60 anos mantemos o nosso compromisso, o nosso profissionalismo e a nossa vontade em ser a melhor alternativa no comércio tradicional de forma a garantir a satisfação dos nossos clientes baseada numa relação de proximidade e confiança.
+                Procuramos diariamente estabelecer as melhores parcerias com os mais diversos fornecedores para que de uma forma rápida e segura possamos ir ao encontro dos gostos e necessidades dos clientes.
+                Cada cliente merece o nosso melhor e é com esse foco que continuamos presentes.
               </p>
               <p className="text-xl text-gray-600 leading-relaxed">
                 Trabalhamos com as melhores marcas do mercado e mantemos um stock sempre atualizado para atender a todas
-                as suas necessidades, seja para uso pessoal, escolar ou em casa.
+                as suas necessidades.
               </p>
             </div>
 
