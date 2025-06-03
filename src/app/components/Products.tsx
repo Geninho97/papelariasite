@@ -148,7 +148,6 @@ export default function Products() {
             <span>Ver Todos os Produtos</span>
             <ArrowRight className="h-5 w-5" />
           </Link>
-          <p className="text-sm text-gray-600 mt-2">Explore todo o nosso catálogo</p>
         </div>
       </div>
 
