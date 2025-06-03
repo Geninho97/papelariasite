@@ -26,7 +26,7 @@ export default function Hero() {
         <div className="grid md:grid-cols-2 gap-12 items-center min-h-[80vh]">
           {/* Content */}
           <div className="space-y-8">
-            <h1 className="text-5xl md:text-7xl font-bold text-gray-800 leading-tight flex flex-col">
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-800 leading-tight flex flex-col">
               <span>Descubra as melhores</span>
               <span>
                 <span className="text-red-600 bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent animate-pulse">
