@@ -1,8 +1,11 @@
 "use client"
 
-import { Star, ChevronDown } from "lucide-react"
+import { Star, ChevronDown, FileText, Calendar } from "lucide-react"
+import { useWeeklyPdfs } from "@/app/hooks/useWeeklyPdfs"
 
 export default function Hero() {
+  const { latestPdf, loading } = useWeeklyPdfs()
+
   return (
     <section
       id="inicio"
@@ -54,15 +57,62 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Image */}
+          {/* PDF Viewer */}
           <div className="relative">
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-10 border border-gray-200 hover:shadow-3xl transition-all duration-500 transform hover:scale-105">
-              <img
-                src="/images/principal.jpg?height=500&width=600"
-                alt="Produtos de papelaria da nossa loja"
-                className="w-full h-96 object-cover rounded-2xl"
-              />
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-6 border border-gray-200 hover:shadow-3xl transition-all duration-500">
+              {loading ? (
+                <div className="h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">Carregando catálogo semanal...</p>
+                  </div>
+                </div>
+              ) : latestPdf ? (
+                <div className="space-y-4">
+                  {/* PDF Header */}
+                  <div className="flex items-center justify-between bg-gradient-to-r from-red-500 to-green-500 text-white p-4 rounded-xl">
+                    <div className="flex items-center space-x-3">
+                      <FileText className="h-6 w-6" />
+                      <div>
+                        <h3 className="font-bold text-lg">{latestPdf.name}</h3>
+                        <div className="flex items-center space-x-2 text-sm opacity-90">
+                          <Calendar className="h-4 w-4" />
+                          <span>
+                            Semana {latestPdf.week}/{latestPdf.year}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <a
+                      href={latestPdf.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+                    >
+                      Abrir PDF
+                    </a>
+                  </div>
+
+                  {/* PDF Embed */}
+                  <div className="h-[600px] rounded-2xl overflow-hidden border-2 border-gray-200">
+                    <iframe
+                      src={`${latestPdf.url}#toolbar=0&navpanes=0&scrollbar=0`}
+                      className="w-full h-full"
+                      title={latestPdf.name}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl">
+                  <div className="text-center">
+                    <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-xl font-bold text-gray-800 mb-2">Nenhum catálogo disponível</h3>
+                    <p className="text-gray-600">O catálogo semanal será carregado em breve</p>
+                  </div>
+                </div>
+              )}
             </div>
+
             {/* Additional floating element */}
             <div className="absolute top-1/2 -left-8 bg-gradient-to-r from-red-400 to-pink-400 text-white px-6 py-3 rounded-full font-semibold shadow-lg transform -rotate-45 animate-pulse delay-700">
               Novo!

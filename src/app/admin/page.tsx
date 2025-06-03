@@ -19,14 +19,28 @@ import {
   Check,
   AlertCircle,
   Clock,
+  FileText,
+  Calendar,
 } from "lucide-react"
 import Link from "next/link"
 import LoginForm from "./components/LoginForm"
 import ImageUpload from "./components/ImageUpload"
 import LogoutButton from "./components/LogoutButton"
+import { useWeeklyPdfs } from "../hooks/useWeeklyPdfs"
+import PdfUpload from "./components/PdfUpload"
 
 export default function AdminPage() {
   const { isAuthenticated, loading: authLoading, error: authError, login, logout } = useAuth()
+  const {
+    pdfs,
+    latestPdf,
+    loading: pdfsLoading,
+    saving: pdfsSaving,
+    error: pdfsError,
+    addPdf,
+    deletePdf,
+    refreshPdfs,
+  } = useWeeklyPdfs()
   const {
     products,
     getFeaturedProducts,
@@ -251,7 +265,7 @@ export default function AdminPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-lg font-semibold text-gray-700">Total de Produtos</h3>
             <p className="text-3xl font-bold text-blue-600">{products.length}</p>
@@ -263,12 +277,174 @@ export default function AdminPage() {
             <p className="text-sm text-gray-500 mt-1">Visíveis na página inicial</p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold text-gray-700">Status</h3>
-            <p className={`text-3xl font-bold ${saving ? "text-orange-600" : "text-green-600"}`}>
-              {saving ? "Salvando" : "Sincronizado"}
-            </p>
-            <p className="text-sm text-gray-500 mt-1">{saving ? "Atualizando dados..." : "Dados atualizados"}</p>
+            <h3 className="text-lg font-semibold text-gray-700">PDFs Semanais</h3>
+            <p className="text-3xl font-bold text-red-600">{pdfs.length}</p>
+            <p className="text-sm text-gray-500 mt-1">Catálogos enviados</p>
           </div>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold text-gray-700">Status</h3>
+            <p className={`text-3xl font-bold ${saving || pdfsSaving ? "text-orange-600" : "text-green-600"}`}>
+              {saving || pdfsSaving ? "Salvando" : "Sincronizado"}
+            </p>
+            <p className="text-sm text-gray-500 mt-1">
+              {saving || pdfsSaving ? "Atualizando dados..." : "Dados atualizados"}
+            </p>
+          </div>
+        </div>
+
+        {/* PDF Management Section */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h2 className="text-xl font-bold text-gray-800">Catálogos Semanais (PDF)</h2>
+              <p className="text-gray-600 mt-1">Gerir os PDFs que aparecem na página principal</p>
+            </div>
+            <button
+              onClick={() => refreshPdfs()}
+              className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              disabled={pdfsLoading}
+            >
+              <RefreshCw className={`h-4 w-4 ${pdfsLoading ? "animate-spin" : ""}`} />
+              <span>Atualizar</span>
+            </button>
+          </div>
+
+          {/* Current PDF Display */}
+          {latestPdf && (
+            <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-4 mb-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-green-100 p-2 rounded-lg">
+                    <FileText className="h-6 w-6 text-green-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-800">PDF Atual na Página Principal</h3>
+                    <p className="text-gray-600">{latestPdf.name}</p>
+                    <div className="flex items-center space-x-2 text-sm text-gray-500 mt-1">
+                      <Calendar className="h-4 w-4" />
+                      <span>
+                        Semana {latestPdf.week}/{latestPdf.year}
+                      </span>
+                      <span>•</span>
+                      <span>Enviado em {new Date(latestPdf.uploadDate).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <a
+                    href={latestPdf.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-2 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    <Eye className="h-4 w-4" />
+                    <span>Ver PDF</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Upload New PDF */}
+          <div className="border border-gray-200 rounded-lg p-6 mb-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Enviar Novo Catálogo Semanal</h3>
+            <PdfUpload
+              onUpload={async (file, name) => {
+                await addPdf(file, name)
+                showStatus("success", "PDF enviado com sucesso! Agora é o PDF principal.")
+              }}
+              isUploading={pdfsSaving}
+            />
+          </div>
+
+          {/* PDF History */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Histórico de PDFs</h3>
+            {pdfsLoading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                <p className="text-gray-600">Carregando PDFs...</p>
+              </div>
+            ) : pdfs.length === 0 ? (
+              <div className="text-center py-8 bg-gray-50 rounded-lg">
+                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                <p className="text-gray-600">Nenhum PDF enviado ainda</p>
+                <p className="text-gray-500 text-sm mt-1">Envie o primeiro catálogo semanal acima</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {pdfs.map((pdf) => (
+                  <div
+                    key={pdf.id}
+                    className={`flex items-center justify-between p-4 border rounded-lg ${
+                      pdf.id === latestPdf?.id ? "border-green-400 bg-green-50" : "border-gray-200 bg-white"
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className={`p-2 rounded-lg ${pdf.id === latestPdf?.id ? "bg-green-100" : "bg-gray-100"}`}>
+                        <FileText
+                          className={`h-5 w-5 ${pdf.id === latestPdf?.id ? "text-green-600" : "text-gray-600"}`}
+                        />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-gray-800">{pdf.name}</h4>
+                        <div className="flex items-center space-x-2 text-sm text-gray-500">
+                          <Calendar className="h-4 w-4" />
+                          <span>
+                            Semana {pdf.week}/{pdf.year}
+                          </span>
+                          <span>•</span>
+                          <span>{new Date(pdf.uploadDate).toLocaleDateString()}</span>
+                          {pdf.id === latestPdf?.id && (
+                            <>
+                              <span>•</span>
+                              <span className="text-green-600 font-medium">ATUAL</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <a
+                        href={pdf.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2 text-blue-600 hover:text-blue-800 transition-colors"
+                        title="Ver PDF"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </a>
+                      <button
+                        onClick={async () => {
+                          if (window.confirm(`Tem certeza que deseja apagar "${pdf.name}"?`)) {
+                            try {
+                              await deletePdf(pdf.id)
+                              showStatus("success", "PDF apagado com sucesso!")
+                            } catch (error) {
+                              showStatus("error", "Erro ao apagar PDF")
+                            }
+                          }
+                        }}
+                        className="p-2 text-red-600 hover:text-red-800 transition-colors"
+                        title="Apagar PDF"
+                        disabled={pdfsSaving}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* PDF Error */}
+          {pdfsError && (
+            <div className="mt-4 text-sm text-red-600 bg-red-50 p-3 rounded-md border border-red-200">
+              <p className="font-medium">Erro nos PDFs:</p>
+              <p>{pdfsError}</p>
+            </div>
+          )}
         </div>
 
         {/* Add Product Button */}

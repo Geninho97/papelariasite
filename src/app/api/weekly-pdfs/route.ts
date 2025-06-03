@@ -1,0 +1,122 @@
+import { NextResponse } from "next/server"
+
+export const dynamic = "force-dynamic"
+
+// GET - Carregar PDFs semanais
+export async function GET() {
+  try {
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      return NextResponse.json({
+        pdfs: [],
+        latest: null,
+        success: true,
+        message: "Token Blob não configurado",
+      })
+    }
+
+    try {
+      const { loadWeeklyPdfsFromCloud, getLatestWeeklyPdf } = await import("@/app/lib/storage")
+      const pdfs = await loadWeeklyPdfsFromCloud()
+      const latest = await getLatestWeeklyPdf()
+
+      return NextResponse.json({
+        pdfs,
+        latest,
+        success: true,
+      })
+    } catch (storageError) {
+      return NextResponse.json({
+        pdfs: [],
+        latest: null,
+        success: true,
+        message: "Erro ao acessar storage",
+      })
+    }
+  } catch (error) {
+    return NextResponse.json({
+      pdfs: [],
+      latest: null,
+      success: true,
+      message: "Erro na API",
+      error: error instanceof Error ? error.message : "Erro desconhecido",
+    })
+  }
+}
+
+// POST - Adicionar novo PDF semanal
+export async function POST(request: Request) {
+  try {
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      return NextResponse.json(
+        {
+          error: "Configuração de storage não encontrada",
+          success: false,
+        },
+        { status: 500 },
+      )
+    }
+
+    const formData = await request.formData()
+    const file = formData.get("file") as File
+    const name = formData.get("name") as string
+
+    if (!file) {
+      return NextResponse.json(
+        {
+          error: "Nenhum arquivo enviado",
+          success: false,
+        },
+        { status: 400 },
+      )
+    }
+
+    if (!name) {
+      return NextResponse.json(
+        {
+          error: "Nome é obrigatório",
+          success: false,
+        },
+        { status: 400 },
+      )
+    }
+
+    // Validar se é PDF
+    if (file.type !== "application/pdf") {
+      return NextResponse.json(
+        {
+          error: "Apenas arquivos PDF são permitidos",
+          success: false,
+        },
+        { status: 400 },
+      )
+    }
+
+    // Validar tamanho (máximo 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      return NextResponse.json(
+        {
+          error: "PDF muito grande (máximo 10MB)",
+          success: false,
+        },
+        { status: 400 },
+      )
+    }
+
+    const { addWeeklyPdf } = await import("@/app/lib/storage")
+    const newPdf = await addWeeklyPdf(file, name)
+
+    return NextResponse.json({
+      pdf: newPdf,
+      success: true,
+    })
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error: "Erro ao fazer upload do PDF",
+        details: error instanceof Error ? error.message : "Erro desconhecido",
+        success: false,
+      },
+      { status: 500 },
+    )
+  }
+}

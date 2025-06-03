@@ -2,6 +2,7 @@ import { put, list } from "@vercel/blob"
 
 const PRODUCTS_FILE = "products.json"
 const SETTINGS_FILE = "site-settings.json"
+const WEEKLY_PDFS_FILE = "weekly-pdfs.json"
 
 export interface Product {
   id: string
@@ -18,6 +19,15 @@ export interface SiteSettings {
   heroImage: string
   heroTitle: string
   heroSubtitle: string
+}
+
+export interface WeeklyPdf {
+  id: string
+  name: string
+  url: string
+  uploadDate: string
+  week: string
+  year: number
 }
 
 const defaultSettings: SiteSettings = {
@@ -158,6 +168,143 @@ export async function uploadImageToCloud(file: File): Promise<string> {
     })
 
     return blob.url
+  } catch (error) {
+    throw error
+  }
+}
+
+// Upload de PDF semanal para a nuvem
+export async function uploadWeeklyPdfToCloud(file: File, name: string): Promise<string> {
+  try {
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      throw new Error("BLOB_READ_WRITE_TOKEN não configurado")
+    }
+
+    const timestamp = Date.now()
+    const filename = `weekly-pdfs/pdf-${timestamp}.pdf`
+
+    const blob = await put(filename, file, {
+      access: "public",
+      addRandomSuffix: true,
+    })
+
+    return blob.url
+  } catch (error) {
+    throw error
+  }
+}
+
+// Carregar PDFs semanais da nuvem
+export async function loadWeeklyPdfsFromCloud(): Promise<WeeklyPdf[]> {
+  try {
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      return []
+    }
+
+    const { blobs } = await list()
+    const pdfsFile = blobs.find((blob) => blob.pathname === WEEKLY_PDFS_FILE)
+
+    if (!pdfsFile) {
+      return []
+    }
+
+    const response = await fetch(pdfsFile.url, {
+      cache: "no-store",
+    })
+
+    if (!response.ok) {
+      throw new Error(`Erro ao carregar PDFs: ${response.status}`)
+    }
+
+    const pdfs = await response.json()
+
+    if (!Array.isArray(pdfs)) {
+      return []
+    }
+
+    return pdfs
+  } catch (error) {
+    return []
+  }
+}
+
+// Salvar PDFs semanais na nuvem
+export async function saveWeeklyPdfsToCloud(pdfs: WeeklyPdf[]): Promise<void> {
+  try {
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      throw new Error("BLOB_READ_WRITE_TOKEN não configurado")
+    }
+
+    const jsonData = JSON.stringify(pdfs, null, 2)
+
+    await put(WEEKLY_PDFS_FILE, jsonData, {
+      access: "public",
+      contentType: "application/json",
+      allowOverwrite: true,
+    })
+  } catch (error) {
+    throw error
+  }
+}
+
+// Adicionar novo PDF semanal
+export async function addWeeklyPdf(file: File, name: string): Promise<WeeklyPdf> {
+  try {
+    // Upload do arquivo PDF
+    const pdfUrl = await uploadWeeklyPdfToCloud(file, name)
+    
+    // Carregar PDFs existentes
+    const existingPdfs = await loadWeeklyPdfsFromCloud()
+    
+    // Criar novo PDF
+    const now = new Date()
+    const newPdf: WeeklyPdf = {
+      id: Date.now().toString(),
+      name,
+      url: pdfUrl,
+      uploadDate: now.toISOString(),
+      week: `${now.getDate()}/${now.getMonth() + 1}`,
+      year: now.getFullYear()
+    }
+    
+    // Adicionar à lista
+    const updatedPdfs = [newPdf, ...existingPdfs]
+    
+    // Salvar lista atualizada
+    await saveWeeklyPdfsToCloud(updatedPdfs)
+    
+    return newPdf
+  } catch (error) {
+    throw error
+  }
+}
+
+// Obter PDF mais recente
+export async function getLatestWeeklyPdf(): Promise<WeeklyPdf | null> {
+  try {
+    const pdfs = await loadWeeklyPdfsFromCloud()
+    
+    if (pdfs.length === 0) {
+      return null
+    }
+    
+    // Ordenar por data de upload (mais recente primeiro)
+    const sortedPdfs = pdfs.sort((a, b) => 
+      new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime()
+    )
+    
+    return sortedPdfs[0]
+  } catch (error) {
+    return null
+  }
+}
+
+// Deletar PDF semanal
+export async function deleteWeeklyPdf(pdfId: string): Promise<void> {
+  try {
+    const existingPdfs = await loadWeeklyPdfsFromCloud()
+    const updatedPdfs = existingPdfs.filter(pdf => pdf.id !== pdfId)
+    await saveWeeklyPdfsToCloud(updatedPdfs)
   } catch (error) {
     throw error
   }
