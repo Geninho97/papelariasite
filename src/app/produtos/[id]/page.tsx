@@ -42,8 +42,6 @@ export default function ProductPage() {
   const additionalImages = product
     ? [
         product.image,
-        `/placeholder.svg?height=600&width=600&text=Imagem+2`,
-        `/placeholder.svg?height=600&width=600&text=Imagem+3`,
       ]
     : []
 
@@ -151,34 +149,20 @@ export default function ProductPage() {
                   <ul className="space-y-2 text-gray-600">
                     <li className="flex items-start">
                       <span className="text-green-500 mr-2">✓</span>
-                      <span>Produto de alta qualidade</span>
+                      <span>Produto de qualidade</span>
                     </li>
                     <li className="flex items-start">
                       <span className="text-green-500 mr-2">✓</span>
                       <span>Garantia de satisfação</span>
                     </li>
-                    <li className="flex items-start">
-                      <span className="text-green-500 mr-2">✓</span>
-                      <span>Entrega disponível</span>
-                    </li>
-                  </ul>
-                </div>
 
-                {/* Actions */}
-                <div className="flex flex-wrap gap-4 pt-6">
-                  <button className="bg-gray-200 hover:bg-gray-300 p-3 rounded-lg transition-colors">
-                    <Heart className="h-5 w-5 text-gray-600" />
-                  </button>
-                  <button className="bg-gray-200 hover:bg-gray-300 p-3 rounded-lg transition-colors">
-                    <Share2 className="h-5 w-5 text-gray-600" />
-                  </button>
+                  </ul>
                 </div>
 
                 {/* Availability */}
                 <div className="flex items-center space-x-2 text-sm">
                   <span className="w-3 h-3 bg-green-500 rounded-full"></span>
                   <span className="text-green-600 font-medium">Em stock</span>
-                  <span className="text-gray-500">- Pronto para entrega</span>
                 </div>
               </div>
             </div>
