@@ -99,7 +99,7 @@ export default function Hero() {
                   {/* Tablet Frame */}
                   <div
                     className="bg-gradient-to-b from-gray-200 to-gray-400 rounded-3xl p-6 shadow-2xl border-2 border-gray-300"
-                    style={{ width: "400px", height: "600px" }}
+                    style={{ width: "480px", height: "600px" }}
                   >
                     {/* Tablet Screen */}
                     <div className="bg-black rounded-2xl p-1 h-full w-full relative overflow-hidden">
@@ -116,13 +116,13 @@ export default function Hero() {
                           <object
                             data={`${latestPdf.url}#page=1&view=FitH&toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&zoom=page-fit`}
                             type="application/pdf"
-                            className="w-full h-full"
+                            className="w-full h-full pdf-no-scrollbar"
                             style={{
                               overflow: "hidden",
                               pointerEvents: "none",
                               border: "none",
                               outline: "none",
-                              msOverflowStyle: "none" /* IE and Edge */,
+                              msOverflowStyle: "none" /* IE e Edge */,
                               scrollbarWidth: "none" /* Firefox */,
                             }}
                           >
@@ -154,7 +154,7 @@ export default function Hero() {
                 </div>
               </div>
             ) : (
-              <div className="w-[400px] h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl border-8 border-gray-300 shadow-2xl">
+              <div className="w-[480px] h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl border-8 border-gray-300 shadow-2xl">
                 <div className="text-center">
                   <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-xl font-bold text-gray-800 mb-2">Nenhum catálogo disponível</h3>
@@ -175,6 +175,19 @@ export default function Hero() {
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
         <ChevronDown className="h-8 w-8 text-gray-600" />
       </div>
+
+      {/* CSS para esconder scrollbar no Chrome/Safari/WebKit */}
+      <style jsx>{`
+        .pdf-no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .pdf-no-scrollbar::-webkit-scrollbar-track {
+          display: none;
+        }
+        .pdf-no-scrollbar::-webkit-scrollbar-thumb {
+          display: none;
+        }
+      `}</style>
     </section>
   )
 }
