@@ -60,7 +60,7 @@ export default function Footer() {
 
           {/* Loja 1 */}
           <div>
-            <h4 className="text-lg font-semibold mb-4 text-secondary-400">Loja 2</h4>
+            <h4 className="text-lg font-semibold mb-4 text-secondary-400">Loja 1</h4>
             <div className="space-y-3 text-gray-300">
               <div className="flex items-start space-x-3">
                 <MapPin className="h-5 w-5 text-secondary-400 mt-1 flex-shrink-0" />
@@ -83,7 +83,7 @@ export default function Footer() {
 
           {/* Loja 2 */}
           <div>
-            <h4 className="text-lg font-semibold mb-4 text-primary-400">Loja 1</h4>
+            <h4 className="text-lg font-semibold mb-4 text-primary-400">Loja 2</h4>
             <div className="space-y-3 text-gray-300">
               <div className="flex items-start space-x-3">
                 <MapPin className="h-5 w-5 text-primary-400 mt-1 flex-shrink-0" />
