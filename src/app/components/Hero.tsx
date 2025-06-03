@@ -1,6 +1,6 @@
 "use client"
 
-import { Star, ChevronDown, FileText, Calendar } from "lucide-react"
+import { Star, ChevronDown, FileText } from "lucide-react"
 import { useWeeklyPdfs } from "@/app/hooks/useWeeklyPdfs"
 
 export default function Hero() {
@@ -28,20 +28,17 @@ export default function Hero() {
           <div className="space-y-8">
             <h1 className="text-5xl md:text-7xl font-bold text-gray-800 leading-tight">
               Descubra as melhores
+              <br />
               <span className="text-red-600 bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent animate-pulse">
-                {" "}
                 promoções
               </span>{" "}
-              da
+              da{" "}
               <span className="text-green-600 bg-gradient-to-r from-green-500 to-green-700 bg-clip-text text-transparent animate-pulse">
-                {" "}
                 semana!
               </span>
             </h1>
 
-            <p className="text-2xl text-gray-700 leading-relaxed">
-              O nosso folheto quinzenal já está disponível! 🌟
-            </p>
+            <p className="text-2xl text-gray-700 leading-relaxed">O nosso folheto quinzenal já está disponível! 🌟</p>
             <p className="text-2xl text-gray-700 leading-relaxed">
               Repleto de produtos incríveis, com preços imperdíveis e descontos especiais só por tempo limitado.
             </p>
