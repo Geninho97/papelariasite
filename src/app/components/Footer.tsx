@@ -58,16 +58,39 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact Info */}
+          {/* Loja 1 */}
           <div>
-            <h4 className="text-lg font-semibold mb-4 text-primary-400">Contato</h4>
+            <h4 className="text-lg font-semibold mb-4 text-secondary-400">Loja 2</h4>
+            <div className="space-y-3 text-gray-300">
+              <div className="flex items-start space-x-3">
+                <MapPin className="h-5 w-5 text-secondary-400 mt-1 flex-shrink-0" />
+                <div>
+                  <p>Avenida São Miguel de Bustelo, 2835</p>
+                  <p>4560-042 Bustelo, Penafiel</p>
+                  <p>Portugal</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Phone className="h-5 w-5 text-primary-400 flex-shrink-0" />
+                <p>255720225</p>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Mail className="h-5 w-5 text-secondary-400 flex-shrink-0" />
+                <p>geral@coutyfil.pt</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Loja 2 */}
+          <div>
+            <h4 className="text-lg font-semibold mb-4 text-primary-400">Loja 1</h4>
             <div className="space-y-3 text-gray-300">
               <div className="flex items-start space-x-3">
                 <MapPin className="h-5 w-5 text-primary-400 mt-1 flex-shrink-0" />
                 <div>
-                  <p>Edf. Estádio, R. Abílio Miranda Loja Q e R</p>
-                  <p>4560-501</p>
-                  <p>Penafiel</p>
+                  <p>R. Abílio Miranda, Edf. Estádio, Loja Q/R</p>
+                  <p>4560-501 - Penafiel</p>
+                  <p>Portugal</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
@@ -80,6 +103,8 @@ export default function Footer() {
               </div>
             </div>
           </div>
+
+          
         </div>
 
         {/* Bottom Bar */}
