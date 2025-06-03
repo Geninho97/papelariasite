@@ -13,7 +13,7 @@ export default function About() {
           {/* Content */}
           <div className="space-y-10">
             <div>
-              <h2 className="text-5xl md:text-6xl font-bold text-gray-800 mb-8">Sobre a Papelaria</h2>
+              <h2 className="text-5xl md:text-6xl font-bold text-gray-800 mb-8">Quem Somos ?</h2>
               <div className="w-32 h-2 bg-gradient-to-r from-red-500 to-green-500 mb-8 rounded-full"></div>
               <p className="text-2xl text-gray-600 leading-relaxed mb-8">
                 A Coutyfil é uma empresa familiar, sediada em Penafiel e dedicada à venda ao retalho desde 1964.
