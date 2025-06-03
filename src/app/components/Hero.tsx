@@ -41,6 +41,8 @@ export default function Hero() {
 
             <p className="text-2xl text-gray-700 leading-relaxed">
               O nosso folheto quinzenal já está disponível! 🌟
+            </p>
+            <p className="text-2xl text-gray-700 leading-relaxed">
               Repleto de produtos incríveis, com preços imperdíveis e descontos especiais só por tempo limitado.
             </p>
             <div className="flex items-center space-x-2">
