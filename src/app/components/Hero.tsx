@@ -68,13 +68,39 @@ export default function Hero() {
                   </div>
                 </div>
               ) : latestPdf ? (
-                <div className="space-y-0">
-                  {/* PDF Container com header sobreposto */}
+                <div className="relative">
+                  {/* Header personalizado FORA do container do PDF */}
+                  <div className="bg-gradient-to-r from-red-500 to-green-500 text-white p-3 rounded-t-lg mb-0 relative z-10">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <FileText className="h-5 w-5" />
+                        <div>
+                          <h3 className="font-bold text-base">{latestPdf.name}</h3>
+                          <div className="flex items-center space-x-2 text-sm opacity-90">
+                            <Calendar className="h-4 w-4" />
+                            <span>
+                              Semana {latestPdf.week}/{latestPdf.year}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <a
+                        href={latestPdf.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-white/20 hover:bg-white/30 px-3 py-2 rounded-lg transition-colors text-sm font-medium"
+                      >
+                        Abrir PDF
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* PDF Container */}
                   <a href={latestPdf.url} target="_blank" rel="noopener noreferrer" className="block relative group">
                     {/* Container principal do PDF */}
                     <div
-                      className="relative bg-white rounded-lg shadow-lg overflow-hidden border border-gray-300"
-                      style={{ width: "424px", height: "600px" }}
+                      className="relative bg-white rounded-b-lg shadow-lg overflow-hidden border border-gray-300 border-t-0"
+                      style={{ width: "424px", height: "570px" }}
                     >
                       {/* PDF Object */}
                       <object
@@ -84,6 +110,7 @@ export default function Hero() {
                         style={{
                           overflow: "hidden",
                           pointerEvents: "none",
+                          marginTop: "-40px", // Ajuste para esconder a barra de ferramentas do PDF
                         }}
                       >
                         <div className="w-full h-full flex items-center justify-center bg-gray-100">
@@ -93,36 +120,6 @@ export default function Hero() {
 
                       {/* Overlay para esconder a barra de rolagem direita */}
                       <div className="absolute top-0 right-0 bottom-0 w-4 bg-white" style={{ zIndex: 10 }}></div>
-
-                      {/* Header personalizado que cobre a barra do PDF */}
-                      <div
-                        className="absolute top-0 left-0 right-0 bg-gradient-to-r from-red-500 to-green-500 text-white p-3 rounded-t-lg"
-                        style={{ zIndex: 20 }}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-3">
-                            <FileText className="h-5 w-5" />
-                            <div>
-                              <h3 className="font-bold text-base">{latestPdf.name}</h3>
-                              <div className="flex items-center space-x-2 text-sm opacity-90">
-                                <Calendar className="h-4 w-4" />
-                                <span>
-                                  Semana {latestPdf.week}/{latestPdf.year}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <div
-                            className="bg-white/20 hover:bg-white/30 px-3 py-2 rounded-lg transition-colors text-sm font-medium"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              window.open(latestPdf.url, "_blank")
-                            }}
-                          >
-                            Abrir PDF
-                          </div>
-                        </div>
-                      </div>
 
                       {/* Hover overlay */}
                       <div
@@ -139,8 +136,8 @@ export default function Hero() {
                     </div>
 
                     {/* A4 Paper Effect */}
-                    <div className="absolute -bottom-1 -right-1 w-full h-full bg-gray-200 rounded-lg -z-10"></div>
-                    <div className="absolute -bottom-2 -right-2 w-full h-full bg-gray-300 rounded-lg -z-20"></div>
+                    <div className="absolute -bottom-1 -right-1 w-full h-full bg-gray-200 rounded-b-lg -z-10"></div>
+                    <div className="absolute -bottom-2 -right-2 w-full h-full bg-gray-300 rounded-b-lg -z-20"></div>
                   </a>
                 </div>
               ) : (
