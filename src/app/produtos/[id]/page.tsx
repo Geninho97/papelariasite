@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { ArrowLeft, ShoppingBag, Heart, Share2 } from "lucide-react"
+import { ArrowLeft, ShoppingBag, Heart, Share2 } from 'lucide-react'
 import Link from "next/link"
 import { useProducts, type Product } from "@/app/hooks/useProducts"
 import Header from "@/app/components/Header"
@@ -137,8 +137,6 @@ export default function ProductPage() {
                   </div>
                 </div>
 
-                <div className="text-3xl font-bold text-red-600">€{product.price.toFixed(2)}</div>
-
                 <div>
                   <h3 className="text-lg font-semibold text-gray-800 mb-2">Descrição</h3>
                   <p className="text-gray-600 leading-relaxed">{product.description}</p>
@@ -155,7 +153,6 @@ export default function ProductPage() {
                       <span className="text-green-500 mr-2">✓</span>
                       <span>Garantia de satisfação</span>
                     </li>
-
                   </ul>
                 </div>
 
@@ -188,7 +185,6 @@ export default function ProductPage() {
                     </div>
                     <div className="p-4">
                       <h3 className="font-bold text-gray-800 mb-1">{relatedProduct.name}</h3>
-                      <p className="text-red-600 font-bold">€{relatedProduct.price.toFixed(2)}</p>
                     </div>
                   </Link>
                 ))}

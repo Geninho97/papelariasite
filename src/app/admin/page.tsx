@@ -115,7 +115,7 @@ export default function AdminPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData.name || !formData.description || !formData.price || !formData.category) {
+    if (!formData.name || !formData.description || !formData.category) {
       showStatus("error", "Por favor, preencha todos os campos obrigatórios")
       return
     }
@@ -129,6 +129,7 @@ export default function AdminPage() {
         const maxOrder = Math.max(...featuredProducts.map((p) => p.order), 0)
         await addProduct({
           ...formData,
+          price: 0, // Preço padrão 0
           featured: true,
           order: maxOrder + 1,
           image: formData.image || "/placeholder.svg?height=300&width=300",
@@ -467,24 +468,13 @@ export default function AdminPage() {
             </h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Basic Info */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Nome do Produto *</label>
                   <input
                     type="text"
                     value={formData.name || ""}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Preço (€) *</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={formData.price || ""}
-                    onChange={(e) => setFormData({ ...formData, price: Number.parseFloat(e.target.value) })}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     required
                   />
@@ -570,9 +560,7 @@ export default function AdminPage() {
                   />
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-800">{product.name}</h3>
-                    <p className="text-sm text-gray-600">
-                      {product.category} • €{product.price.toFixed(2)}
-                    </p>
+                    <p className="text-sm text-gray-600">{product.category}</p>
                   </div>
                   <div className="flex items-center space-x-2">
                     <button
@@ -632,9 +620,7 @@ export default function AdminPage() {
                     className="w-full h-32 object-cover rounded-lg mb-3"
                   />
                   <h3 className="font-semibold text-gray-800 mb-1">{product.name}</h3>
-                  <p className="text-sm text-gray-600 mb-2">
-                    {product.category} • €{product.price.toFixed(2)}
-                  </p>
+                  <p className="text-sm text-gray-600 mb-2">{product.category}</p>
                   <div className="flex justify-between items-center">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${

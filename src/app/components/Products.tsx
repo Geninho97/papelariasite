@@ -1,6 +1,6 @@
 "use client"
 
-import { Heart, ChevronDown, ArrowRight, Plus, RefreshCw } from 'lucide-react'
+import { Heart, ChevronDown, ArrowRight, Plus, RefreshCw } from "lucide-react"
 import { useProducts } from "../hooks/useProducts"
 import Link from "next/link"
 import { useEffect, useState } from "react"
@@ -90,6 +90,10 @@ export default function Products() {
             Descubra os nossos produtos mais recentes e populares em destaque
           </p>
           <div className="w-20 h-1 bg-gradient-to-r from-red-500 to-green-500 mx-auto mt-3 rounded-full"></div>
+          <div className="flex items-center justify-center mt-2 text-xs text-gray-500">
+            <RefreshCw className="h-3 w-3 mr-1" />
+            <span>Última sincronização: {lastSyncTime}</span>
+          </div>
         </div>
 
         {/* Products Grid */}
@@ -130,8 +134,7 @@ export default function Products() {
                   {product.name}
                 </h3>
                 <p className="text-gray-600 mb-3 text-sm line-clamp-2">{product.description}</p>
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-bold text-green-600">€{product.price.toFixed(2)}</span>
+                <div className="flex justify-end items-center">
                   <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">Ver detalhes</span>
                 </div>
               </div>
@@ -148,6 +151,7 @@ export default function Products() {
             <span>Ver Todos os Produtos</span>
             <ArrowRight className="h-5 w-5" />
           </Link>
+          <p className="text-sm text-gray-600 mt-2">Explore todo o nosso catálogo</p>
         </div>
       </div>
 
