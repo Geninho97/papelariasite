@@ -164,7 +164,7 @@ export default function Hero() {
             )}
 
             {/* Additional floating element */}
-            <div className="absolute top-1/2 -left-8 bg-gradient-to-r from-red-400 to-pink-400 text-white px-6 py-3 rounded-full font-semibold shadow-lg transform -rotate-45 animate-pulse delay-700">
+            <div className="absolute top-1/2 left-10 bg-gradient-to-r from-red-400 to-pink-400 text-white px-6 py-3 rounded-full font-semibold shadow-lg transform -rotate-45 animate-pulse delay-700">
               Novo!
             </div>
           </div>
