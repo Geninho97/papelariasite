@@ -27,21 +27,21 @@ export default function Hero() {
           {/* Content */}
           <div className="space-y-8">
             <h1 className="text-5xl md:text-7xl font-bold text-gray-800 leading-tight">
-              Tudo para seu
+              Descubra as melhores
               <span className="text-red-600 bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent animate-pulse">
                 {" "}
-                escritório
+                promoções
               </span>{" "}
-              e
+              da
               <span className="text-green-600 bg-gradient-to-r from-green-500 to-green-700 bg-clip-text text-transparent animate-pulse">
                 {" "}
-                escola
+                semana!
               </span>
             </h1>
 
             <p className="text-2xl text-gray-700 leading-relaxed">
-              Na Papelaria você encontra os melhores produtos para escritório, escola e casa com preços imbatíveis e
-              atendimento de qualidade excepcional.
+              O nosso folheto quinzenal já está disponível! 🌟
+              Repleto de produtos incríveis, com preços imperdíveis e descontos especiais só por tempo limitado.
             </p>
             <div className="flex items-center space-x-2">
               <div className="flex text-yellow-500">
@@ -75,12 +75,6 @@ export default function Hero() {
                       <FileText className="h-5 w-5" />
                       <div>
                         <h3 className="font-bold text-base">{latestPdf.name}</h3>
-                        <div className="flex items-center space-x-2 text-sm opacity-90">
-                          <Calendar className="h-4 w-4" />
-                          <span>
-                            Semana {latestPdf.week}/{latestPdf.year}
-                          </span>
-                        </div>
                       </div>
                     </div>
                     <a
