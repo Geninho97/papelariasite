@@ -60,7 +60,7 @@ export default function Hero() {
           {/* PDF Preview - Tablet Style */}
           <div className="relative flex justify-center">
             {loading ? (
-              <div className="w-[480px] h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl border-8 border-gray-300 shadow-2xl">
+              <div className="w-[460px] h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl border-8 border-gray-300 shadow-2xl">
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
                   <p className="text-gray-600">Carregando catálogo semanal...</p>
@@ -99,7 +99,7 @@ export default function Hero() {
                   {/* Tablet Frame */}
                   <div
                     className="bg-gradient-to-b from-gray-200 to-gray-400 rounded-3xl p-6 shadow-2xl border-2 border-gray-300"
-                    style={{ width: "480px", height: "600px" }}
+                    style={{ width: "460px", height: "600px" }}
                   >
                     {/* Tablet Screen */}
                     <div className="bg-black rounded-2xl p-1 h-full w-full relative overflow-hidden">
@@ -154,7 +154,7 @@ export default function Hero() {
                 </div>
               </div>
             ) : (
-              <div className="w-[480px] h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl border-8 border-gray-300 shadow-2xl">
+              <div className="w-[460px] h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl border-8 border-gray-300 shadow-2xl">
                 <div className="text-center">
                   <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-xl font-bold text-gray-800 mb-2">Nenhum catálogo disponível</h3>
