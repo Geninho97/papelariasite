@@ -166,10 +166,6 @@ export default function ProductPage() {
 
                 {/* Actions */}
                 <div className="flex flex-wrap gap-4 pt-6">
-                  <button className="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 px-6 rounded-lg flex items-center justify-center space-x-2 transition-colors">
-                    <ShoppingBag className="h-5 w-5" />
-                    <span>Adicionar ao Carrinho</span>
-                  </button>
                   <button className="bg-gray-200 hover:bg-gray-300 p-3 rounded-lg transition-colors">
                     <Heart className="h-5 w-5 text-gray-600" />
                   </button>
