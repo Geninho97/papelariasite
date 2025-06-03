@@ -57,9 +57,9 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* PDF Viewer */}
+          {/* PDF Preview */}
           <div className="relative">
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-6 border border-gray-200 hover:shadow-3xl transition-all duration-500">
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-4 border border-gray-200 hover:shadow-3xl transition-all duration-500">
               {loading ? (
                 <div className="h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl">
                   <div className="text-center">
@@ -68,13 +68,13 @@ export default function Hero() {
                   </div>
                 </div>
               ) : latestPdf ? (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {/* PDF Header */}
-                  <div className="flex items-center justify-between bg-gradient-to-r from-red-500 to-green-500 text-white p-4 rounded-xl">
+                  <div className="flex items-center justify-between bg-gradient-to-r from-red-500 to-green-500 text-white p-3 rounded-xl">
                     <div className="flex items-center space-x-3">
-                      <FileText className="h-6 w-6" />
+                      <FileText className="h-5 w-5" />
                       <div>
-                        <h3 className="font-bold text-lg">{latestPdf.name}</h3>
+                        <h3 className="font-bold text-base">{latestPdf.name}</h3>
                         <div className="flex items-center space-x-2 text-sm opacity-90">
                           <Calendar className="h-4 w-4" />
                           <span>
@@ -87,19 +87,49 @@ export default function Hero() {
                       href={latestPdf.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+                      className="bg-white/20 hover:bg-white/30 px-3 py-2 rounded-lg transition-colors text-sm font-medium"
                     >
                       Abrir PDF
                     </a>
                   </div>
 
-                  {/* PDF Embed */}
-                  <div className="h-[600px] rounded-2xl overflow-hidden border-2 border-gray-200">
-                    <iframe
-                      src={`${latestPdf.url}#toolbar=0&navpanes=0&scrollbar=0`}
-                      className="w-full h-full"
-                      title={latestPdf.name}
-                    />
+                  {/* PDF First Page Preview - Clickable */}
+                  <div className="relative group cursor-pointer" onClick={() => window.open(latestPdf.url, "_blank")}>
+                    {/* PDF Preview Container */}
+                    <div className="h-[600px] rounded-2xl overflow-hidden border-2 border-gray-200 bg-white relative">
+                      {/* PDF as background iframe for preview */}
+                      <iframe
+                        src={`${latestPdf.url}#toolbar=0&navpanes=0&scrollbar=0&page=1&zoom=page-fit`}
+                        className="w-full h-full pointer-events-none"
+                        title={`Preview de ${latestPdf.name}`}
+                        style={{
+                          transform: "scale(1.0)",
+                          transformOrigin: "top left",
+                        }}
+                      />
+
+                      {/* Hover overlay */}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 flex items-center justify-center">
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg">
+                          <div className="flex items-center space-x-2 text-gray-800 font-medium">
+                            <FileText className="h-5 w-5" />
+                            <span>Clique para abrir PDF completo</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Click indicator */}
+                    <div className="absolute top-3 right-3 bg-green-500 text-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                        />
+                      </svg>
+                    </div>
                   </div>
                 </div>
               ) : (
