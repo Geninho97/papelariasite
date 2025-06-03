@@ -26,19 +26,19 @@ export default function Contact() {
               <div className="bg-red-100 p-3 rounded-full">
                 <MapPin className="h-6 w-6 text-red-600" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-800">Loja 1</h3>
+              <h3 className="text-2xl font-bold text-gray-800">Coutyfil - Supermecado</h3>
             </div>
 
             <div className="space-y-4 text-gray-700">
               <div>
-                <p>Edf. Estádio, R. Abílio Miranda Loja Q e R</p>
-                <p>4560-501</p>
-                <p>Penafiel</p>
+                <p>Avenida São Miguel de Bustelo, 2835</p>
+                <p>4560-042 - Bustelo - Penafiel</p>
+                <p>Portugal</p>
               </div>
 
               <div className="flex items-center space-x-2">
                 <Phone className="h-4 w-4 text-gray-600" />
-                <span>255214418</span>
+                <span>255720225</span>
               </div>
 
               <div className="space-y-1">
@@ -59,14 +59,14 @@ export default function Contact() {
               <div className="bg-green-100 p-3 rounded-full">
                 <MapPin className="h-6 w-6 text-green-600" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-800">Loja 2</h3>
+              <h3 className="text-2xl font-bold text-gray-800">Coutyfil - Papelaria</h3>
             </div>
 
             <div className="space-y-4 text-gray-700">
               <div>
-                <p>Avenida São Miguel de Bustelo, 2835</p>
-                <p>4560-042 Bustelo PNF</p>
-                <p>Penafiel</p>
+                <p>R. Abílio Miranda, Edf. Estádio, Loja Q/R</p>
+                <p>4560-501 Penafiel</p>
+                <p>Portugal</p>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -85,11 +85,6 @@ export default function Contact() {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Mapa */}
-        <div className="bg-gray-200 h-64 rounded-xl flex items-center justify-center shadow-lg">
-          <p className="text-gray-500 text-lg">Mapa da localização</p>
         </div>
       </div>
     </section>
