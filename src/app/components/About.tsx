@@ -42,7 +42,7 @@ export default function About() {
           {/* Image */}
           <div className="relative">
             <img
-              src="/images/loja.png?height=600&width=700"
+              src="https://maps.app.goo.gl/hHt622n38rnhKBef7?height=600&width=700"
               alt="Nossa loja"
               className="w-full h-[500px] object-cover rounded-3xl shadow-3xl border-4 border-white transform hover:scale-105 transition-all duration-500"
             />
