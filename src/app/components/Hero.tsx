@@ -60,7 +60,7 @@ export default function Hero() {
           {/* PDF Preview - Tablet Style */}
           <div className="relative flex justify-center">
             {loading ? (
-              <div className="w-[400px] h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl border-8 border-gray-300 shadow-2xl">
+              <div className="w-[480px] h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl border-8 border-gray-300 shadow-2xl">
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
                   <p className="text-gray-600">Carregando catálogo semanal...</p>
