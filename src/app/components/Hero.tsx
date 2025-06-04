@@ -178,11 +178,6 @@ export default function Hero() {
                 </div>
               </div>
             )}
-
-            {/* Additional floating element - menor em mobile */}
-            <div className="absolute top-1/2 left-5 sm:left-10 bg-gradient-to-r from-red-400 to-pink-400 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-full font-semibold shadow-lg transform -rotate-45 animate-pulse delay-700 text-sm sm:text-base">
-              Novo!
-            </div>
           </div>
         </div>
       </div>
