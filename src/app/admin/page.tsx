@@ -21,6 +21,8 @@ import {
   Clock,
   FileText,
   Calendar,
+  Star,
+  StarOff,
 } from "lucide-react"
 import Link from "next/link"
 import LoginForm from "./components/LoginForm"
@@ -64,6 +66,7 @@ export default function AdminPage() {
   const [lastUpdateFormatted, setLastUpdateFormatted] = useState<string>("")
 
   const featuredProducts = getFeaturedProducts()
+  const nonFeaturedProducts = products.filter((product) => !product.featured)
 
   const categories = ["Escolar", "Escritório", "Escrita", "Papel", "Eletrônicos", "Brinquedos", "Diversão"]
 
@@ -126,16 +129,16 @@ export default function AdminPage() {
         setEditingProduct(null)
         showStatus("success", "Produto atualizado com sucesso!")
       } else {
-        const maxOrder = Math.max(...featuredProducts.map((p) => p.order), 0)
+        // Adicionar produto SEM colocar em destaque automaticamente
         await addProduct({
           ...formData,
           price: 0, // Preço padrão 0
-          featured: true,
-          order: maxOrder + 1,
+          featured: false, // NÃO colocar em destaque automaticamente
+          order: 0, // Ordem padrão
           image: formData.image || "/placeholder.svg?height=300&width=300",
         } as Omit<Product, "id">)
         setIsAddingProduct(false)
-        showStatus("success", "Produto adicionado com sucesso!")
+        showStatus("success", "Produto adicionado à base de dados! Agora pode selecioná-lo para destaque.")
       }
       setFormData({})
     } catch (error) {
@@ -175,18 +178,33 @@ export default function AdminPage() {
 
   const handleToggleFeatured = async (productId: string) => {
     try {
-      await toggleFeatured(productId)
-      showStatus("success", "Status de destaque atualizado!")
+      const product = products.find((p) => p.id === productId)
+      if (!product) return
+
+      if (product.featured) {
+        // Remover dos destaques (mas manter na base de dados)
+        await updateProduct(productId, { featured: false, order: 0 })
+        showStatus("success", "Produto removido dos destaques!")
+      } else {
+        // Adicionar aos destaques
+        if (featuredProducts.length < 6) {
+          const maxOrder = Math.max(...featuredProducts.map((p) => p.order), 0)
+          await updateProduct(productId, { featured: true, order: maxOrder + 1 })
+          showStatus("success", "Produto adicionado aos destaques!")
+        } else {
+          showStatus("error", "Máximo de 6 produtos em destaque permitidos")
+        }
+      }
     } catch (error) {
       showStatus("error", error instanceof Error ? error.message : "Erro ao alterar destaque")
     }
   }
 
   const handleDeleteProduct = async (productId: string) => {
-    if (window.confirm("Tem certeza que deseja apagar este produto?")) {
+    if (window.confirm("Tem certeza que deseja apagar este produto DEFINITIVAMENTE da base de dados?")) {
       try {
         await deleteProduct(productId)
-        showStatus("success", "Produto apagado com sucesso!")
+        showStatus("success", "Produto apagado definitivamente da base de dados!")
       } catch (error) {
         showStatus("error", "Erro ao apagar produto")
       }
@@ -525,7 +543,7 @@ export default function AdminPage() {
                   className="flex items-center space-x-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
                 >
                   <Save className="h-4 w-4" />
-                  <span>{editingProduct ? "Atualizar" : "Adicionar"}</span>
+                  <span>{editingProduct ? "Atualizar" : "Adicionar à Base de Dados"}</span>
                 </button>
                 <button
                   type="button"
@@ -542,17 +560,29 @@ export default function AdminPage() {
 
         {/* Featured Products */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Produtos em Destaque (Ordem de Exibição)</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold text-gray-800">Produtos em Destaque (Ordem de Exibição)</h2>
+            <div className="text-sm text-gray-600">
+              <span className="font-medium">{featuredProducts.length}/6</span> produtos selecionados
+            </div>
+          </div>
+          <p className="text-gray-600 text-sm mb-6">
+            Estes produtos aparecem na página inicial. Use os botões abaixo para remover dos destaques (produto fica na
+            base de dados).
+          </p>
           {featuredProducts.length === 0 ? (
             <div className="text-center py-8">
-              <Database className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 text-lg">Nenhum produto em destaque na base de dados</p>
-              <p className="text-gray-500 text-sm mt-2">Adicione produtos e marque-os como destaque</p>
+              <Star className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600 text-lg">Nenhum produto em destaque</p>
+              <p className="text-gray-500 text-sm mt-2">Selecione produtos da base de dados para destacar</p>
             </div>
           ) : (
             <div className="space-y-4">
               {featuredProducts.map((product, index) => (
-                <div key={product.id} className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg">
+                <div
+                  key={product.id}
+                  className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg bg-green-50"
+                >
                   <img
                     src={product.image || "/placeholder.svg?height=80&width=80"}
                     alt={product.name}
@@ -567,6 +597,7 @@ export default function AdminPage() {
                       onClick={() => moveProduct(index, "up")}
                       disabled={index === 0}
                       className="p-2 text-gray-600 hover:text-gray-800 disabled:text-gray-300 disabled:cursor-not-allowed"
+                      title="Mover para cima"
                     >
                       <ArrowUp className="h-4 w-4" />
                     </button>
@@ -574,17 +605,23 @@ export default function AdminPage() {
                       onClick={() => moveProduct(index, "down")}
                       disabled={index === featuredProducts.length - 1}
                       className="p-2 text-gray-600 hover:text-gray-800 disabled:text-gray-300 disabled:cursor-not-allowed"
+                      title="Mover para baixo"
                     >
                       <ArrowDown className="h-4 w-4" />
                     </button>
-                    <button onClick={() => handleEdit(product)} className="p-2 text-blue-600 hover:text-blue-800">
+                    <button
+                      onClick={() => handleEdit(product)}
+                      className="p-2 text-blue-600 hover:text-blue-800"
+                      title="Editar produto"
+                    >
                       <Edit className="h-4 w-4" />
                     </button>
                     <button
-                      onClick={() => handleDeleteProduct(product.id)}
-                      className="p-2 text-red-600 hover:text-red-800"
+                      onClick={() => handleToggleFeatured(product.id)}
+                      className="p-2 text-orange-600 hover:text-orange-800"
+                      title="Remover dos destaques (mantém na base de dados)"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <StarOff className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
@@ -596,6 +633,9 @@ export default function AdminPage() {
         {/* All Products */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-bold text-gray-800 mb-4">Todos os Produtos na Base de Dados</h2>
+          <p className="text-gray-600 text-sm mb-6">
+            Todos os produtos armazenados. Use ⭐ para adicionar aos destaques ou 🗑️ para apagar DEFINITIVAMENTE.
+          </p>
           {products.length === 0 ? (
             <div className="text-center py-12">
               <Database className="h-24 w-24 text-gray-400 mx-auto mb-4" />
@@ -613,32 +653,45 @@ export default function AdminPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {products.map((product) => (
-                <div key={product.id} className="border border-gray-200 rounded-lg p-4">
+                <div
+                  key={product.id}
+                  className={`border-2 rounded-lg p-4 ${product.featured ? "border-green-400 bg-green-50" : "border-gray-200 bg-white"}`}
+                >
                   <img
                     src={product.image || "/placeholder.svg?height=150&width=150"}
                     alt={product.name}
                     className="w-full h-32 object-cover rounded-lg mb-3"
                   />
                   <h3 className="font-semibold text-gray-800 mb-1">{product.name}</h3>
-                  <p className="text-sm text-gray-600 mb-2">{product.category}</p>
+                  <p className="text-sm text-gray-600 mb-3">{product.category}</p>
                   <div className="flex justify-between items-center">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
                         product.featured ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
                       }`}
                     >
-                      {product.featured ? "Em Destaque" : "Normal"}
+                      {product.featured ? "⭐ Em Destaque" : "Normal"}
                     </span>
-                    <button
-                      onClick={() => handleToggleFeatured(product.id)}
-                      className={`px-3 py-1 rounded text-xs font-medium ${
-                        product.featured
-                          ? "bg-red-100 text-red-800 hover:bg-red-200"
-                          : "bg-green-100 text-green-800 hover:bg-green-200"
-                      }`}
-                    >
-                      {product.featured ? "Remover" : "Destacar"}
-                    </button>
+                    <div className="flex space-x-1">
+                      <button
+                        onClick={() => handleToggleFeatured(product.id)}
+                        className={`p-2 rounded text-xs font-medium transition-colors ${
+                          product.featured
+                            ? "bg-orange-100 text-orange-800 hover:bg-orange-200"
+                            : "bg-green-100 text-green-800 hover:bg-green-200"
+                        }`}
+                        title={product.featured ? "Remover dos destaques" : "Adicionar aos destaques"}
+                      >
+                        {product.featured ? <StarOff className="h-4 w-4" /> : <Star className="h-4 w-4" />}
+                      </button>
+                      <button
+                        onClick={() => handleDeleteProduct(product.id)}
+                        className="p-2 bg-red-100 text-red-800 hover:bg-red-200 rounded transition-colors"
+                        title="Apagar DEFINITIVAMENTE da base de dados"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
