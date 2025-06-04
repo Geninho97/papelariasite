@@ -60,6 +60,67 @@
   body {
     background-color: var(--neutral-cool);
   }
+
+  /* Sistema de escala responsiva baseado em 1080p */
+  .responsive-container {
+    width: 100%;
+    max-width: 1920px;
+    margin: 0 auto;
+    transform-origin: top center;
+  }
+
+  /* Escala para diferentes resoluções */
+  @media (max-width: 1920px) and (min-width: 1441px) {
+    .responsive-container {
+      transform: scale(calc(100vw / 1920));
+    }
+  }
+
+  @media (max-width: 1440px) and (min-width: 1201px) {
+    .responsive-container {
+      transform: scale(calc(100vw / 1440));
+    }
+  }
+
+  @media (max-width: 1200px) and (min-width: 1025px) {
+    .responsive-container {
+      transform: scale(calc(100vw / 1200));
+    }
+  }
+
+  @media (max-width: 1024px) and (min-width: 769px) {
+    .responsive-container {
+      transform: scale(calc(100vw / 1024));
+    }
+  }
+
+  /* Para tablets e mobile, mantemos responsivo normal */
+  @media (max-width: 768px) {
+    .responsive-container {
+      transform: none;
+    }
+  }
+
+  /* Ajustes específicos para manter legibilidade */
+  @media (max-width: 1440px) and (min-width: 769px) {
+    .responsive-text {
+      font-size: clamp(0.875rem, 1.2vw, 1rem);
+    }
+
+    .responsive-title {
+      font-size: clamp(1.5rem, 4vw, 3rem);
+    }
+
+    .responsive-subtitle {
+      font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+    }
+  }
+
+  /* Garantir que elementos não quebrem */
+  .scale-content {
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 }
 
 @layer utilities {
@@ -81,5 +142,15 @@
 
   .shadow-3xl {
     box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.25);
+  }
+
+  /* Utilitários para escala responsiva */
+  .fixed-aspect {
+    aspect-ratio: 16 / 9;
+  }
+
+  .viewport-scale {
+    transform: scale(var(--scale-factor, 1));
+    transform-origin: top center;
   }
 }

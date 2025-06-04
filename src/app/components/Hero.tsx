@@ -26,7 +26,7 @@ export default function Hero() {
         <div className="grid md:grid-cols-2 gap-12 items-center min-h-[80vh]">
           {/* Content */}
           <div className="space-y-8">
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-800 leading-tight flex flex-col">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-gray-800 leading-tight flex flex-col responsive-title">
               <span>Descubra as melhores</span>
               <span>
                 <span className="text-red-600 bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent animate-pulse">
@@ -39,8 +39,10 @@ export default function Hero() {
               </span>
             </h1>
 
-            <p className="text-2xl text-gray-700 leading-relaxed">O nosso folheto quinzenal já está disponível! 🌟</p>
-            <p className="text-2xl text-gray-700 leading-relaxed">
+            <p className="text-xl md:text-2xl lg:text-3xl text-gray-700 leading-relaxed responsive-subtitle">
+              O nosso folheto quinzenal já está disponível! 🌟
+            </p>
+            <p className="text-xl md:text-2xl lg:text-3xl text-gray-700 leading-relaxed responsive-subtitle">
               Repleto de produtos incríveis, com preços imperdíveis e descontos especiais só por tempo limitado.
             </p>
             <div className="flex items-center space-x-2">
@@ -48,19 +50,21 @@ export default function Hero() {
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className="h-6 w-6 fill-current animate-pulse"
+                    className="h-6 w-6 lg:h-8 lg:w-8 fill-current animate-pulse"
                     style={{ animationDelay: `${i * 200}ms` }}
                   />
                 ))}
               </div>
-              <span className="text-gray-700 font-medium text-lg">Mais de 1000 clientes satisfeitos</span>
+              <span className="text-gray-700 font-medium text-lg md:text-xl lg:text-2xl responsive-text">
+                Mais de 1000 clientes satisfeitos
+              </span>
             </div>
           </div>
 
           {/* PDF Preview - Tablet Style */}
           <div className="relative flex justify-center">
             {loading ? (
-              <div className="w-[460px] h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl border-8 border-gray-300 shadow-2xl">
+              <div className="w-[320px] h-[480px] md:w-[400px] md:h-[600px] lg:w-[460px] lg:h-[650px] xl:w-[520px] xl:h-[700px] flex items-center justify-center bg-gray-100 rounded-2xl border-8 border-gray-300 shadow-2xl">
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
                   <p className="text-gray-600">Carregando catálogo semanal...</p>
@@ -93,7 +97,10 @@ export default function Hero() {
                   {/* Tablet Frame */}
                   <div
                     className="bg-gradient-to-b from-gray-200 to-gray-400 rounded-3xl p-6 shadow-2xl border-2 border-gray-300"
-                    style={{ width: "460px", height: "600px" }}
+                    style={{
+                      width: "clamp(320px, 40vw, 520px)",
+                      height: "clamp(480px, 60vw, 700px)",
+                    }}
                   >
                     {/* Tablet Screen */}
                     <div className="bg-black rounded-2xl p-1 h-full w-full relative overflow-hidden">
@@ -148,7 +155,7 @@ export default function Hero() {
                 </div>
               </div>
             ) : (
-              <div className="w-[460px] h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl border-8 border-gray-300 shadow-2xl">
+              <div className="w-[320px] h-[480px] md:w-[400px] md:h-[600px] lg:w-[460px] lg:h-[650px] xl:w-[520px] xl:h-[700px] flex items-center justify-center bg-gray-100 rounded-2xl border-8 border-gray-300 shadow-2xl">
                 <div className="text-center">
                   <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-xl font-bold text-gray-800 mb-2">Nenhum catálogo disponível</h3>
