@@ -136,25 +136,6 @@ export default function ProductsPage() {
                   <option value="category">Categoria</option>
                 </select>
               </div>
-
-              {/* View Mode */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Visualização</label>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => setViewMode("grid")}
-                    className={`p-2 rounded-lg ${viewMode === "grid" ? "bg-red-600 text-white" : "bg-gray-200 text-gray-600"}`}
-                  >
-                    <Grid className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => setViewMode("list")}
-                    className={`p-2 rounded-lg ${viewMode === "list" ? "bg-red-600 text-white" : "bg-gray-200 text-gray-600"}`}
-                  >
-                    <List className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
             </div>
 
             {/* Results Count */}

@@ -90,10 +90,6 @@ export default function Products() {
             Descubra os nossos produtos mais recentes e populares em destaque
           </p>
           <div className="w-20 h-1 bg-gradient-to-r from-red-500 to-green-500 mx-auto mt-3 rounded-full"></div>
-          <div className="flex items-center justify-center mt-2 text-xs text-gray-500">
-            <RefreshCw className="h-3 w-3 mr-1" />
-            <span>Última sincronização: {lastSyncTime}</span>
-          </div>
         </div>
 
         {/* Products Grid */}
