@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic"
 // GET - Carregar PDFs semanais
 export async function GET() {
   try {
-    const { loadWeeklyPdfsFromCloud, getLatestWeeklyPdf } = await import("@/app/lib/storage-hybrid")
+    const { loadWeeklyPdfsFromCloud, getLatestWeeklyPdf } = await import("@/app/lib/storage-clean")
     const pdfs = await loadWeeklyPdfsFromCloud()
     const latest = await getLatestWeeklyPdf()
 
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "PDF muito grande (máximo 10MB)", success: false }, { status: 400 })
     }
 
-    const { addWeeklyPdf } = await import("@/app/lib/storage-hybrid")
+    const { addWeeklyPdf } = await import("@/app/lib/storage-clean")
     const newPdf = await addWeeklyPdf(file, name)
 
     return NextResponse.json({

@@ -45,25 +45,21 @@ export default function Hero() {
           {/* Content */}
           <div className="space-y-6 md:space-y-8 text-center md:text-left">
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 leading-tight flex flex-col">
-              <span>Descubra os </span>
+              <span>Descubra os destaques</span>
               <span>
-                <span className="text-red-600 bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent animate-pulse">
-                  destaques
-                </span>{" "}
                 no nosso{" "}
-                <span className="text-green-600 bg-gradient-to-r from-green-500 to-green-700 bg-clip-text text-transparent animate-pulse">
+                <span className="text-red-600 bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent animate-pulse">
                   folheto!
                 </span>
               </span>
             </h1>
 
-            <p className="text-xl sm:text-2xl text-gray-700 leading-relaxed">
-              Consulte o nosso folheto, que já está disponível! 🌟
-            </p>
-            <p className="text-xl sm:text-2xl text-gray-700 leading-relaxed">
-              Repleto de produtos incríveis, com preços imperdíveis e descontos especiais!!! 
-            <p className="text-xl sm:text-2xl text-gray-700 leading-relaxed">Aproveite já!!!</p>
-            </p>
+            <div className="text-xl sm:text-2xl text-gray-700 leading-relaxed">
+              Já está disponível o nosso folheto quinzenal! 🌟
+            </div>
+            <div className="text-xl sm:text-2xl text-gray-700 leading-relaxed">
+              Repleto de produtos incríveis, com preços imperdíveis e descontos especiais só por tempo limitado.
+            </div>
             <div className="flex items-center justify-center md:justify-start space-x-2">
               <div className="flex text-yellow-500">
                 {[...Array(5)].map((_, i) => (
@@ -84,7 +80,7 @@ export default function Hero() {
               <div className="w-full max-w-[460px] h-[400px] sm:h-[500px] md:h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl border-8 border-gray-300 shadow-2xl">
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
-                  <p className="text-gray-600">Carregando catálogo semanal...</p>
+                  <div className="text-gray-600">Carregando catálogo semanal...</div>
                 </div>
               </div>
             ) : latestPdf ? (
@@ -96,6 +92,12 @@ export default function Hero() {
                       <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
                       <div>
                         <h3 className="font-bold text-sm sm:text-base line-clamp-1">{latestPdf.name}</h3>
+                        {/* Verificar se o PDF é recente (últimos 7 dias) */}
+                        {new Date(latestPdf.uploadDate) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) && (
+                          <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold animate-pulse">
+                            NOVO!
+                          </span>
+                        )}
                       </div>
                     </div>
                     <a
@@ -144,7 +146,9 @@ export default function Hero() {
                             }}
                           >
                             <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                              <p className="text-gray-600 text-sm">Seu navegador não suporta visualização de PDF.</p>
+                              <div className="text-gray-600 text-sm">
+                                Seu navegador não suporta visualização de PDF.
+                              </div>
                             </div>
                           </object>
 
@@ -175,7 +179,7 @@ export default function Hero() {
                 <div className="text-center px-4">
                   <FileText className="h-12 w-12 sm:h-16 sm:w-16 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2">Nenhum catálogo disponível</h3>
-                  <p className="text-gray-600 text-sm sm:text-base">O catálogo semanal será carregado em breve</p>
+                  <div className="text-gray-600 text-sm sm:text-base">O catálogo semanal será carregado em breve</div>
                 </div>
               </div>
             )}

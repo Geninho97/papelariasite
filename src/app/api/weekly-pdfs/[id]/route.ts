@@ -11,7 +11,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
       return NextResponse.json({ error: "ID do PDF é obrigatório", success: false }, { status: 400 })
     }
 
-    const { deleteWeeklyPdf } = await import("@/app/lib/storage-hybrid")
+    const { deleteWeeklyPdf } = await import("@/app/lib/storage-clean")
     await deleteWeeklyPdf(pdfId)
 
     return NextResponse.json({

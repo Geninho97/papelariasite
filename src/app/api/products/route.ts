@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic"
 // GET - Carregar produtos
 export async function GET() {
   try {
-    const { loadProductsFromCloud } = await import("@/app/lib/storage-hybrid")
+    const { loadProductsFromCloud } = await import("@/app/lib/storage-clean")
     const products = await loadProductsFromCloud()
 
     return NextResponse.json({ products, success: true })
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const { saveProductsToCloud } = await import("@/app/lib/storage-hybrid")
+    const { saveProductsToCloud } = await import("@/app/lib/storage-clean")
     await saveProductsToCloud(products)
 
     return NextResponse.json({ success: true })
