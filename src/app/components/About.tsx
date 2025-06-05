@@ -51,7 +51,7 @@ export default function About() {
               className="w-full h-[300px] sm:h-[400px] md:h-[500px] object-cover rounded-2xl sm:rounded-3xl shadow-xl sm:shadow-3xl border-4 border-white transform hover:scale-105 transition-all duration-500"
             />
             <div className="absolute -bottom-4 sm:-bottom-6 lg:-bottom-8 -right-4 sm:-right-6 lg:-right-8 bg-gradient-to-r from-red-500 to-green-500 text-white p-3 sm:p-4 lg:p-6 rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl transform hover:scale-110 transition-all duration-300">
-              <p className="font-bold text-base sm:text-lg lg:text-xl">Visite a nossa loja!</p>
+              <p className="font-bold text-base sm:text-lg lg:text-xl">Visite as nossas lojas!</p>
             </div>
           </div>
         </div>
