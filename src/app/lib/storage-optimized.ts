@@ -5,6 +5,14 @@ import { localCache, CACHE_CONFIGS } from "./local-cache"
 // Configurações existentes
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+
+// Verificar se as variáveis existem
+if (!supabaseUrl || !supabaseServiceKey) {
+  console.error("❌ [STORAGE] Variáveis Supabase não configuradas:")
+  console.error("   NEXT_PUBLIC_SUPABASE_URL:", !!supabaseUrl)
+  console.error("   SUPABASE_SERVICE_ROLE_KEY:", !!supabaseServiceKey)
+}
+
 const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
 const r2Client = new S3Client({
@@ -48,6 +56,19 @@ export async function loadProductsFromCloud(): Promise<Product[]> {
   try {
     console.log("🔄 [PRODUCTS] Verificando cache local...")
 
+    // SEMPRE tentar carregar da database primeiro para debug
+    if (process.env.NODE_ENV === "development") {
+      console.log("🔧 [PRODUCTS] Modo desenvolvimento - carregando direto da database")
+      const products = await fetchProductsFromDatabase()
+
+      // Salvar no cache para próximas vezes
+      if (products.length > 0) {
+        localCache.set(CACHE_CONFIGS.PRODUCTS, products)
+      }
+
+      return products
+    }
+
     // Tentar carregar do cache primeiro
     const cachedProducts = localCache.get(CACHE_CONFIGS.PRODUCTS)
 
@@ -89,15 +110,28 @@ export async function loadProductsFromCloud(): Promise<Product[]> {
 
 // Função para buscar produtos da base de dados
 async function fetchProductsFromDatabase(): Promise<Product[]> {
-  const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false })
+  try {
+    console.log("🔄 [PRODUCTS] Conectando com Supabase...")
 
-  if (error) {
-    console.error("❌ Erro Supabase:", error)
-    return []
+    const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false })
+
+    if (error) {
+      console.error("❌ Erro Supabase:", error)
+      throw new Error(`Supabase Error: ${error.message}`)
+    }
+
+    console.log(`✅ ${data?.length || 0} produtos carregados da nuvem`)
+
+    // Log dos primeiros produtos para debug
+    if (data && data.length > 0) {
+      console.log("📋 [PRODUCTS] Primeiros produtos:", data.slice(0, 2))
+    }
+
+    return data || []
+  } catch (error) {
+    console.error("💥 [PRODUCTS] Erro na fetchProductsFromDatabase:", error)
+    throw error
   }
-
-  console.log(`✅ ${data?.length || 0} produtos carregados da nuvem`)
-  return data || []
 }
 
 // Verificar atualizações em background
@@ -161,8 +195,7 @@ export async function saveProductsToCloud(products: Product[]): Promise<void> {
   }
 }
 
-// ===== PDFs SEMANAIS COM CACHE =====
-
+// Resto das funções existentes...
 export async function loadWeeklyPdfsFromCloud(): Promise<WeeklyPdf[]> {
   try {
     console.log("🔄 [PDFS] Verificando cache local...")
@@ -171,10 +204,7 @@ export async function loadWeeklyPdfsFromCloud(): Promise<WeeklyPdf[]> {
 
     if (cachedPdfs) {
       console.log(`✅ [PDFS] ${cachedPdfs.length} PDFs carregados do cache`)
-
-      // Verificar atualizações em background
       checkForPdfUpdates()
-
       return cachedPdfs
     }
 
@@ -391,6 +421,19 @@ export function getCacheStats() {
 
 export function clearAllCache() {
   localCache.clearAll()
+
+  // Limpar também outros caches
+  if (typeof localStorage !== "undefined") {
+    const keys = []
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (key?.includes("coutyfil")) {
+        keys.push(key)
+      }
+    }
+    keys.forEach((key) => localStorage.removeItem(key))
+    console.log(`🧹 [CACHE] ${keys.length} itens removidos do localStorage`)
+  }
 }
 
 export function preloadImages(imageUrls: string[]) {
