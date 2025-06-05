@@ -109,9 +109,48 @@ export function useProducts() {
     await saveProducts(newProducts)
   }
 
+  // NOVA FUNÇÃO: Deletar produto DEFINITIVAMENTE da base de dados
   const deleteProduct = async (id: string) => {
-    const newProducts = products.filter((product) => product.id !== id)
-    await saveProducts(newProducts)
+    try {
+      setSaving(true)
+      setError(null)
+
+      console.log(`🗑️ [PRODUCTS] Deletando produto ${id} DEFINITIVAMENTE`)
+
+      // Remover da lista local
+      const newProducts = products.filter((product) => product.id !== id)
+
+      // Atualização otimista
+      setProducts(newProducts)
+
+      // Salvar na base de dados (sem o produto deletado)
+      const response = await fetch("/api/products", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ products: newProducts }),
+      })
+
+      const data = await response.json()
+
+      if (!data.success) {
+        // Se falhou, recarregar produtos
+        await loadProducts()
+        throw new Error(data.error || "Erro ao deletar produto")
+      }
+
+      console.log(`✅ [PRODUCTS] Produto ${id} deletado com sucesso`)
+      setLastUpdate(Date.now())
+    } catch (error) {
+      console.error(`❌ [PRODUCTS] Erro ao deletar produto ${id}:`, error)
+      setError(error instanceof Error ? error.message : "Erro ao deletar produto")
+      // Recarregar produtos em caso de erro
+      await loadProducts()
+      throw error
+    } finally {
+      setSaving(false)
+    }
   }
 
   const toggleFeatured = async (productId: string) => {
@@ -173,7 +212,7 @@ export function useProducts() {
     getFeaturedProducts,
     addProduct,
     updateProduct,
-    deleteProduct,
+    deleteProduct, // Agora deleta DEFINITIVAMENTE
     reorderFeaturedProducts,
     toggleFeatured,
     refreshProducts: loadProducts,

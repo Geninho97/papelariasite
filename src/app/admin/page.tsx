@@ -200,11 +200,17 @@ export default function AdminPage() {
     }
   }
 
+  // NOVA FUNÇÃO: Deletar produto DEFINITIVAMENTE
   const handleDeleteProduct = async (productId: string) => {
-    if (window.confirm("Tem certeza que deseja apagar este produto DEFINITIVAMENTE da base de dados?")) {
+    const product = products.find((p) => p.id === productId)
+    if (!product) return
+
+    const confirmMessage = `Tem certeza que deseja APAGAR DEFINITIVAMENTE o produto "${product.name}" da base de dados?\n\nEsta ação NÃO pode ser desfeita!`
+
+    if (window.confirm(confirmMessage)) {
       try {
         await deleteProduct(productId)
-        showStatus("success", "Produto apagado definitivamente da base de dados!")
+        showStatus("success", "Produto apagado DEFINITIVAMENTE da base de dados!")
       } catch (error) {
         showStatus("error", "Erro ao apagar produto")
       }
