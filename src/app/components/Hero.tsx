@@ -62,7 +62,7 @@ export default function Hero() {
             </p>
             <p className="text-xl sm:text-2xl text-gray-700 leading-relaxed">
               Repleto de produtos incríveis, com preços imperdíveis e descontos especiais!!! 
-              <span>Aproveite já!!!</span>
+            <p>Aproveite já!!!</p>
             </p>
             <div className="flex items-center justify-center md:justify-start space-x-2">
               <div className="flex text-yellow-500">
