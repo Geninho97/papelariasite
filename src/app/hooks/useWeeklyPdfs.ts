@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import type { WeeklyPdf } from "@/app/lib/storage-clean"
+import type { WeeklyPdf } from "@/app/lib/storage-optimized"
 
 export function useWeeklyPdfs() {
   const [pdfs, setPdfs] = useState<WeeklyPdf[]>([])

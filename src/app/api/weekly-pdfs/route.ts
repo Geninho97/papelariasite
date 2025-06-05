@@ -2,10 +2,10 @@ import { NextResponse } from "next/server"
 
 export const dynamic = "force-dynamic"
 
-// GET - Carregar PDFs semanais
+// GET - Carregar PDFs semanais com cache
 export async function GET() {
   try {
-    const { loadWeeklyPdfsFromCloud, getLatestWeeklyPdf } = await import("@/app/lib/storage-clean")
+    const { loadWeeklyPdfsFromCloud, getLatestWeeklyPdf } = await import("@/app/lib/storage-optimized")
     const pdfs = await loadWeeklyPdfsFromCloud()
     const latest = await getLatestWeeklyPdf()
 
@@ -13,6 +13,7 @@ export async function GET() {
       pdfs,
       latest,
       success: true,
+      cached: true,
     })
   } catch (error) {
     console.error("❌ Erro ao carregar PDFs:", error)
@@ -43,17 +44,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Nome é obrigatório", success: false }, { status: 400 })
     }
 
-    // Validar se é PDF
     if (file.type !== "application/pdf") {
       return NextResponse.json({ error: "Apenas arquivos PDF são permitidos", success: false }, { status: 400 })
     }
 
-    // Validar tamanho (máximo 10MB)
     if (file.size > 10 * 1024 * 1024) {
       return NextResponse.json({ error: "PDF muito grande (máximo 10MB)", success: false }, { status: 400 })
     }
 
-    const { addWeeklyPdf } = await import("@/app/lib/storage-clean")
+    const { addWeeklyPdf } = await import("@/app/lib/storage-optimized")
     const newPdf = await addWeeklyPdf(file, name)
 
     return NextResponse.json({

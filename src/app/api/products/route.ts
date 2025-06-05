@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server"
 
-export const dynamic = "force-dynamic"
+export const dynamic = "force_dynamic"
 
-// GET - Carregar produtos
+// GET - Carregar produtos com cache otimizado
 export async function GET() {
   try {
     console.log("🔄 [PRODUCTS] === CARREGANDO PRODUTOS ===")
 
-    // Verificar variáveis de ambiente primeiro
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
       console.error("❌ [PRODUCTS] Variáveis Supabase não configuradas")
       return NextResponse.json(
@@ -15,10 +14,6 @@ export async function GET() {
           products: [],
           success: false,
           error: "Configuração Supabase incompleta",
-          debug: {
-            hasUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-            hasKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-          },
         },
         { status: 500 },
       )
@@ -26,10 +21,9 @@ export async function GET() {
 
     console.log("✅ [PRODUCTS] Variáveis Supabase configuradas")
 
-    // Tentar carregar produtos
     try {
-      console.log("📦 [PRODUCTS] Importando storage...")
-      const { loadProductsFromCloud } = await import("@/app/lib/storage-clean")
+      console.log("📦 [PRODUCTS] Importando storage otimizado...")
+      const { loadProductsFromCloud } = await import("@/app/lib/storage-optimized")
 
       console.log("🔄 [PRODUCTS] Carregando produtos...")
       const products = await loadProductsFromCloud()
@@ -41,6 +35,7 @@ export async function GET() {
         success: true,
         count: products.length,
         timestamp: new Date().toISOString(),
+        cached: true, // Indica que pode estar usando cache
       })
     } catch (storageError) {
       console.error("💥 [PRODUCTS] Erro no storage:", storageError)
@@ -51,7 +46,6 @@ export async function GET() {
           success: false,
           error: "Erro ao carregar produtos do storage",
           details: storageError instanceof Error ? storageError.message : String(storageError),
-          stack: storageError instanceof Error ? storageError.stack : undefined,
         },
         { status: 500 },
       )
@@ -65,7 +59,6 @@ export async function GET() {
         success: false,
         error: "Erro interno do servidor",
         details: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
       },
       { status: 500 },
     )
@@ -89,7 +82,7 @@ export async function POST(request: Request) {
 
     console.log(`📊 [PRODUCTS] Salvando ${products.length} produtos`)
 
-    const { saveProductsToCloud } = await import("@/app/lib/storage-clean")
+    const { saveProductsToCloud } = await import("@/app/lib/storage-optimized")
     await saveProductsToCloud(products)
 
     console.log("✅ [PRODUCTS] Produtos salvos com sucesso")

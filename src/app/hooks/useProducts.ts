@@ -20,7 +20,7 @@ export function useProducts() {
   const [error, setError] = useState<string | null>(null)
   const [lastUpdate, setLastUpdate] = useState<number>(Date.now())
 
-  // Carregar produtos - SEM useCallback para evitar loops
+  // Carregar produtos com cache otimizado
   const loadProducts = async (silent = false) => {
     try {
       if (!silent) setLoading(true)
@@ -144,31 +144,25 @@ export function useProducts() {
     await saveProducts(newProducts)
   }
 
-  // Carregar produtos APENAS uma vez ao montar
+  // Carregar produtos ao montar
   useEffect(() => {
     loadProducts()
-  }, []) // IMPORTANTE: Array vazio
+  }, [])
 
-  // Polling simples - sem dependências complexas
+  // Escutar atualizações do cache
   useEffect(() => {
-    const interval = setInterval(async () => {
-      try {
-        const response = await fetch("/api/products/last-modified", {
-          cache: "no-store",
-        })
-        if (response.ok) {
-          const data = await response.json()
-          if (data.lastModified && data.lastModified > lastUpdate) {
-            loadProducts(true)
-          }
-        }
-      } catch (error) {
-        // Silencioso
-      }
-    }, 30000) // 30 segundos
+    const handleProductsUpdated = (event: CustomEvent) => {
+      console.log("🔄 [PRODUCTS] Cache atualizado automaticamente")
+      setProducts(event.detail)
+      setLastUpdate(Date.now())
+    }
 
-    return () => clearInterval(interval)
-  }, [lastUpdate]) // Apenas lastUpdate como dependência
+    window.addEventListener("productsUpdated", handleProductsUpdated as EventListener)
+
+    return () => {
+      window.removeEventListener("productsUpdated", handleProductsUpdated as EventListener)
+    }
+  }, [])
 
   return {
     products,

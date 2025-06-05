@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 
-export const dynamic = "force-dynamic"
+export const dynamic = "force_dynamic"
 
 export async function POST(request: Request) {
   try {
@@ -27,38 +27,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Imagem muito grande (máximo 5MB)", success: false }, { status: 400 })
     }
 
-    // Verificar variáveis de ambiente DETALHADAMENTE
-    const envVars = {
-      CLOUDFLARE_R2_ACCOUNT_ID: process.env.CLOUDFLARE_R2_ACCOUNT_ID,
-      CLOUDFLARE_R2_ACCESS_KEY_ID: process.env.CLOUDFLARE_R2_ACCESS_KEY_ID,
-      CLOUDFLARE_R2_SECRET_ACCESS_KEY: process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY,
-      CLOUDFLARE_R2_BUCKET_NAME: process.env.CLOUDFLARE_R2_BUCKET_NAME,
-    }
-
-    console.log("🔍 [UPLOAD] Verificando variáveis de ambiente:")
-    for (const [key, value] of Object.entries(envVars)) {
-      const exists = !!value
-      const length = value?.length || 0
-      console.log(`   ${key}: ${exists ? "✅" : "❌"} (${length} chars)`)
-
-      if (!exists) {
-        return NextResponse.json(
-          {
-            error: `Configuração incompleta: ${key} não definida`,
-            success: false,
-            debug: { missingVar: key },
-          },
-          { status: 500 },
-        )
-      }
-    }
-
-    console.log("✅ [UPLOAD] Todas as variáveis de ambiente estão definidas")
-
-    // Tentar importar e usar a função de upload
     try {
-      console.log("📦 [UPLOAD] Importando módulo de storage...")
-      const { uploadImageToCloud } = await import("@/app/lib/storage-clean")
+      console.log("📦 [UPLOAD] Importando módulo de storage otimizado...")
+      const { uploadImageToCloud } = await import("@/app/lib/storage-optimized")
 
       console.log("🚀 [UPLOAD] Iniciando upload para R2...")
       const imageUrl = await uploadImageToCloud(file)
@@ -71,43 +42,28 @@ export async function POST(request: Request) {
         method: "cloudflare-r2",
         filename: file.name,
         size: file.size,
+        cached: true, // Indica que a imagem foi cacheada localmente
       })
     } catch (uploadError) {
       console.error("💥 [UPLOAD] ERRO NO UPLOAD:", uploadError)
-
-      // Log detalhado do erro
-      if (uploadError instanceof Error) {
-        console.error("💥 [UPLOAD] Mensagem:", uploadError.message)
-        console.error("💥 [UPLOAD] Stack:", uploadError.stack)
-        console.error("💥 [UPLOAD] Nome:", uploadError.name)
-      }
 
       return NextResponse.json(
         {
           error: "Erro no upload para R2",
           details: uploadError instanceof Error ? uploadError.message : "Erro desconhecido",
           success: false,
-          debug: {
-            errorType: uploadError instanceof Error ? uploadError.name : typeof uploadError,
-            errorMessage: uploadError instanceof Error ? uploadError.message : String(uploadError),
-          },
         },
         { status: 500 },
       )
     }
   } catch (error) {
     console.error("💥 [UPLOAD] ERRO GERAL:", error)
-    console.error("💥 [UPLOAD] Stack trace:", error instanceof Error ? error.stack : "N/A")
 
     return NextResponse.json(
       {
         error: "Erro interno do servidor",
         details: error instanceof Error ? error.message : "Erro desconhecido",
         success: false,
-        debug: {
-          errorType: error instanceof Error ? error.name : typeof error,
-          timestamp: new Date().toISOString(),
-        },
       },
       { status: 500 },
     )

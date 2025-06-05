@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 
-export const dynamic = "force-dynamic"
+export const dynamic = "force_dynamic"
 
 // DELETE - Deletar PDF semanal
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
@@ -11,7 +11,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
       return NextResponse.json({ error: "ID do PDF é obrigatório", success: false }, { status: 400 })
     }
 
-    const { deleteWeeklyPdf } = await import("@/app/lib/storage-clean")
+    const { deleteWeeklyPdf } = await import("@/app/lib/storage-optimized")
     await deleteWeeklyPdf(pdfId)
 
     return NextResponse.json({
