@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 
-export const dynamic = "force_dynamic"
+export const dynamic = "force-dynamic"
 
 // DELETE - Deletar PDF semanal
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
