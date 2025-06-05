@@ -56,27 +56,35 @@ export async function loadProductsFromCloud(): Promise<Product[]> {
   try {
     console.log("🔄 [PRODUCTS] Verificando cache local...")
 
+    // Verificar se estamos no navegador
+    const isClient = typeof window !== "undefined"
+
     // SEMPRE tentar carregar da database primeiro para debug
     if (process.env.NODE_ENV === "development") {
       console.log("🔧 [PRODUCTS] Modo desenvolvimento - carregando direto da database")
       const products = await fetchProductsFromDatabase()
 
-      // Salvar no cache para próximas vezes
-      if (products.length > 0) {
+      // Salvar no cache para próximas vezes (apenas no cliente)
+      if (products.length > 0 && isClient) {
         localCache.set(CACHE_CONFIGS.PRODUCTS, products)
       }
 
       return products
     }
 
-    // Tentar carregar do cache primeiro
-    const cachedProducts = localCache.get(CACHE_CONFIGS.PRODUCTS)
+    // Tentar carregar do cache primeiro (apenas no cliente)
+    let cachedProducts = null
+    if (isClient) {
+      cachedProducts = localCache.get(CACHE_CONFIGS.PRODUCTS)
+    }
 
     if (cachedProducts) {
       console.log(`✅ [PRODUCTS] ${cachedProducts.length} produtos carregados do cache`)
 
-      // Verificar em background se há atualizações
-      checkForProductUpdates()
+      // Verificar em background (apenas no cliente)
+      if (isClient) {
+        checkForProductUpdates()
+      }
 
       return cachedProducts
     }
@@ -85,22 +93,26 @@ export async function loadProductsFromCloud(): Promise<Product[]> {
     console.log("☁️ [PRODUCTS] Carregando da nuvem...")
     const products = await fetchProductsFromDatabase()
 
-    // Salvar no cache
-    localCache.set(CACHE_CONFIGS.PRODUCTS, products)
+    // Salvar no cache (apenas no cliente)
+    if (isClient) {
+      localCache.set(CACHE_CONFIGS.PRODUCTS, products)
+    }
 
     return products
   } catch (error) {
     console.error("❌ Erro ao carregar produtos:", error)
 
-    // Em caso de erro, tentar retornar cache mesmo que expirado
-    const fallbackCache = localStorage.getItem("coutyfil_products")
-    if (fallbackCache) {
+    // Em caso de erro, tentar retornar cache mesmo que expirado (apenas no cliente)
+    if (typeof window !== "undefined") {
       try {
-        const parsed = JSON.parse(fallbackCache)
-        console.log("🆘 [PRODUCTS] Usando cache de emergência")
-        return parsed.data || []
+        const fallbackCache = localStorage.getItem("coutyfil_products")
+        if (fallbackCache) {
+          const parsed = JSON.parse(fallbackCache)
+          console.log("🆘 [PRODUCTS] Usando cache de emergência")
+          return parsed.data || []
+        }
       } catch {
-        return []
+        // Ignorar erros de fallback
       }
     }
 
@@ -137,6 +149,9 @@ async function fetchProductsFromDatabase(): Promise<Product[]> {
 // Verificar atualizações em background
 async function checkForProductUpdates(): Promise<void> {
   try {
+    // Verificar se estamos no navegador
+    if (typeof window === "undefined") return
+
     // Buscar apenas timestamp da última modificação
     const { data } = await supabase
       .from("products")
@@ -416,24 +431,27 @@ export async function getLatestWeeklyPdf(): Promise<WeeklyPdf | null> {
 // ===== UTILITÁRIOS DE CACHE =====
 
 export function getCacheStats() {
+  if (typeof window === "undefined") {
+    return { totalItems: 0, totalSize: 0, items: [] }
+  }
   return localCache.getStats()
 }
 
 export function clearAllCache() {
+  if (typeof window === "undefined") return
+
   localCache.clearAll()
 
   // Limpar também outros caches
-  if (typeof localStorage !== "undefined") {
-    const keys = []
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)
-      if (key?.includes("coutyfil")) {
-        keys.push(key)
-      }
+  const keys = []
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i)
+    if (key?.includes("coutyfil")) {
+      keys.push(key)
     }
-    keys.forEach((key) => localStorage.removeItem(key))
-    console.log(`🧹 [CACHE] ${keys.length} itens removidos do localStorage`)
   }
+  keys.forEach((key) => localStorage.removeItem(key))
+  console.log(`🧹 [CACHE] ${keys.length} itens removidos do localStorage`)
 }
 
 export function preloadImages(imageUrls: string[]) {

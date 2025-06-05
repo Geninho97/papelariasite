@@ -63,18 +63,19 @@ export async function GET() {
 
         // 4. Verificar cache local
         const cacheStats = {
-          localStorage: typeof localStorage !== "undefined",
+          localStorage: false, // Não temos localStorage no servidor
           cacheKeys: [] as string[],
         }
 
-        if (typeof localStorage !== "undefined") {
-          for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i)
-            if (key && key.includes("coutyfil")) {
-              cacheStats.cacheKeys.push(key)
-            }
-          }
-        }
+        // Remover a verificação de localStorage que não funciona no servidor
+        // if (typeof localStorage !== "undefined") {
+        //   for (let i = 0; i < localStorage.length; i++) {
+        //     const key = localStorage.key(i)
+        //     if (key && key.includes("coutyfil")) {
+        //       cacheStats.cacheKeys.push(key)
+        //     }
+        //   }
+        // }
 
         // 5. Testar API de produtos
         console.log("🔄 [DEBUG-PRODUCTS] Testando API de produtos...")

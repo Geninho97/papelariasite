@@ -15,6 +15,11 @@ interface CacheConfig {
 class LocalCache {
   private static instance: LocalCache
   private readonly CACHE_PREFIX = "coutyfil_"
+  private isClient: boolean
+
+  constructor() {
+    this.isClient = typeof window !== "undefined"
+  }
 
   static getInstance(): LocalCache {
     if (!LocalCache.instance) {
@@ -42,6 +47,8 @@ class LocalCache {
 
   // Salvar no cache
   set(config: CacheConfig, data: any): void {
+    if (!this.isClient) return
+
     try {
       const cacheData: CacheData = {
         data,
@@ -62,6 +69,8 @@ class LocalCache {
 
   // Recuperar do cache
   get(config: CacheConfig): any | null {
+    if (!this.isClient) return null
+
     try {
       const cached = localStorage.getItem(`${this.CACHE_PREFIX}${config.key}`)
 
@@ -89,6 +98,8 @@ class LocalCache {
 
   // Verificar se precisa atualizar
   async needsUpdate(config: CacheConfig, remoteChecksum: string): Promise<boolean> {
+    if (!this.isClient) return true
+
     const cached = this.get(config)
 
     if (!cached) return true
@@ -106,12 +117,16 @@ class LocalCache {
 
   // Remover item específico
   remove(key: string): void {
+    if (!this.isClient) return
+
     localStorage.removeItem(`${this.CACHE_PREFIX}${key}`)
     console.log(`🗑️ [CACHE] Removido: ${key}`)
   }
 
   // Limpar cache antigo (mais de 7 dias)
   clearOldCache(): void {
+    if (!this.isClient) return
+
     const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000
 
     for (let i = 0; i < localStorage.length; i++) {
@@ -133,6 +148,8 @@ class LocalCache {
 
   // Limpar todo o cache
   clearAll(): void {
+    if (!this.isClient) return
+
     const keys = []
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i)
@@ -147,6 +164,10 @@ class LocalCache {
 
   // Obter estatísticas do cache
   getStats(): { totalItems: number; totalSize: number; items: string[] } {
+    if (!this.isClient) {
+      return { totalItems: 0, totalSize: 0, items: [] }
+    }
+
     let totalSize = 0
     const items: string[] = []
 
@@ -175,17 +196,23 @@ export const localCache = LocalCache.getInstance()
 export const CACHE_CONFIGS = {
   PRODUCTS: {
     key: "products",
-    maxAge: 30 * 60 * 1000, // 30 minutos
+    maxAge: 30 * 60 * 1000, // 30 minutos - depois disso força reload
     version: "1.0.0",
   },
   WEEKLY_PDFS: {
     key: "weekly_pdfs",
-    maxAge: 60 * 60 * 1000, // 1 hora
+    maxAge: 60 * 60 * 1000, // 1 hora - PDFs mudam menos
     version: "1.0.0",
   },
   PRODUCT_IMAGES: {
     key: "product_images",
-    maxAge: 24 * 60 * 60 * 1000, // 24 horas
+    maxAge: 24 * 60 * 60 * 1000, // 24 horas - imagens raramente mudam
     version: "1.0.0",
   },
 } as const
+
+// Você pode ajustar estes tempos conforme necessário:
+// - 5 minutos: 5 * 60 * 1000
+// - 15 minutos: 15 * 60 * 1000
+// - 1 hora: 60 * 60 * 1000
+// - 1 dia: 24 * 60 * 60 * 1000
