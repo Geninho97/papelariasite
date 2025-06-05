@@ -187,6 +187,28 @@ async function checkForProductUpdates(): Promise<void> {
 export async function saveProductsToCloud(products: Product[]): Promise<void> {
   try {
     console.log("💾 [PRODUCTS] Salvando na nuvem...")
+    console.log(`📊 [PRODUCTS] Recebidos ${products.length} produtos para salvar`)
+
+    // Verificar se temos produtos válidos
+    if (!Array.isArray(products)) {
+      throw new Error("Products deve ser um array")
+    }
+
+    // Validar cada produto
+    for (let i = 0; i < products.length; i++) {
+      const product = products[i]
+      if (!product.id || !product.name) {
+        console.error(`❌ [PRODUCTS] Produto inválido no índice ${i}:`, product)
+        throw new Error(`Produto inválido no índice ${i}: faltam campos obrigatórios (id, name)`)
+      }
+    }
+
+    // Verificar conexão Supabase
+    if (!supabaseUrl || !supabaseServiceKey) {
+      throw new Error("Credenciais Supabase não configuradas")
+    }
+
+    console.log("🔄 [PRODUCTS] Executando upsert no Supabase...")
 
     const { error } = await supabase.from("products").upsert(
       products.map((product) => ({
@@ -195,13 +217,18 @@ export async function saveProductsToCloud(products: Product[]): Promise<void> {
       })),
     )
 
-    if (error) throw error
+    if (error) {
+      console.error("❌ [PRODUCTS] Erro Supabase:", error)
+      throw new Error(`Erro Supabase: ${error.message}`)
+    }
 
-    // Atualizar cache local
-    localCache.set(CACHE_CONFIGS.PRODUCTS, products)
+    console.log("✅ [PRODUCTS] Upsert concluído com sucesso")
 
-    // Atualizar timestamp de verificação
-    localStorage.setItem("coutyfil_products_last_check", Date.now().toString())
+    // Atualizar cache local (apenas no cliente)
+    if (typeof window !== "undefined") {
+      localCache.set(CACHE_CONFIGS.PRODUCTS, products)
+      localStorage.setItem("coutyfil_products_last_check", Date.now().toString())
+    }
 
     console.log(`✅ ${products.length} produtos salvos e cache atualizado`)
   } catch (error) {

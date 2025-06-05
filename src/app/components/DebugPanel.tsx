@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { RefreshCw, Bug, Trash2, Database, Eye } from "lucide-react"
+import { RefreshCw, Bug, Trash2, Database, Eye, Save } from "lucide-react"
 
 export default function DebugPanel() {
   const [debugInfo, setDebugInfo] = useState<any>(null)
@@ -25,6 +25,48 @@ export default function DebugPanel() {
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro de conexão")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const testSaveProducts = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      // Criar um produto de teste
+      const testProducts = [
+        {
+          id: "test-" + Date.now(),
+          name: "Produto Teste",
+          description: "Produto para teste de salvamento",
+          price: 10.99,
+          image: "/placeholder.svg?height=300&width=300",
+          category: "Teste",
+          featured: false,
+          order: 0,
+        },
+      ]
+
+      const response = await fetch("/api/debug/save-products", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ products: testProducts }),
+      })
+
+      const data = await response.json()
+      setDebugInfo(data)
+
+      if (data.success) {
+        alert("✅ Teste de salvamento bem-sucedido!")
+      } else {
+        setError(data.error || "Erro no teste de salvamento")
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro no teste")
     } finally {
       setLoading(false)
     }
@@ -98,6 +140,15 @@ export default function DebugPanel() {
           >
             <Database className="h-4 w-4" />
             <span>Diagnosticar Produtos</span>
+          </button>
+
+          <button
+            onClick={testSaveProducts}
+            disabled={loading}
+            className="w-full flex items-center space-x-2 bg-purple-600 text-white px-3 py-2 rounded hover:bg-purple-700 disabled:bg-gray-400"
+          >
+            <Save className="h-4 w-4" />
+            <span>Testar Salvamento</span>
           </button>
 
           <button
