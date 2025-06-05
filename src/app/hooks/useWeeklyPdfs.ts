@@ -73,20 +73,37 @@ export function useWeeklyPdfs() {
     }
   }
 
-  // Deletar PDF
+  // Deletar PDF e seu arquivo
   const deletePdf = async (pdfId: string) => {
     try {
       setSaving(true)
       setError(null)
 
+      // Chamar a API específica para deletar o PDF e seu arquivo
       const response = await fetch(`/api/weekly-pdfs/${pdfId}`, {
         method: "DELETE",
       })
 
       const data = await response.json()
 
-      if (!data.success) {
-        throw new Error(data.error || "Erro ao deletar")
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Erro ao deletar PDF")
+      }
+
+      console.log(`✅ [PDFS] PDF ${pdfId} deletado com sucesso:`, data.message)
+
+      // Limpar cache local
+      if (typeof localStorage !== "undefined") {
+        try {
+          // Tentar limpar cache de PDFs
+          localStorage.removeItem("coutyfil_weekly_pdfs")
+          localStorage.removeItem("coutyfil_pdfs_last_check")
+
+          // Limpar cache de 24h se existir
+          localStorage.removeItem("coutyfil_24h_weekly_pdfs")
+        } catch (e) {
+          // Ignorar erros de localStorage
+        }
       }
 
       // Recarregar PDFs

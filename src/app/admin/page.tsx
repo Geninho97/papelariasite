@@ -64,6 +64,7 @@ export default function AdminPage() {
     message: "",
   })
   const [lastUpdateFormatted, setLastUpdateFormatted] = useState<string>("")
+  const [isDeleting, setIsDeleting] = useState<string | null>(null)
 
   const featuredProducts = getFeaturedProducts()
   const nonFeaturedProducts = products.filter((product) => !product.featured)
@@ -200,19 +201,20 @@ export default function AdminPage() {
     }
   }
 
-  // NOVA FUNÇÃO: Deletar produto DEFINITIVAMENTE
   const handleDeleteProduct = async (productId: string) => {
-    const product = products.find((p) => p.id === productId)
-    if (!product) return
-
-    const confirmMessage = `Tem certeza que deseja APAGAR DEFINITIVAMENTE o produto "${product.name}" da base de dados?\n\nEsta ação NÃO pode ser desfeita!`
-
-    if (window.confirm(confirmMessage)) {
+    if (
+      window.confirm(
+        "Tem certeza que deseja APAGAR PERMANENTEMENTE este produto?\n\nEsta ação irá:\n- Remover o produto da base de dados\n- Apagar a imagem do produto do servidor\n- Remover o produto de todos os destaques\n\nEsta ação NÃO pode ser desfeita!",
+      )
+    ) {
       try {
+        setIsDeleting(productId)
         await deleteProduct(productId)
-        showStatus("success", "Produto apagado DEFINITIVAMENTE da base de dados!")
+        showStatus("success", "Produto apagado permanentemente da base de dados e do servidor!")
       } catch (error) {
         showStatus("error", "Erro ao apagar produto")
+      } finally {
+        setIsDeleting(null)
       }
     }
   }
@@ -640,7 +642,7 @@ export default function AdminPage() {
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-bold text-gray-800 mb-4">Todos os Produtos na Base de Dados</h2>
           <p className="text-gray-600 text-sm mb-6">
-            Todos os produtos armazenados. Use ⭐ para adicionar aos destaques ou 🗑️ para apagar DEFINITIVAMENTE.
+            Todos os produtos armazenados. Use ⭐ para adicionar aos destaques ou 🗑️ para apagar PERMANENTEMENTE.
           </p>
           {products.length === 0 ? (
             <div className="text-center py-12">
@@ -687,15 +689,21 @@ export default function AdminPage() {
                             : "bg-green-100 text-green-800 hover:bg-green-200"
                         }`}
                         title={product.featured ? "Remover dos destaques" : "Adicionar aos destaques"}
+                        disabled={isDeleting === product.id}
                       >
                         {product.featured ? <StarOff className="h-4 w-4" /> : <Star className="h-4 w-4" />}
                       </button>
                       <button
                         onClick={() => handleDeleteProduct(product.id)}
                         className="p-2 bg-red-100 text-red-800 hover:bg-red-200 rounded transition-colors"
-                        title="Apagar DEFINITIVAMENTE da base de dados"
+                        title="Apagar PERMANENTEMENTE da base de dados e do servidor"
+                        disabled={isDeleting === product.id}
                       >
-                        <Trash2 className="h-4 w-4" />
+                        {isDeleting === product.id ? (
+                          <RefreshCw className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
                       </button>
                     </div>
                   </div>

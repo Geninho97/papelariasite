@@ -109,7 +109,7 @@ export function useProducts() {
     await saveProducts(newProducts)
   }
 
-  // NOVA FUNÇÃO: Deletar produto DEFINITIVAMENTE da base de dados
+  // Deletar produto DEFINITIVAMENTE da base de dados e do storage
   const deleteProduct = async (id: string) => {
     try {
       setSaving(true)
@@ -117,31 +117,41 @@ export function useProducts() {
 
       console.log(`🗑️ [PRODUCTS] Deletando produto ${id} DEFINITIVAMENTE`)
 
-      // Remover da lista local
+      // Remover da lista local (atualização otimista)
       const newProducts = products.filter((product) => product.id !== id)
-
-      // Atualização otimista
       setProducts(newProducts)
 
-      // Salvar na base de dados (sem o produto deletado)
-      const response = await fetch("/api/products", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ products: newProducts }),
+      // Chamar a API específica para deletar o produto e sua imagem
+      const response = await fetch(`/api/products/${id}`, {
+        method: "DELETE",
       })
 
       const data = await response.json()
 
-      if (!data.success) {
+      if (!response.ok || !data.success) {
         // Se falhou, recarregar produtos
         await loadProducts()
         throw new Error(data.error || "Erro ao deletar produto")
       }
 
-      console.log(`✅ [PRODUCTS] Produto ${id} deletado com sucesso`)
+      console.log(`✅ [PRODUCTS] Produto ${id} deletado com sucesso:`, data.message)
+
+      // Limpar cache local
+      if (typeof localStorage !== "undefined") {
+        try {
+          // Tentar limpar cache de produtos
+          localStorage.removeItem("coutyfil_products")
+          localStorage.removeItem("coutyfil_products_last_check")
+
+          // Limpar cache de 24h se existir
+          localStorage.removeItem("coutyfil_24h_products")
+        } catch (e) {
+          // Ignorar erros de localStorage
+        }
+      }
+
       setLastUpdate(Date.now())
+      return data
     } catch (error) {
       console.error(`❌ [PRODUCTS] Erro ao deletar produto ${id}:`, error)
       setError(error instanceof Error ? error.message : "Erro ao deletar produto")
@@ -212,7 +222,7 @@ export function useProducts() {
     getFeaturedProducts,
     addProduct,
     updateProduct,
-    deleteProduct, // Agora deleta DEFINITIVAMENTE
+    deleteProduct,
     reorderFeaturedProducts,
     toggleFeatured,
     refreshProducts: loadProducts,
