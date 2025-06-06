@@ -8,7 +8,7 @@ export default function Contact() {
       id="contato"
       className="min-h-screen bg-gradient-to-br from-red-50 via-white to-green-50 flex items-center py-12 sm:py-16"
     >
-      <div className="container mx-auto px-4 max-w-6xl">
+      <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-10 sm:mb-16">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800 mb-3 sm:mb-4">Venha-nos conhecer</h2>
@@ -20,9 +20,9 @@ export default function Contact() {
 
         {/* Lojas em Balões - Ajustado para mobile */}
         <div className="flex justify-center">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-5xl w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 sm:gap-10 w-full max-w-7xl">
             {/* Loja 1 - Supermercado */}
-            <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 sm:p-8 border border-gray-100 hover:scale-105">
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-7 sm:p-10 border border-gray-100 hover:scale-105">
               <div className="flex items-center space-x-3 mb-4 sm:mb-6">
                 <div className="bg-red-100 p-2 sm:p-3 rounded-full">
                   <MapPin className="h-5 w-5 sm:h-6 sm:w-6 text-red-600" />
@@ -59,7 +59,7 @@ export default function Contact() {
             </div>
 
             {/* Loja 2 - Papelaria */}
-            <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 sm:p-8 border border-gray-100 hover:scale-105">
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-7 sm:p-10 border border-gray-100 hover:scale-105">
               <div className="flex items-center space-x-3 mb-4 sm:mb-6">
                 <div className="bg-green-100 p-2 sm:p-3 rounded-full">
                   <MapPin className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
@@ -96,7 +96,7 @@ export default function Contact() {
             </div>
 
             {/* Loja 3 - Online */}
-            <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 sm:p-8 border border-gray-100 hover:scale-105">
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-7 sm:p-10 border border-gray-100 hover:scale-105">
               <div className="flex items-center space-x-3 mb-4 sm:mb-6">
                 <div className="bg-red-100 p-2 sm:p-3 rounded-full">
                   <MapPin className="h-5 w-5 sm:h-6 sm:w-6 text-red-600" />
@@ -117,7 +117,7 @@ export default function Contact() {
                       href="https://wa.me/351910146031"
                       target="_blank"
                       rel="noreferrer"
-                      className="font-medium text-green-600 hover:text-green-700 hover:underline"
+                      className="font-medium hover:underline"
                     >
                       Whatsapp: 910146031
                     </a>
@@ -129,7 +129,7 @@ export default function Contact() {
                       href="https://www.coutyfil.pt"
                       target="_blank"
                       rel="noreferrer"
-                      className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                      className="font-medium hover:underline"
                     >
                       www.coutyfil.pt
                     </a>
@@ -139,7 +139,7 @@ export default function Contact() {
                     <Mail className="h-4 w-4 text-gray-600" />
                     <a
                       href="mailto:info@coutyfil.pt"
-                      className="font-medium text-gray-600 hover:text-gray-700 hover:underline"
+                      className="font-medium hover:underline"
                     >
                       info@coutyfil.pt
                     </a>
