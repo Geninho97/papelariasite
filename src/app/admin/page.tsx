@@ -69,7 +69,7 @@ export default function AdminPage() {
   const featuredProducts = getFeaturedProducts()
   const nonFeaturedProducts = products.filter((product) => !product.featured)
 
-  const categories = ["Escolar", "Escritório", "Escrita", "Papel", "Eletrônicos", "Brinquedos", "Diversão"]
+  const categories = ["Mercearia", "Escritorio", "Escolar", "Brinquedos", "Eletrônicos", "Outros"]
 
   // Formatar a data da última atualização
   useEffect(() => {

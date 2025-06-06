@@ -99,6 +99,7 @@ export function useProducts() {
     const newProduct: Product = {
       ...product,
       id: Date.now().toString(),
+      price: 0, // Definir preço como 0 já que não será exibido
     }
     const newProducts = [...products, newProduct]
     await saveProducts(newProducts)

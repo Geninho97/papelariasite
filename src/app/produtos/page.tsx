@@ -206,7 +206,6 @@ export default function ProductsPage() {
                       {product.description}
                     </p>
                     <div className="flex justify-between items-center">
-                      <span className="text-base sm:text-lg font-bold text-red-600">€{product.price.toFixed(2)}</span>
                       <span className="text-[0.6rem] sm:text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
                         Ver detalhes
                       </span>
@@ -249,7 +248,6 @@ export default function ProductsPage() {
                       </div>
                       <p className="text-gray-600 text-[0.7rem] sm:text-sm mb-2 sm:mb-3">{product.description}</p>
                       <div className="flex justify-between items-center">
-                        <span className="text-lg font-bold text-red-600">€{product.price.toFixed(2)}</span>
                         <span className="text-[0.7rem] sm:text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded">
                           Ver detalhes →
                         </span>

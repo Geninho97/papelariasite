@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { ArrowLeft, ShoppingBag, Heart, Share2 } from 'lucide-react'
+import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { useProducts, type Product } from "@/app/hooks/useProducts"
 import Header from "@/app/components/Header"
@@ -39,11 +39,7 @@ export default function ProductPage() {
   }, [params.id, products, loading, router])
 
   // Imagens adicionais simuladas (na implementação real, viriam do banco de dados)
-  const additionalImages = product
-    ? [
-        product.image,
-      ]
-    : []
+  const additionalImages = product ? [product.image] : []
 
   if (loading || !product) {
     return (
