@@ -8,7 +8,7 @@ export default function Contact() {
       id="contato"
       className="min-h-screen bg-gradient-to-br from-red-50 via-white to-green-50 flex items-center py-12 sm:py-16"
     >
-      <div className="container mx-auto px-4 max-w-6xl">
+      <div className="container mx-auto px-4 max-w-7xl">
         {/* Header */}
         <div className="text-center mb-10 sm:mb-16">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800 mb-3 sm:mb-4">Venha-nos conhecer</h2>
@@ -20,7 +20,7 @@ export default function Contact() {
 
         {/* Lojas em Balões - Ajustado para mobile */}
         <div className="flex justify-center">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-4xl w-full">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-5xl w-full">
             {/* Loja 1 - Supermercado */}
             <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 sm:p-8 border border-gray-100 hover:scale-105">
               <div className="flex items-center space-x-3 mb-4 sm:mb-6">
@@ -37,9 +37,12 @@ export default function Contact() {
                   <p>Portugal</p>
                 </div>
 
-                <div className="flex items-center space-x-2 pt-1 sm:pt-2">
-                  <Phone className="h-4 w-4 text-red-600" />
-                  <span className="font-medium">255720225(Chamada para rede fixa nacional)</span>
+                <div className="flex flex-col pt-1 sm:pt-2">
+                  <div className="flex items-center space-x-2">
+                    <Phone className="h-4 w-4 text-red-600" />
+                    <span className="font-medium">255720225</span>
+                  </div>
+                  <span className="text-xs text-gray-500 ml-6">(Chamada para rede fixa nacional)</span>
                 </div>
 
                 <div className="space-y-1 sm:space-y-2 pt-1 sm:pt-2">
@@ -71,9 +74,12 @@ export default function Contact() {
                   <p>Portugal</p>
                 </div>
 
-                <div className="flex items-center space-x-2 pt-1 sm:pt-2">
-                  <Phone className="h-4 w-4 text-green-600" />
-                  <span className="font-medium">255213418(Chamada para rede fixa nacional)</span>
+                <div className="flex flex-col pt-1 sm:pt-2">
+                  <div className="flex items-center space-x-2">
+                    <Phone className="h-4 w-4 text-green-600" />
+                    <span className="font-medium">255213418</span>
+                  </div>
+                  <span className="text-xs text-gray-500 ml-6">(Chamada para rede fixa nacional)</span>
                 </div>
 
                 <div className="space-y-1 sm:space-y-2 pt-1 sm:pt-2">
@@ -88,7 +94,7 @@ export default function Contact() {
                 </div>
               </div>
             </div>
-            
+
             {/* Loja 3 - Online */}
             <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 sm:p-8 border border-gray-100 hover:scale-105">
               <div className="flex items-center space-x-3 mb-4 sm:mb-6">
@@ -103,7 +109,9 @@ export default function Contact() {
                   <p className="font-medium">Visite tambem a nossa loja Online</p>
                   <p>Especialista em artigos Sem Glúten</p>
                   <p>
-                    <a href="https://www.coutyfil.pt" target="_blank">www.coutyfil.pt</a>
+                    <a href="https://www.coutyfil.pt" target="_blank" rel="noreferrer">
+                      www.coutyfil.pt
+                    </a>
                   </p>
                 </div>
 
@@ -111,7 +119,6 @@ export default function Contact() {
                   <Phone className="h-4 w-4 text-green-600" />
                   <span className="font-medium">Whatsapp: 910146031</span>
                 </div>
-
               </div>
             </div>
           </div>
