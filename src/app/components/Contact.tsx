@@ -39,7 +39,7 @@ export default function Contact() {
 
                 <div className="flex items-center space-x-2 pt-1 sm:pt-2">
                   <Phone className="h-4 w-4 text-red-600" />
-                  <span className="font-medium">255720225</span>
+                  <span className="font-medium">255720225(Chamada para rede fixa nacional)</span>
                 </div>
 
                 <div className="space-y-1 sm:space-y-2 pt-1 sm:pt-2">
@@ -73,7 +73,7 @@ export default function Contact() {
 
                 <div className="flex items-center space-x-2 pt-1 sm:pt-2">
                   <Phone className="h-4 w-4 text-green-600" />
-                  <span className="font-medium">255213418</span>
+                  <span className="font-medium">255213418(Chamada para rede fixa nacional)</span>
                 </div>
 
                 <div className="space-y-1 sm:space-y-2 pt-1 sm:pt-2">
@@ -86,6 +86,32 @@ export default function Contact() {
                     <p>Sábado e Domingo: 9h às 13h</p>
                   </div>
                 </div>
+              </div>
+            </div>
+            
+            {/* Loja 3 - Online */}
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 sm:p-8 border border-gray-100 hover:scale-105">
+              <div className="flex items-center space-x-3 mb-4 sm:mb-6">
+                <div className="bg-green-100 p-2 sm:p-3 rounded-full">
+                  <MapPin className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold text-gray-800">Coutyfil - Online</h3>
+              </div>
+
+              <div className="space-y-3 sm:space-y-4 text-gray-700">
+                <div className="space-y-1">
+                  <p className="font-medium">Visite tambem a nossa loja Online</p>
+                  <p>Especialista em artigos Sem Glúten</p>
+                  <p>
+                    <a href="https://www.coutyfil.pt">www.coutyfil.pt</a>
+                  </p>
+                </div>
+
+                <div className="flex items-center space-x-2 pt-1 sm:pt-2">
+                  <Phone className="h-4 w-4 text-green-600" />
+                  <span className="font-medium">Whatsapp: 910146031</span>
+                </div>
+
               </div>
             </div>
           </div>
