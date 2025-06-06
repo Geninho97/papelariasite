@@ -20,7 +20,7 @@ export default function Contact() {
 
         {/* Lojas em Balões - Ajustado para mobile */}
         <div className="flex justify-center">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-4xl w-full">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-4xl w-full">
             {/* Loja 1 - Supermercado */}
             <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 sm:p-8 border border-gray-100 hover:scale-105">
               <div className="flex items-center space-x-3 mb-4 sm:mb-6">
@@ -92,8 +92,8 @@ export default function Contact() {
             {/* Loja 3 - Online */}
             <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 sm:p-8 border border-gray-100 hover:scale-105">
               <div className="flex items-center space-x-3 mb-4 sm:mb-6">
-                <div className="bg-green-100 p-2 sm:p-3 rounded-full">
-                  <MapPin className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
+                <div className="bg-red-100 p-2 sm:p-3 rounded-full">
+                  <MapPin className="h-5 w-5 sm:h-6 sm:w-6 text-red-600" />
                 </div>
                 <h3 className="text-lg sm:text-xl font-bold text-gray-800">Coutyfil - Online</h3>
               </div>
