@@ -1,6 +1,6 @@
 "use client"
 
-import { MapPin, Phone, Clock } from "lucide-react"
+import { MapPin, Phone, Clock, Globe, Mail } from "lucide-react"
 
 export default function Contact() {
   return (
@@ -8,7 +8,7 @@ export default function Contact() {
       id="contato"
       className="min-h-screen bg-gradient-to-br from-red-50 via-white to-green-50 flex items-center py-12 sm:py-16"
     >
-      <div className="container mx-auto px-4 max-w-7xl">
+      <div className="container mx-auto px-4 max-w-6xl">
         {/* Header */}
         <div className="text-center mb-10 sm:mb-16">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800 mb-3 sm:mb-4">Venha-nos conhecer</h2>
@@ -108,16 +108,42 @@ export default function Contact() {
                 <div className="space-y-1">
                   <p className="font-medium">Visite tambem a nossa loja Online</p>
                   <p>Especialista em artigos Sem Glúten</p>
-                  <p>
-                    <a href="https://www.coutyfil.pt" target="_blank" rel="noreferrer">
-                      www.coutyfil.pt
-                    </a>
-                  </p>
                 </div>
 
-                <div className="flex items-center space-x-2 pt-1 sm:pt-2">
-                  <Phone className="h-4 w-4 text-green-600" />
-                  <span className="font-medium">Whatsapp: 910146031</span>
+                <div className="space-y-2 pt-1 sm:pt-2">
+                  <div className="flex items-center space-x-2">
+                    <Phone className="h-4 w-4 text-green-600" />
+                    <a
+                      href="https://wa.me/351910146031"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-medium text-green-600 hover:text-green-700 hover:underline"
+                    >
+                      Whatsapp: 910146031
+                    </a>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Globe className="h-4 w-4 text-blue-600" />
+                    <a
+                      href="https://www.coutyfil.pt"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                    >
+                      www.coutyfil.pt
+                    </a>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Mail className="h-4 w-4 text-gray-600" />
+                    <a
+                      href="mailto:info@coutyfil.pt"
+                      className="font-medium text-gray-600 hover:text-gray-700 hover:underline"
+                    >
+                      info@coutyfil.pt
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
