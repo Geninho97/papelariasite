@@ -103,7 +103,7 @@ export default function Contact() {
                   <p className="font-medium">Visite tambem a nossa loja Online</p>
                   <p>Especialista em artigos Sem Glúten</p>
                   <p>
-                    <a href="https://www.coutyfil.pt">www.coutyfil.pt</a>
+                    <a href="https://www.coutyfil.pt" target="_blank">www.coutyfil.pt</a>
                   </p>
                 </div>
 
