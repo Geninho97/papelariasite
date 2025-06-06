@@ -188,30 +188,6 @@ export default function About() {
                 <p className="font-bold text-base sm:text-lg lg:text-xl">Visite as nossas lojas!</p>
               </div>
             </div>
-
-            {/* Thumbnails (opcional - apenas em telas maiores e se tiver mais de uma imagem) */}
-            {!isLoading && storeImages.length > 1 && (
-              <div className="hidden lg:flex justify-center space-x-2 mt-6">
-                {storeImages.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => goToSlide(index)}
-                    className={`relative w-16 h-12 rounded-lg overflow-hidden transition-all duration-300 ${
-                      index === currentImageIndex ? "ring-2 ring-red-500 scale-110" : "opacity-60 hover:opacity-80"
-                    }`}
-                  >
-                    <img
-                      src={image || "/placeholder.svg"}
-                      alt={`Thumbnail ${index + 1}`}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src = "/images/loja.png?height=100&width=100"
-                      }}
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
         </div>
       </div>
