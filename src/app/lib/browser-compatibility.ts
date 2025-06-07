@@ -25,8 +25,16 @@ export function detectOldBrowser(): boolean {
   return false
 }
 
-export function getBrowserInfo(): { name: string; version: number; isOld: boolean } {
-  if (typeof window === "undefined") return { name: "unknown", version: 0, isOld: false }
+export function detectWindows7(): boolean {
+  if (typeof window === "undefined") return false
+
+  const userAgent = navigator.userAgent
+  // Detectar Windows 7 especificamente
+  return /Windows NT 6\.1/.test(userAgent)
+}
+
+export function getBrowserInfo(): { name: string; version: number; isOld: boolean; isWindows7: boolean } {
+  if (typeof window === "undefined") return { name: "unknown", version: 0, isOld: false, isWindows7: false }
 
   const userAgent = navigator.userAgent
   let name = "unknown"
@@ -50,6 +58,7 @@ export function getBrowserInfo(): { name: string; version: number; isOld: boolea
     name,
     version,
     isOld: detectOldBrowser(),
+    isWindows7: detectWindows7(),
   }
 }
 
@@ -58,9 +67,14 @@ export function applyCompatibilityStyles(): void {
 
   const browserInfo = getBrowserInfo()
 
-  if (browserInfo.isOld) {
-    // Adicionar classe para navegadores antigos
+  if (browserInfo.isOld || browserInfo.isWindows7) {
+    // Adicionar classe para navegadores antigos ou Windows 7
     document.documentElement.classList.add("legacy-browser")
+
+    if (browserInfo.isWindows7) {
+      document.documentElement.classList.add("windows-7")
+    }
+
     document.documentElement.classList.add(`legacy-${browserInfo.name.toLowerCase().replace(" ", "-")}`)
 
     // Criar e injetar CSS de fallback
@@ -73,13 +87,21 @@ export function applyCompatibilityStyles(): void {
         --gradient-fallback-yellow: #fef3c7;
       }
       
-      /* Gradientes específicos para o hero */
-      .legacy-browser .bg-gradient-to-br {
-        background: linear-gradient(135deg, #fecaca 0%, #ffffff 50%, #bbf7d0 100%) !important;
+      /* Gradientes específicos para o hero - apenas Windows 7 */
+      .windows-7 .bg-gradient-to-br {
+        background: linear-gradient(135deg, rgba(254, 202, 202, 0.4) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(187, 247, 208, 0.4) 100%) !important;
       }
       
       .legacy-browser .bg-gradient-to-r {
         background: linear-gradient(90deg, #ef4444 0%, #22c55e 100%) !important;
+      }
+      
+      /* Correção específica para a palavra "folheto!" no Windows 7 */
+      .windows-7 .bg-gradient-to-r.from-red-500.to-red-700.bg-clip-text.text-transparent {
+        background: none !important;
+        color: #dc2626 !important;
+        -webkit-background-clip: unset !important;
+        background-clip: unset !important;
       }
       
       /* Fallback para backdrop-blur */
@@ -488,7 +510,7 @@ export function applyCompatibilityStyles(): void {
     document.head.appendChild(style)
 
     console.log(
-      `Navegador antigo detectado: ${browserInfo.name} ${browserInfo.version}. Aplicando fallbacks de compatibilidade.`,
+      `Navegador detectado: ${browserInfo.name} ${browserInfo.version}${browserInfo.isWindows7 ? " (Windows 7)" : ""}. Aplicando fallbacks de compatibilidade.`,
     )
   }
 }
