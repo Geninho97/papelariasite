@@ -39,6 +39,7 @@ export function getBrowserInfo(): { name: string; version: number; isOld: boolea
   const userAgent = navigator.userAgent
   let name = "unknown"
   let version = 0
+  const isWindows7 = detectWindows7()
 
   if (/Chrome\/(\d+)/.test(userAgent)) {
     name = "Chrome"
@@ -54,11 +55,16 @@ export function getBrowserInfo(): { name: string; version: number; isOld: boolea
     version = Number.parseInt(userAgent.match(/MSIE (\d+)/)?.[1] || "0")
   }
 
+  // Detecção mais específica para Chrome no Windows 7
+  if (isWindows7 && name === "Chrome") {
+    document.documentElement.classList.add("legacy-chrome")
+  }
+
   return {
     name,
     version,
     isOld: detectOldBrowser(),
-    isWindows7: detectWindows7(),
+    isWindows7,
   }
 }
 
@@ -87,55 +93,90 @@ export function applyCompatibilityStyles(): void {
         --gradient-fallback-yellow: #fef3c7;
       }
       
+      /* Layout específico para Windows 7 - forçar folheto à direita - MAIS ESPECÍFICO */
+      .windows-7 #inicio .container .grid.md\\:grid-cols-2 {
+        display: -webkit-box !important;
+        display: -ms-flexbox !important;
+        display: flex !important;
+        -ms-flex-wrap: nowrap !important;
+        flex-wrap: nowrap !important;
+        -webkit-box-align: center !important;
+        -ms-flex-align: center !important;
+        align-items: center !important;
+        gap: 2rem !important;
+        margin: 0 !important;
+      }
+
+      .windows-7 #inicio .container .grid.md\\:grid-cols-2 > * {
+        width: 50% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+      }
+
+      /* Garantir que o texto fique à esquerda e o folheto à direita - FORÇADO */
+      .windows-7 #inicio .container .grid.md\\:grid-cols-2 > *:first-child {
+        -webkit-box-ordinal-group: 1 !important;
+        -ms-flex-order: 0 !important;
+        order: 0 !important;
+        -webkit-box-flex: 0 !important;
+        -ms-flex: 0 0 45% !important;
+        flex: 0 0 45% !important;
+      }
+
+      .windows-7 #inicio .container .grid.md\\:grid-cols-2 > *:last-child {
+        -webkit-box-ordinal-group: 2 !important;
+        -ms-flex-order: 1 !important;
+        order: 1 !important;
+        -webkit-box-flex: 0 !important;
+        -ms-flex: 0 0 55% !important;
+        flex: 0 0 55% !important;
+      }
+
+      /* Ajustes específicos para resolução 1600x1200 no Windows 7 - MAIS ESPECÍFICO */
+      @media (min-width: 1400px) {
+        .windows-7 #inicio .container .grid.md\\:grid-cols-2 {
+          gap: 3rem !important;
+          max-width: 1400px !important;
+          margin: 0 auto !important;
+        }
+        
+        .windows-7 #inicio .container .grid.md\\:grid-cols-2 > *:first-child {
+          -ms-flex: 0 0 40% !important;
+          flex: 0 0 40% !important;
+        }
+        
+        .windows-7 #inicio .container .grid.md\\:grid-cols-2 > *:last-child {
+          -ms-flex: 0 0 60% !important;
+          flex: 0 0 60% !important;
+        }
+      }
+
+      /* Fallback específico para Chrome antigo no Windows 7 */
+      .windows-7.legacy-chrome #inicio .container .grid.md\\:grid-cols-2 {
+        display: table !important;
+        width: 100% !important;
+        table-layout: fixed !important;
+      }
+
+      .windows-7.legacy-chrome #inicio .container .grid.md\\:grid-cols-2 > * {
+        display: table-cell !important;
+        vertical-align: middle !important;
+        width: 50% !important;
+        padding: 0 1rem !important;
+      }
+
+      .windows-7.legacy-chrome #inicio .container .grid.md\\:grid-cols-2 > *:first-child {
+        width: 45% !important;
+      }
+
+      .windows-7.legacy-chrome #inicio .container .grid.md\\:grid-cols-2 > *:last-child {
+        width: 55% !important;
+      }
+      
       /* Gradientes específicos para o hero - apenas Windows 7 */
       .windows-7 .bg-gradient-to-br {
         background: linear-gradient(135deg, rgba(254, 202, 202, 0.4) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(187, 247, 208, 0.4) 100%) !important;
-      }
-      
-      /* Layout específico para Windows 7 - forçar folheto à direita */
-      .windows-7 .grid.md\\:grid-cols-2 {
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        -ms-flex-wrap: nowrap;
-        flex-wrap: nowrap;
-        -webkit-box-align: center;
-        -ms-flex-align: center;
-        align-items: center;
-        gap: 2rem;
-      }
-
-      .windows-7 .grid.md\\:grid-cols-2 > * {
-        width: 50%;
-        padding: 0;
-      }
-
-      /* Garantir que o texto fique à esquerda e o folheto à direita */
-      .windows-7 .grid.md\\:grid-cols-2 > *:first-child {
-        -webkit-box-ordinal-group: 1;
-        -ms-flex-order: 0;
-        order: 0;
-      }
-
-      .windows-7 .grid.md\\:grid-cols-2 > *:last-child {
-        -webkit-box-ordinal-group: 2;
-        -ms-flex-order: 1;
-        order: 1;
-      }
-
-      /* Ajustes específicos para resolução 1600x1200 no Windows 7 */
-      @media (min-width: 1400px) {
-        .windows-7 .grid.md\\:grid-cols-2 {
-          gap: 3rem;
-        }
-        
-        .windows-7 .grid.md\\:grid-cols-2 > *:first-child {
-          width: 45%;
-        }
-        
-        .windows-7 .grid.md\\:grid-cols-2 > *:last-child {
-          width: 55%;
-        }
       }
       
       .legacy-browser .bg-gradient-to-r {
