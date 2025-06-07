@@ -92,6 +92,52 @@ export function applyCompatibilityStyles(): void {
         background: linear-gradient(135deg, rgba(254, 202, 202, 0.4) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(187, 247, 208, 0.4) 100%) !important;
       }
       
+      /* Layout específico para Windows 7 - forçar folheto à direita */
+      .windows-7 .grid.md\\:grid-cols-2 {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: nowrap;
+        flex-wrap: nowrap;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
+        gap: 2rem;
+      }
+
+      .windows-7 .grid.md\\:grid-cols-2 > * {
+        width: 50%;
+        padding: 0;
+      }
+
+      /* Garantir que o texto fique à esquerda e o folheto à direita */
+      .windows-7 .grid.md\\:grid-cols-2 > *:first-child {
+        -webkit-box-ordinal-group: 1;
+        -ms-flex-order: 0;
+        order: 0;
+      }
+
+      .windows-7 .grid.md\\:grid-cols-2 > *:last-child {
+        -webkit-box-ordinal-group: 2;
+        -ms-flex-order: 1;
+        order: 1;
+      }
+
+      /* Ajustes específicos para resolução 1600x1200 no Windows 7 */
+      @media (min-width: 1400px) {
+        .windows-7 .grid.md\\:grid-cols-2 {
+          gap: 3rem;
+        }
+        
+        .windows-7 .grid.md\\:grid-cols-2 > *:first-child {
+          width: 45%;
+        }
+        
+        .windows-7 .grid.md\\:grid-cols-2 > *:last-child {
+          width: 55%;
+        }
+      }
+      
       .legacy-browser .bg-gradient-to-r {
         background: linear-gradient(90deg, #ef4444 0%, #22c55e 100%) !important;
       }
