@@ -25,12 +25,43 @@ export function detectOldBrowser(): boolean {
   return false
 }
 
+export function getBrowserInfo(): { name: string; version: number; isOld: boolean } {
+  if (typeof window === "undefined") return { name: "unknown", version: 0, isOld: false }
+
+  const userAgent = navigator.userAgent
+  let name = "unknown"
+  let version = 0
+
+  if (/Chrome\/(\d+)/.test(userAgent)) {
+    name = "Chrome"
+    version = Number.parseInt(userAgent.match(/Chrome\/(\d+)/)?.[1] || "0")
+  } else if (/Firefox\/(\d+)/.test(userAgent)) {
+    name = "Firefox"
+    version = Number.parseInt(userAgent.match(/Firefox\/(\d+)/)?.[1] || "0")
+  } else if (/Safari\/(\d+)/.test(userAgent) && !/Chrome/.test(userAgent)) {
+    name = "Safari"
+    version = Number.parseInt(userAgent.match(/Version\/(\d+)/)?.[1] || "0")
+  } else if (/MSIE|Trident/.test(userAgent)) {
+    name = "Internet Explorer"
+    version = Number.parseInt(userAgent.match(/MSIE (\d+)/)?.[1] || "0")
+  }
+
+  return {
+    name,
+    version,
+    isOld: detectOldBrowser(),
+  }
+}
+
 export function applyCompatibilityStyles(): void {
   if (typeof window === "undefined") return
 
-  if (detectOldBrowser()) {
+  const browserInfo = getBrowserInfo()
+
+  if (browserInfo.isOld) {
     // Adicionar classe para navegadores antigos
     document.documentElement.classList.add("legacy-browser")
+    document.documentElement.classList.add(`legacy-${browserInfo.name.toLowerCase().replace(" ", "-")}`)
 
     // Criar e injetar CSS de fallback
     const fallbackCSS = `
@@ -39,20 +70,23 @@ export function applyCompatibilityStyles(): void {
         --gradient-fallback-red: #fee2e2;
         --gradient-fallback-green: #f0fdf4;
         --gradient-fallback-blue: #dbeafe;
+        --gradient-fallback-yellow: #fef3c7;
       }
       
+      /* Gradientes específicos para o hero */
       .legacy-browser .bg-gradient-to-br {
-        background: var(--gradient-fallback-red) !important;
+        background: linear-gradient(135deg, #fecaca 0%, #ffffff 50%, #bbf7d0 100%) !important;
       }
       
       .legacy-browser .bg-gradient-to-r {
-        background: linear-gradient(to right, #ef4444, #22c55e) !important;
+        background: linear-gradient(90deg, #ef4444 0%, #22c55e 100%) !important;
       }
       
       /* Fallback para backdrop-blur */
       .legacy-browser .backdrop-blur-sm {
-        background: rgba(255, 255, 255, 0.9) !important;
+        background: rgba(255, 255, 255, 0.95) !important;
         backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
       }
       
       /* Fallback para aspect-ratio */
@@ -60,6 +94,7 @@ export function applyCompatibilityStyles(): void {
         position: relative;
         padding-bottom: 56.25%;
         height: 0;
+        overflow: hidden;
       }
       
       .legacy-browser .aspect-video > * {
@@ -68,15 +103,38 @@ export function applyCompatibilityStyles(): void {
         left: 0;
         width: 100%;
         height: 100%;
+        object-fit: cover;
       }
       
-      /* Fallback para grid */
+      .legacy-browser .aspect-square {
+        position: relative;
+        padding-bottom: 100%;
+        height: 0;
+        overflow: hidden;
+      }
+      
+      .legacy-browser .aspect-square > * {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      
+      /* Fallback para grid - melhorado */
       .legacy-browser .grid {
         display: -webkit-box;
         display: -ms-flexbox;
         display: flex;
         -ms-flex-wrap: wrap;
         flex-wrap: wrap;
+        margin: -0.5rem;
+      }
+      
+      .legacy-browser .grid > * {
+        padding: 0.5rem;
+        box-sizing: border-box;
       }
       
       .legacy-browser .grid-cols-1 > * {
@@ -84,31 +142,48 @@ export function applyCompatibilityStyles(): void {
       }
       
       .legacy-browser .md\\:grid-cols-2 > * {
-        width: 50%;
+        width: 100%;
       }
       
       .legacy-browser .md\\:grid-cols-3 > * {
-        width: 33.333333%;
+        width: 100%;
       }
       
       .legacy-browser .lg\\:grid-cols-3 > * {
-        width: 33.333333%;
+        width: 100%;
       }
       
-      /* Fallback para flexbox gap */
-      .legacy-browser .gap-6 > * {
-        margin: 0.75rem;
+      /* Responsivo para grid */
+      @media (min-width: 768px) {
+        .legacy-browser .md\\:grid-cols-2 > * {
+          width: 50%;
+        }
+        
+        .legacy-browser .md\\:grid-cols-3 > * {
+          width: 33.333333%;
+        }
       }
       
-      .legacy-browser .gap-8 > * {
-        margin: 1rem;
+      @media (min-width: 1024px) {
+        .legacy-browser .lg\\:grid-cols-3 > * {
+          width: 33.333333%;
+        }
       }
       
+      /* Fallback para flexbox gap - removido para evitar conflitos */
+      .legacy-browser .gap-6,
+      .legacy-browser .gap-8,
+      .legacy-browser .gap-10 {
+        margin: -0.5rem;
+      }
+      
+      .legacy-browser .gap-6 > *,
+      .legacy-browser .gap-8 > *,
       .legacy-browser .gap-10 > * {
-        margin: 1.25rem;
+        margin: 0.5rem;
       }
       
-      /* Fallback para space-x e space-y */
+      /* Fallback para space utilities */
       .legacy-browser .space-x-2 > * + * {
         margin-left: 0.5rem;
       }
@@ -146,6 +221,11 @@ export function applyCompatibilityStyles(): void {
         transform: translateY(-0.25rem);
       }
       
+      .legacy-browser .transform {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+      }
+      
       /* Fallback para border-radius */
       .legacy-browser .rounded-xl {
         border-radius: 0.75rem;
@@ -157,6 +237,10 @@ export function applyCompatibilityStyles(): void {
       
       .legacy-browser .rounded-full {
         border-radius: 50%;
+      }
+      
+      .legacy-browser .rounded-lg {
+        border-radius: 0.5rem;
       }
       
       /* Fallback para shadow */
@@ -172,54 +256,62 @@ export function applyCompatibilityStyles(): void {
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
       }
       
+      .legacy-browser .shadow-md {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+      
       /* Fallback para transition */
       .legacy-browser .transition-all {
         -webkit-transition: all 0.15s ease-in-out;
+        -o-transition: all 0.15s ease-in-out;
         transition: all 0.15s ease-in-out;
       }
       
       .legacy-browser .transition-colors {
         -webkit-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+        -o-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
         transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
       }
       
       .legacy-browser .transition-transform {
         -webkit-transition: -webkit-transform 0.15s ease-in-out;
+        -o-transition: transform 0.15s ease-in-out;
         transition: transform 0.15s ease-in-out;
       }
       
       .legacy-browser .duration-300 {
         -webkit-transition-duration: 300ms;
+        -o-transition-duration: 300ms;
         transition-duration: 300ms;
       }
       
       /* Fallback para animações */
       .legacy-browser .animate-pulse {
-        -webkit-animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        -webkit-animation: legacy-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        animation: legacy-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
       }
       
       .legacy-browser .animate-bounce {
-        -webkit-animation: bounce 1s infinite;
-        animation: bounce 1s infinite;
+        -webkit-animation: legacy-bounce 1s infinite;
+        animation: legacy-bounce 1s infinite;
       }
       
       .legacy-browser .animate-spin {
-        -webkit-animation: spin 1s linear infinite;
-        animation: spin 1s linear infinite;
+        -webkit-animation: legacy-spin 1s linear infinite;
+        animation: legacy-spin 1s linear infinite;
       }
       
-      @-webkit-keyframes pulse {
+      @-webkit-keyframes legacy-pulse {
         0%, 100% { opacity: 1; }
-        50% { opacity: .5; }
+        50% { opacity: 0.5; }
       }
       
-      @keyframes pulse {
+      @keyframes legacy-pulse {
         0%, 100% { opacity: 1; }
-        50% { opacity: .5; }
+        50% { opacity: 0.5; }
       }
       
-      @-webkit-keyframes bounce {
+      @-webkit-keyframes legacy-bounce {
         0%, 100% { 
           -webkit-transform: translateY(0);
           transform: translateY(0);
@@ -230,7 +322,7 @@ export function applyCompatibilityStyles(): void {
         }
       }
       
-      @keyframes bounce {
+      @keyframes legacy-bounce {
         0%, 100% { 
           transform: translateY(0);
         }
@@ -239,7 +331,7 @@ export function applyCompatibilityStyles(): void {
         }
       }
       
-      @-webkit-keyframes spin {
+      @-webkit-keyframes legacy-spin {
         from { 
           -webkit-transform: rotate(0deg);
           transform: rotate(0deg);
@@ -250,7 +342,7 @@ export function applyCompatibilityStyles(): void {
         }
       }
       
-      @keyframes spin {
+      @keyframes legacy-spin {
         from { transform: rotate(0deg); }
         to { transform: rotate(360deg); }
       }
@@ -266,6 +358,18 @@ export function applyCompatibilityStyles(): void {
       
       .legacy-browser .text-blue-600 {
         color: #2563eb !important;
+      }
+      
+      .legacy-browser .text-gray-600 {
+        color: #4b5563 !important;
+      }
+      
+      .legacy-browser .text-gray-700 {
+        color: #374151 !important;
+      }
+      
+      .legacy-browser .text-gray-800 {
+        color: #1f2937 !important;
       }
       
       .legacy-browser .bg-red-100 {
@@ -305,21 +409,77 @@ export function applyCompatibilityStyles(): void {
         text-decoration: underline !important;
       }
       
-      /* Fallback para responsive design */
-      @media (min-width: 768px) {
-        .legacy-browser .md\\:grid-cols-2 > * {
-          width: calc(50% - 1rem);
+      .legacy-browser .hover\\:shadow-xl:hover {
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+      }
+      
+      /* Fallback específico para o catálogo */
+      .legacy-browser .catalog-container {
+        background: #ffffff;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.75rem;
+        padding: 2rem;
+        text-align: center;
+        min-height: 400px;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
+      }
+      
+      /* Melhorias para resolução 1600x1200 */
+      @media (min-width: 1400px) {
+        .legacy-browser .container {
+          max-width: 1200px;
+          margin: 0 auto;
         }
         
-        .legacy-browser .md\\:grid-cols-3 > * {
-          width: calc(33.333333% - 1rem);
+        .legacy-browser .lg\\:grid-cols-3 > * {
+          width: 33.333333%;
+          padding: 1rem;
+        }
+        
+        .legacy-browser .text-3xl,
+        .legacy-browser .text-4xl,
+        .legacy-browser .text-5xl {
+          font-size: 2.5rem;
+          line-height: 1.2;
         }
       }
       
-      @media (min-width: 1024px) {
-        .legacy-browser .lg\\:grid-cols-3 > * {
-          width: calc(33.333333% - 1rem);
-        }
+      /* Fallback para flex utilities */
+      .legacy-browser .flex {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+      }
+      
+      .legacy-browser .items-center {
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
+      }
+      
+      .legacy-browser .justify-center {
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+      }
+      
+      .legacy-browser .flex-col {
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
       }
     `
 
@@ -327,6 +487,8 @@ export function applyCompatibilityStyles(): void {
     style.textContent = fallbackCSS
     document.head.appendChild(style)
 
-    console.log("Navegador antigo detectado. Aplicando fallbacks de compatibilidade.")
+    console.log(
+      `Navegador antigo detectado: ${browserInfo.name} ${browserInfo.version}. Aplicando fallbacks de compatibilidade.`,
+    )
   }
 }
