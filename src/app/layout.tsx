@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
+import BrowserCompatibility from "./components/BrowserCompatibility"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -17,8 +18,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <BrowserCompatibility />
+        {children}
+      </body>
     </html>
   )
 }
-
