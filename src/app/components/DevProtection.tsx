@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { hasDevAccess, grantDevAccess, checkDevAccessParam } from "@/app/lib/dev-access"
-import { Lock, Key } from "lucide-react"
+import { Lock, Key, Loader2 } from "lucide-react"
 
 interface DevProtectionProps {
   children: React.ReactNode
@@ -16,6 +16,7 @@ export default function DevProtection({ children, pageName }: DevProtectionProps
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     // Verificar acesso quando o componente montar
@@ -27,8 +28,8 @@ export default function DevProtection({ children, pageName }: DevProtectionProps
         return
       }
 
-      // Verificar parâmetro na URL
-      if (typeof window !== "undefined") {
+      // Verificar parâmetro na URL (apenas para desenvolvimento)
+      if (typeof window !== "undefined" && process.env.NODE_ENV === "development") {
         if (checkDevAccessParam(window.location.href)) {
           grantDevAccess()
           setHasAccess(true)
@@ -43,18 +44,35 @@ export default function DevProtection({ children, pageName }: DevProtectionProps
     checkAccess()
   }, [])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setIsSubmitting(true)
+    setError(null)
 
-    // Senha para acesso (você pode alterar para qualquer valor)
-    const DEV_PASSWORD = "coutyfil2024"
+    try {
+      // Usar a mesma API de login do admin
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ password }),
+      })
 
-    if (password === DEV_PASSWORD) {
-      grantDevAccess()
-      setHasAccess(true)
-      setError(null)
-    } else {
-      setError("Senha incorreta")
+      const data = await response.json()
+
+      if (data.success) {
+        // Login bem-sucedido
+        grantDevAccess()
+        setHasAccess(true)
+      } else {
+        // Login falhou
+        setError(data.error || "Senha incorreta")
+      }
+    } catch (error) {
+      setError("Erro ao verificar senha. Tente novamente.")
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -86,7 +104,7 @@ export default function DevProtection({ children, pageName }: DevProtectionProps
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Senha de Acesso
+                Senha de Administrador
               </label>
               <div className="relative">
                 <input
@@ -95,7 +113,8 @@ export default function DevProtection({ children, pageName }: DevProtectionProps
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full p-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  placeholder="Digite a senha para acesso"
+                  placeholder="Digite a senha de administrador"
+                  disabled={isSubmitting}
                 />
                 <Key className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
               </div>
@@ -104,9 +123,17 @@ export default function DevProtection({ children, pageName }: DevProtectionProps
 
             <button
               type="submit"
-              className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition-colors font-medium"
+              className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center justify-center space-x-2"
+              disabled={isSubmitting}
             >
-              Acessar {pageName}
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Verificando...</span>
+                </>
+              ) : (
+                <span>Acessar {pageName}</span>
+              )}
             </button>
           </form>
 

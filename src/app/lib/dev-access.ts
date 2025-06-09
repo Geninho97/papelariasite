@@ -1,7 +1,4 @@
-// Sistema simples para proteger páginas em desenvolvimento
-
-// Chave secreta para acesso (você pode alterar para qualquer valor)
-const DEV_ACCESS_KEY = "coutyfil-dev-2024"
+// Sistema para proteger páginas em desenvolvimento usando a mesma autenticação do admin
 
 // Nome do cookie
 const DEV_COOKIE_NAME = "coutyfil-dev-access"
@@ -13,34 +10,41 @@ export function hasDevAccess(): boolean {
     return true
   }
 
-  // Verificar cookie
+  // Verificar cookie de admin (reutilizar autenticação existente)
   if (typeof document !== "undefined") {
     const cookies = document.cookie.split(";").map((cookie) => cookie.trim())
-    const devCookie = cookies.find((cookie) => cookie.startsWith(`${DEV_COOKIE_NAME}=`))
 
+    // Verificar se o cookie de admin existe
+    const adminCookie = cookies.find((cookie) => cookie.startsWith("admin-token="))
+    if (adminCookie) {
+      return true
+    }
+
+    // Verificar cookie específico de dev
+    const devCookie = cookies.find((cookie) => cookie.startsWith(`${DEV_COOKIE_NAME}=`))
     if (devCookie) {
-      const value = devCookie.split("=")[1]
-      return value === DEV_ACCESS_KEY
+      return devCookie.split("=")[1] === "true"
     }
   }
 
   return false
 }
 
-// Conceder acesso
+// Conceder acesso após verificação bem-sucedida
 export function grantDevAccess(): void {
   // Definir cookie que expira em 7 dias
   const expiryDate = new Date()
   expiryDate.setDate(expiryDate.getDate() + 7)
 
-  document.cookie = `${DEV_COOKIE_NAME}=${DEV_ACCESS_KEY}; expires=${expiryDate.toUTCString()}; path=/`
+  document.cookie = `${DEV_COOKIE_NAME}=true; expires=${expiryDate.toUTCString()}; path=/`
 }
 
-// Verificar parâmetro de URL para acesso
+// Verificar parâmetro de URL para acesso rápido (apenas para desenvolvimento)
 export function checkDevAccessParam(url: string): boolean {
   try {
     const urlObj = new URL(url)
-    return urlObj.searchParams.get("dev-access") === DEV_ACCESS_KEY
+    // Parâmetro simplificado apenas para desenvolvimento
+    return urlObj.searchParams.get("dev") === "true"
   } catch {
     // Se a URL não for válida
     return false

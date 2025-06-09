@@ -23,7 +23,7 @@ export default function Footer() {
               />
             </div>
             <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
-              Sua papelaria de confiança há mais de 10 anos. Qualidade, variedade e atendimento excepcional.
+              A sua loja de confiança há mais de 60 anos. Qualidade, variedade e atendimento excepcional.
             </p>
           </div>
 
