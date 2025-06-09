@@ -102,6 +102,9 @@ export function applyCompatibilityStyles(): void {
     -webkit-box-align: center !important;
     -ms-flex-align: center !important;
     align-items: center !important;
+    /* COR SÓLIDA NEUTRA PARA WINDOWS 7 - SEM GRADIENTES */
+    background: #f5f5f5 !important;
+    background-image: none !important;
   }
 
   .windows-7 section#inicio .container {
@@ -220,13 +223,47 @@ export function applyCompatibilityStyles(): void {
     margin-top: 0 !important;
   }
 
-  /* Gradientes específicos para o hero - apenas Windows 7 */
-  .windows-7 .bg-gradient-to-br {
-    background: linear-gradient(135deg, rgba(254, 202, 202, 0.4) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(187, 247, 208, 0.4) 100%) !important;
+  /* REMOVER TODOS OS EFEITOS "RESPIRAR" E GRADIENTES NO WINDOWS 7 */
+  .windows-7 .bg-gradient-to-br,
+  .windows-7 .bg-gradient-to-r,
+  .windows-7 .bg-gradient-to-l,
+  .windows-7 .bg-gradient-to-t,
+  .windows-7 .bg-gradient-to-b {
+    background: #f5f5f5 !important;
+    background-image: none !important;
   }
-  
-  .legacy-browser .bg-gradient-to-r {
-    background: linear-gradient(90deg, #ef4444 0%, #22c55e 100%) !important;
+
+  /* Cor sólida para o hero no Windows 7 */
+  .windows-7 section#inicio {
+    background: #f5f5f5 !important;
+    background-image: none !important;
+  }
+
+  /* Remover animações de pulse/respirar no Windows 7 */
+  .windows-7 .animate-pulse {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  /* Elementos decorativos de fundo - remover no Windows 7 */
+  .windows-7 section#inicio .absolute {
+    display: none !important;
+  }
+
+  /* Cor sólida para outras seções também */
+  .windows-7 section#novidades {
+    background: #ffffff !important;
+    background-image: none !important;
+  }
+
+  .windows-7 section#sobre {
+    background: #f8f9fa !important;
+    background-image: none !important;
+  }
+
+  .windows-7 section#contato {
+    background: #ffffff !important;
+    background-image: none !important;
   }
   
   /* Correção específica para a palavra "folheto!" no Windows 7 */
@@ -290,51 +327,22 @@ export function applyCompatibilityStyles(): void {
     transition: all 0.15s ease-in-out;
   }
   
-  .legacy-browser .animate-pulse {
-    -webkit-animation: legacy-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    animation: legacy-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  /* ANIMAÇÕES SIMPLIFICADAS PARA WINDOWS 7 */
+  .windows-7 .animate-pulse {
+    animation: none !important;
+    opacity: 1 !important;
   }
   
-  .legacy-browser .animate-bounce {
-    -webkit-animation: legacy-bounce 1s infinite;
-    animation: legacy-bounce 1s infinite;
+  .windows-7 .animate-bounce {
+    animation: none !important;
   }
   
-  .legacy-browser .animate-spin {
+  .windows-7 .animate-spin {
     -webkit-animation: legacy-spin 1s linear infinite;
     animation: legacy-spin 1s linear infinite;
   }
   
-  @-webkit-keyframes legacy-pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-  }
-  
-  @keyframes legacy-pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-  }
-  
-  @-webkit-keyframes legacy-bounce {
-    0%, 100% { 
-      -webkit-transform: translateY(0);
-      transform: translateY(0);
-    }
-    50% { 
-      -webkit-transform: translateY(-25%);
-      transform: translateY(-25%);
-    }
-  }
-  
-  @keyframes legacy-bounce {
-    0%, 100% { 
-      transform: translateY(0);
-    }
-    50% { 
-      transform: translateY(-25%);
-    }
-  }
-  
+  /* Manter apenas animação de spin para loading */
   @-webkit-keyframes legacy-spin {
     from { 
       -webkit-transform: rotate(0deg);
@@ -403,7 +411,7 @@ export function applyCompatibilityStyles(): void {
     document.head.appendChild(style)
 
     console.log(
-      `Navegador detectado: ${browserInfo.name} ${browserInfo.version}${browserInfo.isWindows7 ? " (Windows 7)" : ""}. Aplicando fallbacks de compatibilidade.`,
+      `Navegador detectado: ${browserInfo.name} ${browserInfo.version}${browserInfo.isWindows7 ? " (Windows 7)" : ""}. Aplicando fallbacks de compatibilidade com cores sólidas.`,
     )
   }
 }
