@@ -102,7 +102,7 @@ export function applyCompatibilityStyles(): void {
     -webkit-box-align: center !important;
     -ms-flex-align: center !important;
     align-items: center !important;
-    /* COR SÓLIDA NEUTRA PARA WINDOWS 7 - SEM GRADIENTES */
+    /* COR SÓLIDA NEUTRA PARA WINDOWS 7 - CINZA CLARO */
     background: #f5f5f5 !important;
     background-image: none !important;
   }
@@ -233,9 +233,24 @@ export function applyCompatibilityStyles(): void {
     background-image: none !important;
   }
 
-  /* Cor sólida para o hero no Windows 7 */
+  /* CORES INTERCALADAS PARA AS SEÇÕES NO WINDOWS 7 */
   .windows-7 section#inicio {
-    background: #f5f5f5 !important;
+    background: #f5f5f5 !important; /* Cinza claro */
+    background-image: none !important;
+  }
+
+  .windows-7 section#novidades {
+    background: #e8e8e8 !important; /* Cinza mais escuro */
+    background-image: none !important;
+  }
+
+  .windows-7 section#sobre {
+    background: #f5f5f5 !important; /* Cinza claro */
+    background-image: none !important;
+  }
+
+  .windows-7 section#contato {
+    background: #e8e8e8 !important; /* Cinza mais escuro */
     background-image: none !important;
   }
 
@@ -249,22 +264,6 @@ export function applyCompatibilityStyles(): void {
   .windows-7 section#inicio .absolute {
     display: none !important;
   }
-
-  /* Cor sólida para outras seções também */
-  .windows-7 section#novidades {
-    background: #ffffff !important;
-    background-image: none !important;
-  }
-
-  .windows-7 section#sobre {
-    background: #f8f9fa !important;
-    background-image: none !important;
-  }
-
-  .windows-7 section#contato {
-    background: #ffffff !important;
-    background-image: none !important;
-  }
   
   /* Correção específica para a palavra "folheto!" no Windows 7 */
   .windows-7 .bg-gradient-to-r.from-red-500.to-red-700.bg-clip-text.text-transparent {
@@ -272,6 +271,31 @@ export function applyCompatibilityStyles(): void {
     color: #dc2626 !important;
     -webkit-background-clip: unset !important;
     background-clip: unset !important;
+  }
+
+  /* CORREÇÃO PARA ESTRELAS DOURADAS EM TODOS OS NAVEGADORES */
+  .text-yellow-500 {
+    color: #eab308 !important;
+  }
+
+  .fill-current {
+    fill: currentColor !important;
+  }
+
+  /* Forçar cor dourada nas estrelas especificamente */
+  .text-yellow-500.fill-current {
+    color: #eab308 !important;
+    fill: #eab308 !important;
+  }
+
+  /* Fallback para SVG das estrelas */
+  svg.text-yellow-500 {
+    color: #eab308 !important;
+    fill: #eab308 !important;
+  }
+
+  svg.text-yellow-500 path {
+    fill: #eab308 !important;
   }
   
   /* Resto dos fallbacks... */
@@ -411,7 +435,7 @@ export function applyCompatibilityStyles(): void {
     document.head.appendChild(style)
 
     console.log(
-      `Navegador detectado: ${browserInfo.name} ${browserInfo.version}${browserInfo.isWindows7 ? " (Windows 7)" : ""}. Aplicando fallbacks de compatibilidade com cores sólidas.`,
+      `Navegador detectado: ${browserInfo.name} ${browserInfo.version}${browserInfo.isWindows7 ? " (Windows 7)" : ""}. Aplicando fallbacks de compatibilidade com cores intercaladas e estrelas douradas.`,
     )
   }
 }
