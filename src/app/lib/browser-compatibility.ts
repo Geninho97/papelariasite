@@ -102,9 +102,13 @@ export function applyCompatibilityStyles(): void {
     -webkit-box-align: center !important;
     -ms-flex-align: center !important;
     align-items: center !important;
-    /* COR SÓLIDA NEUTRA PARA WINDOWS 7 - CINZA CLARO */
-    background: #f5f5f5 !important;
-    background-image: none !important;
+    /* GRADIENTE SUAVE COMPATÍVEL COM WINDOWS 7 - ROSA/SALMÃO */
+    background: #fdf2f8 !important;
+    background: -webkit-linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #fbcfe8 100%) !important;
+    background: -moz-linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #fbcfe8 100%) !important;
+    background: -o-linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #fbcfe8 100%) !important;
+    background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #fbcfe8 100%) !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fdf2f8', endColorstr='#fbcfe8', GradientType=1) !important;
   }
 
   .windows-7 section#inicio .container {
@@ -223,35 +227,42 @@ export function applyCompatibilityStyles(): void {
     margin-top: 0 !important;
   }
 
-  /* REMOVER TODOS OS EFEITOS "RESPIRAR" E GRADIENTES NO WINDOWS 7 */
+  /* GRADIENTES SUAVES COMPATÍVEIS PARA OUTRAS SEÇÕES */
   .windows-7 .bg-gradient-to-br,
   .windows-7 .bg-gradient-to-r,
   .windows-7 .bg-gradient-to-l,
   .windows-7 .bg-gradient-to-t,
   .windows-7 .bg-gradient-to-b {
-    background: #f5f5f5 !important;
-    background-image: none !important;
+    /* Fallback para navegadores que não suportam gradientes */
+    background: #f8fafc !important;
   }
 
-  /* CORES INTERCALADAS PARA AS SEÇÕES NO WINDOWS 7 */
-  .windows-7 section#inicio {
-    background: #f5f5f5 !important; /* Cinza claro */
-    background-image: none !important;
-  }
-
+  /* CORES INTERCALADAS COM GRADIENTES SUAVES PARA AS SEÇÕES NO WINDOWS 7 */
   .windows-7 section#novidades {
-    background: #e8e8e8 !important; /* Cinza mais escuro */
-    background-image: none !important;
+    background: #f1f5f9 !important;
+    background: -webkit-linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #cbd5e1 100%) !important;
+    background: -moz-linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #cbd5e1 100%) !important;
+    background: -o-linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #cbd5e1 100%) !important;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #cbd5e1 100%) !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f1f5f9', endColorstr='#cbd5e1', GradientType=1) !important;
   }
 
   .windows-7 section#sobre {
-    background: #f5f5f5 !important; /* Cinza claro */
-    background-image: none !important;
+    background: #f0fdf4 !important;
+    background: -webkit-linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%) !important;
+    background: -moz-linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%) !important;
+    background: -o-linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%) !important;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%) !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f0fdf4', endColorstr='#bbf7d0', GradientType=1) !important;
   }
 
   .windows-7 section#contato {
-    background: #e8e8e8 !important; /* Cinza mais escuro */
-    background-image: none !important;
+    background: #fefce8 !important;
+    background: -webkit-linear-gradient(135deg, #fefce8 0%, #fef3c7 50%, #fde68a 100%) !important;
+    background: -moz-linear-gradient(135deg, #fefce8 0%, #fef3c7 50%, #fde68a 100%) !important;
+    background: -o-linear-gradient(135deg, #fefce8 0%, #fef3c7 50%, #fde68a 100%) !important;
+    background: linear-gradient(135deg, #fefce8 0%, #fef3c7 50%, #fde68a 100%) !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fefce8', endColorstr='#fde68a', GradientType=1) !important;
   }
 
   /* Remover animações de pulse/respirar no Windows 7 */
@@ -268,7 +279,7 @@ export function applyCompatibilityStyles(): void {
   /* Correção específica para a palavra "folheto!" no Windows 7 */
   .windows-7 .bg-gradient-to-r.from-red-500.to-red-700.bg-clip-text.text-transparent {
     background: none !important;
-    color: #dc2626 !important;
+    color: #ec4899 !important; /* Rosa mais vibrante para combinar com o fundo */
     -webkit-background-clip: unset !important;
     background-clip: unset !important;
   }
@@ -435,7 +446,7 @@ export function applyCompatibilityStyles(): void {
     document.head.appendChild(style)
 
     console.log(
-      `Navegador detectado: ${browserInfo.name} ${browserInfo.version}${browserInfo.isWindows7 ? " (Windows 7)" : ""}. Aplicando fallbacks de compatibilidade com cores intercaladas e estrelas douradas.`,
+      `Navegador detectado: ${browserInfo.name} ${browserInfo.version}${browserInfo.isWindows7 ? " (Windows 7)" : ""}. Aplicando gradientes suaves compatíveis com Windows 7.`,
     )
   }
 }
