@@ -55,7 +55,7 @@ export default function Hero() {
             </h1>
 
             <div className="text-xl sm:text-2xl text-gray-700 leading-relaxed">
-              Já está disponível o nosso folheto quinzenal! 
+              Já está disponível o nosso novo folheto ! 
             </div>
             <div className="text-xl sm:text-2xl text-gray-700 leading-relaxed">
               Repleto de produtos incríveis, com preços imperdíveis e descontos especiais só por tempo limitado.
