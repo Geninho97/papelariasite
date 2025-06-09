@@ -342,6 +342,115 @@ export function applyCompatibilityStyles(): void {
     fill: #eab308 !important;
   }
   
+  /* CORREÇÃO PARA FOOTER - MANTER CORES ORIGINAIS */
+  .windows-7 footer,
+  .legacy-browser footer {
+    background-color: #111827 !important; /* Cinza escuro original */
+    background: #111827 !important;
+    color: #ffffff !important;
+  }
+
+  .windows-7 footer *,
+  .legacy-browser footer * {
+    color: inherit !important;
+  }
+
+  .windows-7 footer .text-white,
+  .legacy-browser footer .text-white {
+    color: #ffffff !important;
+  }
+
+  .windows-7 footer .text-gray-300,
+  .legacy-browser footer .text-gray-300 {
+    color: #d1d5db !important;
+  }
+
+  .windows-7 footer .text-primary-400,
+  .legacy-browser footer .text-primary-400 {
+    color: #f87171 !important;
+  }
+
+  .windows-7 footer .text-secondary-400,
+  .legacy-browser footer .text-secondary-400 {
+    color: #a3e635 !important;
+  }
+
+  /* CORREÇÃO PARA FUNDOS DAS SEÇÕES - MANTER GRADIENTES COLORIDOS */
+  .windows-7 section {
+    background: inherit !important;
+  }
+
+  /* Forçar gradientes específicos para cada seção */
+  .windows-7 section#inicio {
+    background: #fdf2f8 !important;
+    background: -webkit-linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #fbcfe8 100%) !important;
+    background: -moz-linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #fbcfe8 100%) !important;
+    background: -o-linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #fbcfe8 100%) !important;
+    background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #fbcfe8 100%) !important;
+  }
+
+  .windows-7 section#novidades {
+    background: #f1f5f9 !important;
+    background: -webkit-linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #cbd5e1 100%) !important;
+    background: -moz-linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #cbd5e1 100%) !important;
+    background: -o-linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #cbd5e1 100%) !important;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #cbd5e1 100%) !important;
+  }
+
+  .windows-7 section#sobre {
+    background: #f0fdf4 !important;
+    background: -webkit-linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%) !important;
+    background: -moz-linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%) !important;
+    background: -o-linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%) !important;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%) !important;
+  }
+
+  .windows-7 section#contato {
+    background: #fefce8 !important;
+    background: -webkit-linear-gradient(135deg, #fefce8 0%, #fef3c7 50%, #fde68a 100%) !important;
+    background: -moz-linear-gradient(135deg, #fefce8 0%, #fef3c7 50%, #fde68a 100%) !important;
+    background: -o-linear-gradient(135deg, #fefce8 0%, #fef3c7 50%, #fde68a 100%) !important;
+    background: linear-gradient(135deg, #fefce8 0%, #fef3c7 50%, #fde68a 100%) !important;
+  }
+
+  /* CORREÇÃO PARA ELEMENTOS BRANCOS QUE PERDERAM COR */
+  .windows-7 .bg-white,
+  .legacy-browser .bg-white {
+    background-color: #ffffff !important;
+  }
+
+  .windows-7 .bg-gray-900,
+  .legacy-browser .bg-gray-900 {
+    background-color: #111827 !important;
+  }
+
+  /* CORREÇÃO PARA CARDS E ELEMENTOS COM FUNDO */
+  .windows-7 .bg-gradient-to-br,
+  .legacy-browser .bg-gradient-to-br {
+    background: inherit !important;
+  }
+
+  /* Manter cores dos textos */
+  .windows-7 .text-white,
+  .legacy-browser .text-white {
+    color: #ffffff !important;
+  }
+
+  .windows-7 .text-gray-300,
+  .legacy-browser .text-gray-300 {
+    color: #d1d5db !important;
+  }
+
+  .windows-7 .text-gray-600,
+  .legacy-browser .text-gray-600 {
+    color: #4b5563 !important;
+  }
+
+  .windows-7 .text-gray-800,
+  .legacy-browser .text-gray-800 {
+    color: #1f2937 !important;
+  }
+  
   /* Resto dos fallbacks... */
   .legacy-browser .backdrop-blur-sm {
     background: rgba(255, 255, 255, 0.95) !important;
