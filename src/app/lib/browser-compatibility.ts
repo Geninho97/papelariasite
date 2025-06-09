@@ -276,12 +276,45 @@ export function applyCompatibilityStyles(): void {
     display: none !important;
   }
   
-  /* Correção específica para a palavra "folheto!" no Windows 7 */
-  .windows-7 .bg-gradient-to-r.from-red-500.to-red-700.bg-clip-text.text-transparent {
+  /* CORREÇÃO ULTRA ESPECÍFICA PARA A PALAVRA "FOLHETO!" EM VERMELHO */
+  /* Targeting múltiplas variações possíveis */
+  .windows-7 .bg-gradient-to-r.from-red-500.to-red-700.bg-clip-text.text-transparent,
+  .windows-7 .text-red-600.bg-gradient-to-r.from-red-500.to-red-700.bg-clip-text.text-transparent,
+  .windows-7 span.text-red-600.bg-gradient-to-r.from-red-500.to-red-700.bg-clip-text.text-transparent,
+  .windows-7 .bg-clip-text.text-transparent {
     background: none !important;
-    color: #ec4899 !important; /* Rosa mais vibrante para combinar com o fundo */
+    background-image: none !important;
+    color: #dc2626 !important; /* Vermelho forte */
     -webkit-background-clip: unset !important;
     background-clip: unset !important;
+    -webkit-text-fill-color: #dc2626 !important;
+    text-fill-color: #dc2626 !important;
+  }
+
+  /* Fallback ainda mais específico para Chrome */
+  .windows-7.legacy-chrome .bg-gradient-to-r.from-red-500.to-red-700.bg-clip-text.text-transparent,
+  .windows-7.legacy-chrome .text-red-600.bg-gradient-to-r.from-red-500.to-red-700.bg-clip-text.text-transparent,
+  .windows-7.legacy-chrome span.text-red-600.bg-gradient-to-r.from-red-500.to-red-700.bg-clip-text.text-transparent {
+    background: none !important;
+    background-image: none !important;
+    color: #dc2626 !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+    -webkit-text-fill-color: #dc2626 !important;
+    text-fill-color: #dc2626 !important;
+  }
+
+  /* CORREÇÃO GLOBAL PARA TODOS OS NAVEGADORES - FORÇAR VERMELHO */
+  .legacy-browser .bg-gradient-to-r.from-red-500.to-red-700.bg-clip-text.text-transparent,
+  .legacy-browser .text-red-600.bg-gradient-to-r.from-red-500.to-red-700.bg-clip-text.text-transparent,
+  .legacy-browser span.text-red-600.bg-gradient-to-r.from-red-500.to-red-700.bg-clip-text.text-transparent {
+    background: none !important;
+    background-image: none !important;
+    color: #dc2626 !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+    -webkit-text-fill-color: #dc2626 !important;
+    text-fill-color: #dc2626 !important;
   }
 
   /* CORREÇÃO PARA ESTRELAS DOURADAS EM TODOS OS NAVEGADORES */
@@ -446,7 +479,7 @@ export function applyCompatibilityStyles(): void {
     document.head.appendChild(style)
 
     console.log(
-      `Navegador detectado: ${browserInfo.name} ${browserInfo.version}${browserInfo.isWindows7 ? " (Windows 7)" : ""}. Aplicando gradientes suaves compatíveis com Windows 7.`,
+      `Navegador detectado: ${browserInfo.name} ${browserInfo.version}${browserInfo.isWindows7 ? " (Windows 7)" : ""}. Aplicando gradientes suaves e palavra "folheto!" em vermelho.`,
     )
   }
 }
