@@ -39,22 +39,24 @@ export default function Footer() {
                   Início
                 </a>
               </li>
-              <li>
+              {/* Link para Novidades removido temporariamente */}
+              {/* <li>
                 <a
                   href="/#novidades"
                   className="text-gray-300 hover:text-white transition-colors hover:text-primary-400 text-sm sm:text-base"
                 >
                   Novidades
                 </a>
-              </li>
-              <li>
+              </li> */}
+              {/* Link para Produtos removido temporariamente */}
+              {/* <li>
                 <a
                   href="/produtos"
                   className="text-gray-300 hover:text-white transition-colors hover:text-primary-400 text-sm sm:text-base"
                 >
                   Produtos
                 </a>
-              </li>
+              </li> */}
               <li>
                 <a
                   href="/#sobre"

@@ -38,18 +38,20 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-4 lg:space-x-8">
-            <a
+            {/* Link para Novidades removido temporariamente */}
+            {/* <a
               href="/#novidades"
               className="text-gray-700 hover:text-primary-600 transition-colors font-medium text-sm lg:text-base"
             >
               Novidades
-            </a>
-            <a
+            </a> */}
+            {/* Link para Produtos removido temporariamente */}
+            {/* <a
               href="/produtos"
               className="text-gray-700 hover:text-primary-600 transition-colors font-medium text-sm lg:text-base"
             >
               Produtos
-            </a>
+            </a> */}
             <a
               href="/#sobre"
               className="text-gray-700 hover:text-primary-600 transition-colors font-medium text-sm lg:text-base"
@@ -81,20 +83,22 @@ export default function Header() {
         {isMenuOpen && (
           <nav className="md:hidden mt-3 pb-3 border-t border-primary-100 pt-3 animate-in slide-in-from-top duration-300">
             <div className="flex flex-col space-y-4">
-              <a
+              {/* Link para Novidades removido temporariamente */}
+              {/* <a
                 href="/#novidades"
                 className="text-gray-700 hover:text-primary-600 transition-colors font-medium px-2 py-1.5 rounded-md hover:bg-gray-50"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Novidades
-              </a>
-              <a
+              </a> */}
+              {/* Link para Produtos removido temporariamente */}
+              {/* <a
                 href="/produtos"
                 className="text-gray-700 hover:text-primary-600 transition-colors font-medium px-2 py-1.5 rounded-md hover:bg-gray-50"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Produtos
-              </a>
+              </a> */}
               <a
                 href="/#sobre"
                 className="text-gray-700 hover:text-primary-600 transition-colors font-medium px-2 py-1.5 rounded-md hover:bg-gray-50"

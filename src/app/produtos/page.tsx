@@ -6,6 +6,7 @@ import Link from "next/link"
 import { useProducts, type Product } from "@/app/hooks/useProducts"
 import Header from "@/app/components/Header"
 import Footer from "@/app/components/Footer"
+import DevProtection from "@/app/components/DevProtection"
 
 export default function ProductsPage() {
   const { products, loading } = useProducts()
@@ -75,22 +76,8 @@ export default function ProductsPage() {
     setFilteredProducts(filtered)
   }, [products, searchTerm, selectedCategory, sortBy])
 
-  if (loading) {
-    return (
-      <>
-        <Header />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-b-2 border-red-600 mx-auto mb-4"></div>
-            <p className="text-base sm:text-xl text-gray-600">Carregando produtos...</p>
-          </div>
-        </div>
-        <Footer />
-      </>
-    )
-  }
-
-  return (
+  // Conteúdo da página
+  const pageContent = (
     <>
       <Header />
       <main className="min-h-screen bg-gradient-to-br from-white via-red-50 to-green-50 py-6 sm:py-8">
@@ -98,17 +85,18 @@ export default function ProductsPage() {
           {/* Header */}
           <div className="mb-6 sm:mb-8">
             <Link
-              href="/#novidades"
+              href="/"
               className="inline-flex items-center space-x-2 text-gray-600 hover:text-red-600 transition-colors mb-3 sm:mb-4"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span>Voltar às novidades</span>
+              <span>Voltar à página inicial</span>
             </Link>
 
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-2">Todos os Produtos</h1>
             <p className="text-sm sm:text-base text-gray-600">Explore todo o nosso catálogo de produtos</p>
           </div>
 
+          {/* Resto do conteúdo da página... */}
           {/* Filters and Search - Reorganizado para mobile */}
           <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 mb-6 sm:mb-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 items-end">
@@ -285,4 +273,22 @@ export default function ProductsPage() {
       <Footer />
     </>
   )
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-b-2 border-red-600 mx-auto mb-4"></div>
+            <p className="text-base sm:text-xl text-gray-600">Carregando produtos...</p>
+          </div>
+        </div>
+        <Footer />
+      </>
+    )
+  }
+
+  // Envolver o conteúdo com o componente de proteção
+  return <DevProtection pageName="Produtos">{pageContent}</DevProtection>
 }

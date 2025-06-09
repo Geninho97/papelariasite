@@ -2,7 +2,8 @@
 
 import Header from "./components/Header"
 import Hero from "./components/Hero"
-import Products from "./components/Products"
+// Comentar a importação de Products para ocultar a seção de Novidades
+// import Products from "./components/Products"
 import About from "./components/About"
 import Contact from "./components/Contact"
 import Footer from "./components/Footer"
@@ -18,7 +19,8 @@ export default function Page() {
     <main className="min-h-screen">
       <Header />
       <Hero />
-      <Products />
+      {/* Comentar a seção de Products/Novidades */}
+      {/* <Products /> */}
       <About />
       <Contact />
       <Footer />

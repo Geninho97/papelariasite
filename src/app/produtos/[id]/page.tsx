@@ -7,6 +7,7 @@ import Link from "next/link"
 import { useProducts, type Product } from "@/app/hooks/useProducts"
 import Header from "@/app/components/Header"
 import Footer from "@/app/components/Footer"
+import DevProtection from "@/app/components/DevProtection"
 
 export default function ProductPage() {
   const params = useParams()
@@ -41,22 +42,8 @@ export default function ProductPage() {
   // Imagens adicionais simuladas (na implementação real, viriam do banco de dados)
   const additionalImages = product ? [product.image] : []
 
-  if (loading || !product) {
-    return (
-      <>
-        <Header />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-red-600 mx-auto mb-4"></div>
-            <p className="text-xl text-gray-600">Carregando produto...</p>
-          </div>
-        </div>
-        <Footer />
-      </>
-    )
-  }
-
-  return (
+  // Conteúdo da página
+  const pageContent = (
     <>
       <Header />
       <main className="min-h-screen bg-gradient-to-br from-white via-red-50 to-green-50 py-8">
@@ -67,20 +54,20 @@ export default function ProductPage() {
               Início
             </Link>
             <span>/</span>
-            <Link href="/#produtos" className="hover:text-red-600 transition-colors">
+            <Link href="/produtos" className="hover:text-red-600 transition-colors">
               Produtos
             </Link>
             <span>/</span>
-            <Link href={`/#produtos`} className="hover:text-red-600 transition-colors">
-              {product.category}
+            <Link href={`/produtos`} className="hover:text-red-600 transition-colors">
+              {product?.category}
             </Link>
             <span>/</span>
-            <span className="text-gray-900 font-medium">{product.name}</span>
+            <span className="text-gray-900 font-medium">{product?.name}</span>
           </nav>
 
           {/* Back Button */}
           <Link
-            href="/#produtos"
+            href="/produtos"
             className="inline-flex items-center space-x-2 text-gray-600 hover:text-red-600 transition-colors mb-6"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -95,8 +82,8 @@ export default function ProductPage() {
                 {/* Main Image */}
                 <div className="bg-gray-100 rounded-lg overflow-hidden h-80 flex items-center justify-center">
                   <img
-                    src={selectedImage || product.image}
-                    alt={product.name}
+                    src={selectedImage || product?.image}
+                    alt={product?.name}
                     className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
                   />
                 </div>
@@ -113,7 +100,7 @@ export default function ProductPage() {
                     >
                       <img
                         src={img || "/placeholder.svg"}
-                        alt={`${product.name} - Imagem ${index + 1}`}
+                        alt={`${product?.name} - Imagem ${index + 1}`}
                         className="w-full h-full object-cover"
                       />
                     </button>
@@ -124,18 +111,18 @@ export default function ProductPage() {
               {/* Product Info */}
               <div className="space-y-6">
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-800 mb-2">{product.name}</h1>
+                  <h1 className="text-3xl font-bold text-gray-800 mb-2">{product?.name}</h1>
                   <div className="flex items-center space-x-2">
                     <span className="px-3 py-1 bg-green-600 text-white rounded-full text-sm font-medium">
-                      {product.category}
+                      {product?.category}
                     </span>
-                    <span className="text-gray-500 text-sm">ID: {product.id}</span>
+                    <span className="text-gray-500 text-sm">ID: {product?.id}</span>
                   </div>
                 </div>
 
                 <div>
                   <h3 className="text-lg font-semibold text-gray-800 mb-2">Descrição</h3>
-                  <p className="text-gray-600 leading-relaxed">{product.description}</p>
+                  <p className="text-gray-600 leading-relaxed">{product?.description}</p>
                 </div>
 
                 <div className="pt-4 border-t border-gray-200">
@@ -192,4 +179,22 @@ export default function ProductPage() {
       <Footer />
     </>
   )
+
+  if (loading || !product) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-red-600 mx-auto mb-4"></div>
+            <p className="text-xl text-gray-600">Carregando produto...</p>
+          </div>
+        </div>
+        <Footer />
+      </>
+    )
+  }
+
+  // Envolver o conteúdo com o componente de proteção
+  return <DevProtection pageName="Detalhes do Produto">{pageContent}</DevProtection>
 }
