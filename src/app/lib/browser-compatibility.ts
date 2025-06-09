@@ -505,6 +505,106 @@ svg.text-yellow-500 path,
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+/* CORREÇÕES ESPECÍFICAS PARA SMARTPHONES */
+@media screen and (max-width: 768px) {
+  /* FORÇAR GRADIENTES EM SMARTPHONES - Header do folheto */
+  .bg-gradient-to-r.from-red-500.to-green-500 {
+    background: linear-gradient(to right, #ef4444, #22c55e) !important;
+    background-image: linear-gradient(to right, #ef4444, #22c55e) !important;
+  }
+  
+  /* Fallback para gradientes que não funcionam */
+  .bg-gradient-to-r {
+    background: linear-gradient(to right, #ef4444, #22c55e) !important;
+  }
+  
+  /* FORÇAR CORES DO HEADER DO FOLHETO EM SMARTPHONES */
+  .bg-gradient-to-r.from-red-500.to-green-500,
+  .from-red-500.to-green-500 {
+    background-color: #ef4444 !important;
+    background-image: linear-gradient(90deg, #ef4444 0%, #22c55e 100%) !important;
+    background: linear-gradient(90deg, #ef4444 0%, #22c55e 100%) !important;
+  }
+  
+  /* Garantir que o texto seja branco no header */
+  .bg-gradient-to-r.from-red-500.to-green-500 *,
+  .from-red-500.to-green-500 * {
+    color: #ffffff !important;
+  }
+  
+  /* WEBKIT específico para iOS Safari */
+  @supports (-webkit-appearance: none) {
+    .bg-gradient-to-r.from-red-500.to-green-500 {
+      background: -webkit-linear-gradient(left, #ef4444, #22c55e) !important;
+      background: linear-gradient(to right, #ef4444, #22c55e) !important;
+    }
+  }
+  
+  /* FORÇAR CORES SÓLIDAS COMO FALLBACK FINAL */
+  .bg-gradient-to-r.from-red-500.to-green-500 {
+    background-color: #dc2626 !important; /* Vermelho sólido como fallback */
+  }
+  
+  /* Melhorar visibilidade de botões em smartphones */
+  .bg-white\/20,
+  .bg-white\/30 {
+    background-color: rgba(255, 255, 255, 0.3) !important;
+    backdrop-filter: none !important;
+  }
+  
+  /* Garantir que ícones sejam visíveis */
+  .text-white svg,
+  .bg-gradient-to-r.from-red-500.to-green-500 svg {
+    color: #ffffff !important;
+    fill: #ffffff !important;
+  }
+  
+  /* ANIMAÇÕES SUAVES EM SMARTPHONES */
+  .animate-pulse {
+    animation: mobile-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+  }
+  
+  @keyframes mobile-pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+  
+  /* MELHORAR CONTRASTE EM TELAS PEQUENAS */
+  .text-gray-600 {
+    color: #374151 !important;
+  }
+  
+  .text-gray-700 {
+    color: #1f2937 !important;
+  }
+  
+  /* GARANTIR QUE BADGES "NOVO!" SEJAM VISÍVEIS */
+  .bg-red-500.text-white {
+    background-color: #dc2626 !important;
+    color: #ffffff !important;
+  }
+}
+
+/* CORREÇÕES ESPECÍFICAS PARA iOS SAFARI */
+@supports (-webkit-touch-callout: none) {
+  .bg-gradient-to-r.from-red-500.to-green-500 {
+    background: -webkit-linear-gradient(left, #ef4444 0%, #22c55e 100%) !important;
+    background: linear-gradient(to right, #ef4444 0%, #22c55e 100%) !important;
+  }
+}
+
+/* CORREÇÕES PARA ANDROID CHROME */
+@media screen and (max-width: 768px) and (-webkit-min-device-pixel-ratio: 1) {
+  .bg-gradient-to-r.from-red-500.to-green-500 {
+    background: linear-gradient(90deg, #ef4444, #22c55e) !important;
+    background-image: linear-gradient(90deg, #ef4444, #22c55e) !important;
+  }
+}
 `
 
     const style = document.createElement("style")
