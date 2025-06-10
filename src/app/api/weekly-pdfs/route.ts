@@ -29,7 +29,7 @@ export async function GET() {
   }
 }
 
-// POST - Adicionar novo PDF semanal
+// POST - Adicionar novo PDF
 export async function POST(request: Request) {
   try {
     const formData = await request.formData()
