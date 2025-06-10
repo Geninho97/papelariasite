@@ -52,7 +52,7 @@ export default function Contact() {
                   </div>
                   <div className="ml-6 space-y-1 text-xs sm:text-sm">
                     <p>Segunda a Sábado: 9h às 12:30</p>
-                    <p className="ml-[108px] sm:ml-[120px]">14:30 às 19h</p>
+                    <p className="text-right">14:30 às 19h</p>
                     <p>Domingos: Encerrados</p>
                   </div>
                 </div>
