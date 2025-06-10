@@ -32,7 +32,7 @@ export default function Contact() {
 
               <div className="space-y-3 sm:space-y-4 text-gray-700">
                 <div className="space-y-1">
-                  <a href="https://maps.app.goo.gl/D92pvzPqkWcGMqzw9" target="_blank">
+                  <a href="https://maps.app.goo.gl/9NywXPgtkRrrm4Lj8" target="_blank">
                   <p className="font-medium">Avenida São Miguel de Bustelo, 2835</p>
                   <p>4560-042 - Bustelo - Penafiel</p>
                   <p>Portugal</p>
