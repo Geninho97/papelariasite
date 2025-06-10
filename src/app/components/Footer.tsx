@@ -90,7 +90,7 @@ export default function Footer() {
               </div>
               <div className="flex items-center space-x-2 sm:space-x-3">
                 <Phone className="h-4 w-4 sm:h-5 sm:w-5 text-primary-400 flex-shrink-0" />
-                <p>255720225</p>
+                <a href="tel:255720225">255720225</a>
                 <span className="text-xs text-gray-500 ml-6">(Chamada para rede fixa nacional)</span>
               </div>
               <div className="flex items-center space-x-2 sm:space-x-3">
@@ -116,7 +116,7 @@ export default function Footer() {
               </div>
               <div className="flex items-center space-x-2 sm:space-x-3">
                 <Phone className="h-4 w-4 sm:h-5 sm:w-5 text-secondary-400 flex-shrink-0" />
-                <p>255213418</p>
+                <a href="tel:255213418">255213418</a>
                 <span className="text-xs text-gray-500 ml-6">(Chamada para rede fixa nacional)</span>
               </div>
               <div className="flex items-center space-x-2 sm:space-x-3">
