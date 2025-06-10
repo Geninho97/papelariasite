@@ -50,9 +50,9 @@ export default function Contact() {
                     <Clock className="h-4 w-4 text-red-600" />
                     <span className="font-medium">Horário de Funcionamento</span>
                   </div>
-                  <div className="ml-6 space-y-1 text-xs sm:text-sm font-mono">
+                  <div className="ml-6 space-y-1 text-xs sm:text-sm">
                     <p>Segunda a Sábado: 9h às 12:30h</p>
-                    <p> 14:30h às 19h</p>
+                    <p>                  14:30h às 19h</p>
                     <p>Domingos: Encerrados</p>
                   </div>
                 </div>
