@@ -51,8 +51,8 @@ export default function Contact() {
                     <span className="font-medium">Horário de Funcionamento</span>
                   </div>
                   <div className="ml-6 space-y-1 text-xs sm:text-sm">
-                    <p>Segunda a Sábado: 9h às 12:30h</p>
-                    <p>                  14:30h às 19h</p>
+                    <p>Segunda a Sábado: </p>
+                    <p>9h às 12:30h & 14:30h às 19h</p>
                     <p>Domingos: Encerrados</p>
                   </div>
                 </div>
