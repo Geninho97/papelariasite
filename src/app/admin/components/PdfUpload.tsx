@@ -114,7 +114,7 @@ export default function PdfUpload({ onUpload, isUploading = false, className = "
             type="text"
             value={pdfName}
             onChange={(e) => setPdfName(e.target.value)}
-            placeholder="Ex: Folheto 15/1 a 22/1"
+            placeholder="Ex: Folheto de 15/1 a 22/1"
             className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
             disabled={isUploading}
           />
