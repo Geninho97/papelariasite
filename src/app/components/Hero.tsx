@@ -271,11 +271,12 @@ export default function Hero() {
                       >
                         {/* PDF Display Area */}
                         <div className="relative bg-white rounded-xl shadow-lg h-full w-full overflow-hidden">
-                          {/* PDF Object */}
+                          {/* PDF Object com permissões explícitas */}
                           <object
                             data={`${pdfUrlToUse}#page=1&view=FitH&toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&zoom=page-fit`}
                             type="application/pdf"
                             className="w-full h-full pdf-no-scrollbar"
+                            allow="fullscreen"
                             style={{
                               overflow: "hidden",
                               pointerEvents: "none",

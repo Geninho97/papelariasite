@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Inter } from 'next/font/google'
 import "./globals.css"
 import BrowserCompatibility from "./components/BrowserCompatibility"
 
@@ -18,6 +18,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
+      <head>
+        {/* Permissions Policy para resolver violações de fullscreen */}
+        <meta 
+          httpEquiv="Permissions-Policy" 
+          content="fullscreen=*, display-capture=*, camera=*, microphone=*, geolocation=*" 
+        />
+      </head>
       <body className={inter.className}>
         <BrowserCompatibility />
         {children}
