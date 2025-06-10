@@ -7,6 +7,7 @@ import { useEffect, useState } from "react"
 export default function Hero() {
   const { latestPdf, loading } = useWeeklyPdfs()
   const [isMobile, setIsMobile] = useState(false)
+  const [isReady, setIsReady] = useState(false)
 
   // Detectar tamanho da tela para ajustes responsivos
   useEffect(() => {
@@ -23,6 +24,20 @@ export default function Hero() {
     // Cleanup
     return () => window.removeEventListener("resize", checkMobile)
   }, [])
+
+  // Controlar quando o conteúdo está pronto para ser mostrado
+  useEffect(() => {
+    if (!loading) {
+      // Pequeno delay para garantir que o estado está estável
+      const timer = setTimeout(() => {
+        setIsReady(true)
+      }, 100)
+
+      return () => clearTimeout(timer)
+    } else {
+      setIsReady(false)
+    }
+  }, [loading])
 
   return (
     <section
@@ -44,7 +59,27 @@ export default function Hero() {
         <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
           {/* Content */}
           <div className="space-y-6 md:space-y-8 text-center md:text-left">
-            {latestPdf ? (
+            {loading || !isReady ? (
+              // Loading state - mostrar skeleton ou loading
+              <div className="space-y-6 md:space-y-8">
+                <div className="space-y-4">
+                  <div className="h-12 sm:h-16 md:h-20 bg-gray-200 rounded-lg animate-pulse"></div>
+                  <div className="h-8 sm:h-10 bg-gray-200 rounded-lg animate-pulse w-3/4"></div>
+                </div>
+                <div className="space-y-3">
+                  <div className="h-6 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-6 bg-gray-200 rounded animate-pulse w-5/6"></div>
+                </div>
+                <div className="flex items-center justify-center md:justify-start space-x-2">
+                  <div className="flex space-x-1">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="h-5 w-5 sm:h-6 sm:w-6 bg-gray-200 rounded animate-pulse"></div>
+                    ))}
+                  </div>
+                  <div className="h-6 bg-gray-200 rounded animate-pulse w-48"></div>
+                </div>
+              </div>
+            ) : latestPdf ? (
               <>
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 leading-tight flex flex-col">
                   <span>Descubra os destaques</span>
@@ -82,23 +117,27 @@ export default function Hero() {
               </>
             )}
 
-            <div className="flex items-center justify-center md:justify-start space-x-2">
-              <div className="flex text-yellow-500">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className="h-5 w-5 sm:h-6 sm:w-6 fill-current animate-pulse"
-                    style={{ animationDelay: `${i * 200}ms` }}
-                  />
-                ))}
+            {isReady && (
+              <div className="flex items-center justify-center md:justify-start space-x-2">
+                <div className="flex text-yellow-500">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className="h-5 w-5 sm:h-6 sm:w-6 fill-current animate-pulse"
+                      style={{ animationDelay: `${i * 200}ms` }}
+                    />
+                  ))}
+                </div>
+                <span className="text-gray-700 font-medium text-base sm:text-lg">
+                  Mais de 1000 clientes satisfeitos
+                </span>
               </div>
-              <span className="text-gray-700 font-medium text-base sm:text-lg">Mais de 1000 clientes satisfeitos</span>
-            </div>
+            )}
           </div>
 
           {/* PDF Preview - Tablet Style - Ajustado para mobile */}
           <div className="relative flex justify-center mt-8 md:mt-0">
-            {loading ? (
+            {loading || !isReady ? (
               <div className="w-full max-w-[460px] h-[400px] sm:h-[500px] md:h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl border-8 border-gray-300 shadow-2xl">
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
@@ -114,8 +153,8 @@ export default function Hero() {
                       <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
                       <div>
                         <h3 className="font-bold text-sm sm:text-base line-clamp-1">{latestPdf.name}</h3>
-                        {/* Verificar se o PDF é recente (últimos 15 dias) */}
-                        {new Date(latestPdf.uploadDate) > new Date(Date.now() - 15 * 24 * 60 * 60 * 1000) && (
+                        {/* Verificar se o PDF é recente (últimos 7 dias) */}
+                        {new Date(latestPdf.uploadDate) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) && (
                           <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold animate-pulse">
                             NOVO!
                           </span>
