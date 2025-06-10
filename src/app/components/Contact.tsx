@@ -107,8 +107,8 @@ export default function Contact() {
 
               <div className="space-y-3 sm:space-y-4 text-gray-700">
                 <div className="space-y-1">
-                  <p className="font-medium">Visite tambem a nossa loja Online</p>
-                  <p>Especialista em artigos Sem Glúten</p>
+                  <p className="font-medium">Espaço destinado a venda</p>
+                  <p>exclusiva de <span style={{ textDecorationLine: 'underline' }}>Alimentação Sem Gluten</span></p>
                   <p></p>
                 </div>
 
