@@ -24,7 +24,6 @@ import {
   Star,
   StarOff,
 } from "lucide-react"
-import Link from "next/link"
 import LoginForm from "./components/LoginForm"
 import ImageUpload from "./components/ImageUpload"
 import LogoutButton from "./components/LogoutButton"
@@ -280,13 +279,15 @@ export default function AdminPage() {
                 <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
                 <span>Atualizar Agora</span>
               </button>
-              <Link
-                href="/"
+              <button
+                onClick={() => {
+                  window.location.href = "/"
+                }}
                 className="flex items-center space-x-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
               >
                 <Eye className="h-4 w-4" />
                 <span>Ver Site</span>
-              </Link>
+              </button>
               <LogoutButton onLogout={logout} />
             </div>
           </div>
