@@ -49,37 +49,40 @@ export default function Hero() {
     }
   }, [loading])
 
-  // Gerenciar cache do PDF
+  // Gerenciar cache do PDF - VERSÃO SIMPLIFICADA
   useEffect(() => {
     if (latestPdf && isReady) {
       const handlePdfCache = async () => {
         try {
+          // Sempre usar o proxy como fallback confiável
+          const proxyUrl = getProxyUrl(latestPdf.url)
+
           // Verificar se já está em cache
           const cached = getCachedPdf(latestPdf.url)
 
           if (cached) {
+            logWithThrottle("hero-cache-hit", `✅ [HERO] PDF encontrado no cache`)
             setCachedPdfUrl(cached)
           } else {
-            logWithThrottle("hero-cache-miss", `📄 [HERO] PDF não está em cache, iniciando download...`)
+            logWithThrottle("hero-cache-miss", `📄 [HERO] PDF não está em cache, usando proxy direto`)
+            setCachedPdfUrl(proxyUrl)
+
+            // Tentar cachear em background (sem bloquear a UI)
             setIsCaching(true)
-
-            // Cachear o PDF
-            const cachedUrl = await cachePdf(latestPdf.url, latestPdf.name)
-
-            if (cachedUrl) {
-              logWithThrottle("hero-cache-success", `✅ [HERO] PDF cacheado com sucesso por 24h`)
-              setCachedPdfUrl(cachedUrl)
-            } else {
-              logWithThrottle("hero-cache-fail", `⚠️ [HERO] Falha no cache, usando proxy direto`)
-              const proxyUrl = getProxyUrl(latestPdf.url)
-              setCachedPdfUrl(proxyUrl)
+            try {
+              const cachedUrl = await cachePdf(latestPdf.url, latestPdf.name)
+              if (cachedUrl && cachedUrl !== proxyUrl) {
+                logWithThrottle("hero-cache-success", `✅ [HERO] PDF cacheado com sucesso`)
+                setCachedPdfUrl(cachedUrl)
+              }
+            } catch (error) {
+              logWithThrottle("hero-cache-fail", `⚠️ [HERO] Falha no cache, mantendo proxy`)
             }
-
             setIsCaching(false)
           }
         } catch (error) {
           console.error(`❌ [HERO] Erro no cache do PDF:`, error)
-          // Fallback para proxy
+          // Fallback final para proxy
           const proxyUrl = getProxyUrl(latestPdf.url)
           setCachedPdfUrl(proxyUrl)
           setIsCaching(false)
@@ -255,20 +258,19 @@ export default function Hero() {
                             src={`${pdfUrlToUse}#page=1&view=FitH&toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&zoom=page-fit`}
                             allow="fullscreen"
                             className="w-full h-full pdf-no-scrollbar"
-                              style={{
-                            overflow: "hidden",
-                            pointerEvents: "none",
-                            border: "none",
-                            outline: "none",
+                            style={{
+                              overflow: "hidden",
+                              pointerEvents: "none",
+                              border: "none",
+                              outline: "none",
                             }}
-                            >
+                          >
                             <div className="w-full h-full flex items-center justify-center bg-gray-100">
                               <div className="text-gray-600 text-sm">
                                 Seu navegador não suporta visualização de PDF.
                               </div>
                             </div>
                           </iframe>
-
 
                           {/* Hover overlay */}
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 flex items-center justify-center rounded-xl">

@@ -1,14 +1,9 @@
-// Sistema de cache específico para PDFs com duração de 24 horas
+// Sistema de cache específico para PDFs com duração de 24 horas - VERSÃO CORRIGIDA
 interface PdfCacheData {
   url: string
-  blob: Blob
-  timestamp: number
   name: string
+  timestamp: number
   size: number
-}
-
-interface PdfCacheEntry {
-  data: PdfCacheData
   expiresAt: number
 }
 
@@ -17,7 +12,7 @@ class PdfCache {
   private readonly CACHE_PREFIX = "coutyfil_pdf_"
   private readonly CACHE_DURATION = 24 * 60 * 60 * 1000 // 24 horas
   private readonly MAX_CACHE_SIZE = 50 * 1024 * 1024 // 50MB máximo
-  private logTimestamps: Record<string, number> = {} // Para controlar logs repetitivos
+  private logTimestamps: Record<string, number> = {}
 
   static getInstance(): PdfCache {
     if (!PdfCache.instance) {
@@ -33,29 +28,14 @@ class PdfCache {
 
   // Gerar chave única para o PDF
   private generateKey(url: string): string {
-    return `${this.CACHE_PREFIX}${btoa(url).slice(0, 32)}`
+    // Usar uma chave mais simples e confiável
+    const cleanUrl = url.replace(/[^a-zA-Z0-9]/g, "_")
+    return `${this.CACHE_PREFIX}${cleanUrl.slice(0, 32)}`
   }
 
   // Verificar se o cache é válido
-  private isValidCache(entry: PdfCacheEntry): boolean {
-    return Date.now() < entry.expiresAt
-  }
-
-  // Obter tamanho total do cache
-  private getCacheSize(): number {
-    if (!this.isClient()) return 0
-
-    let totalSize = 0
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)
-      if (key?.startsWith(this.CACHE_PREFIX)) {
-        const value = localStorage.getItem(key)
-        if (value) {
-          totalSize += value.length
-        }
-      }
-    }
-    return totalSize
+  private isValidCache(data: PdfCacheData): boolean {
+    return Date.now() < data.expiresAt
   }
 
   // Log controlado para evitar spam
@@ -69,71 +49,18 @@ class PdfCache {
     }
   }
 
-  // Limpar cache antigo para fazer espaço
-  private clearOldCache(): void {
-    if (!this.isClient()) return
-
-    const keys: string[] = []
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)
-      if (key?.startsWith(this.CACHE_PREFIX)) {
-        keys.push(key)
-      }
-    }
-
-    // Ordenar por timestamp (mais antigo primeiro)
-    keys.sort((a, b) => {
-      try {
-        const entryA = JSON.parse(localStorage.getItem(a) || "{}")
-        const entryB = JSON.parse(localStorage.getItem(b) || "{}")
-        return entryA.data?.timestamp - entryB.data?.timestamp
-      } catch {
-        return 0
-      }
-    })
-
-    // Remover até ter espaço suficiente
-    for (const key of keys) {
-      if (this.getCacheSize() < this.MAX_CACHE_SIZE * 0.8) break
-      localStorage.removeItem(key)
-      this.logWithThrottle("cache-clear", `🗑️ [PDF-CACHE] Cache antigo removido: ${key}`)
-    }
-  }
-
-  // Converter Blob para Base64 para armazenamento
-  private async blobToBase64(blob: Blob): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = () => resolve(reader.result as string)
-      reader.onerror = reject
-      reader.readAsDataURL(blob)
-    })
-  }
-
-  // Converter Base64 de volta para Blob
-  private base64ToBlob(base64: string): Blob {
-    const [header, data] = base64.split(",")
-    const mimeType = header.match(/:(.*?);/)?.[1] || "application/pdf"
-    const byteCharacters = atob(data)
-    const byteNumbers = new Array(byteCharacters.length)
-
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i)
-    }
-
-    const byteArray = new Uint8Array(byteNumbers)
-    return new Blob([byteArray], { type: mimeType })
-  }
-
   // Gerar URL do proxy para contornar CORS
-  private getProxyUrl(originalUrl: string): string {
+  getProxyUrl(originalUrl: string): string {
     const encodedUrl = encodeURIComponent(originalUrl)
     return `/api/pdf-proxy?url=${encodedUrl}`
   }
 
-  // Armazenar PDF no cache
+  // Armazenar PDF no cache (versão simplificada)
   async cachePdf(url: string, name: string): Promise<string | null> {
-    if (!this.isClient()) return null
+    if (!this.isClient()) {
+      this.logWithThrottle("no-client", "📄 [PDF-CACHE] Não está no cliente, usando proxy direto")
+      return this.getProxyUrl(url)
+    }
 
     try {
       this.logWithThrottle("cache-init", `📄 [PDF-CACHE] Iniciando cache do PDF: ${name}`)
@@ -147,9 +74,9 @@ class PdfCache {
 
       // Usar proxy para contornar CORS
       const proxyUrl = this.getProxyUrl(url)
-      this.logWithThrottle("proxy-use", `🔄 [PDF-CACHE] Usando proxy para buscar PDF: ${proxyUrl}`)
+      this.logWithThrottle("proxy-use", `🔄 [PDF-CACHE] Usando proxy: ${proxyUrl}`)
 
-      // Baixar o PDF através do proxy
+      // Tentar baixar o PDF através do proxy
       const response = await fetch(proxyUrl, {
         method: "GET",
         headers: {
@@ -164,59 +91,50 @@ class PdfCache {
       const blob = await response.blob()
       const sizeInMB = (blob.size / (1024 * 1024)).toFixed(2)
 
-      this.logWithThrottle("download-complete", `📦 [PDF-CACHE] PDF baixado via proxy: ${sizeInMB}MB`)
+      this.logWithThrottle("download-complete", `📦 [PDF-CACHE] PDF baixado: ${sizeInMB}MB`)
 
-      // Verificar se há espaço suficiente
-      if (this.getCacheSize() + blob.size > this.MAX_CACHE_SIZE) {
-        this.logWithThrottle("cache-cleanup", `🧹 [PDF-CACHE] Limpando cache antigo...`)
-        this.clearOldCache()
+      // Verificar se o PDF não é muito grande para cache
+      if (blob.size > 10 * 1024 * 1024) {
+        // 10MB
+        this.logWithThrottle(
+          "too-large",
+          `⚠️ [PDF-CACHE] PDF muito grande para cache (${sizeInMB}MB), usando proxy direto`,
+        )
+        return proxyUrl
       }
 
-      // Converter para base64 para armazenamento
-      const base64 = await this.blobToBase64(blob)
-
-      const cacheEntry: PdfCacheEntry = {
-        data: {
-          url,
-          blob: blob, // Não armazenamos o blob diretamente, apenas para referência
-          timestamp: Date.now(),
-          name,
-          size: blob.size,
-        },
-        expiresAt: Date.now() + this.CACHE_DURATION,
-      }
-
-      // Armazenar no localStorage (sem o blob, apenas metadados + base64)
-      const storageData = {
-        ...cacheEntry,
-        base64Data: base64,
-      }
-
-      const key = this.generateKey(url)
-      localStorage.setItem(key, JSON.stringify(storageData))
+      // Limpar cache antigo se necessário
+      this.clearOldCache()
 
       // Criar URL do blob para uso imediato
       const blobUrl = URL.createObjectURL(blob)
 
-      this.logWithThrottle("cache-store", `✅ [PDF-CACHE] PDF armazenado em cache por 24h: ${name} (${sizeInMB}MB)`)
+      // Salvar metadados no localStorage (sem o blob, apenas referência)
+      const cacheData: PdfCacheData = {
+        url,
+        name,
+        timestamp: Date.now(),
+        size: blob.size,
+        expiresAt: Date.now() + this.CACHE_DURATION,
+      }
+
+      const key = this.generateKey(url)
+      localStorage.setItem(key, JSON.stringify(cacheData))
+
+      this.logWithThrottle("cache-store", `✅ [PDF-CACHE] PDF cacheado por 24h: ${name} (${sizeInMB}MB)`)
 
       return blobUrl
     } catch (error) {
       console.error(`❌ [PDF-CACHE] Erro ao cachear PDF:`, error)
 
-      // Fallback: tentar usar o proxy diretamente
-      try {
-        const proxyUrl = this.getProxyUrl(url)
-        this.logWithThrottle("fallback", `🔄 [PDF-CACHE] Tentando fallback com proxy: ${proxyUrl}`)
-        return proxyUrl
-      } catch (fallbackError) {
-        console.error(`❌ [PDF-CACHE] Fallback também falhou:`, fallbackError)
-        return null
-      }
+      // Fallback: usar o proxy diretamente
+      const proxyUrl = this.getProxyUrl(url)
+      this.logWithThrottle("fallback", `🔄 [PDF-CACHE] Usando fallback com proxy: ${proxyUrl}`)
+      return proxyUrl
     }
   }
 
-  // Recuperar PDF do cache
+  // Recuperar PDF do cache (versão simplificada)
   getCachedPdf(url: string): string | null {
     if (!this.isClient()) return null
 
@@ -225,26 +143,24 @@ class PdfCache {
       const cached = localStorage.getItem(key)
 
       if (!cached) {
-        this.logWithThrottle("cache-miss", `📭 [PDF-CACHE] PDF não encontrado no cache`)
         return null
       }
 
-      const entry = JSON.parse(cached)
+      const cacheData: PdfCacheData = JSON.parse(cached)
 
-      if (!this.isValidCache(entry)) {
+      if (!this.isValidCache(cacheData)) {
         this.logWithThrottle("cache-expired", `⏰ [PDF-CACHE] Cache expirado, removendo...`)
         localStorage.removeItem(key)
         return null
       }
 
-      // Converter base64 de volta para blob
-      const blob = this.base64ToBlob(entry.base64Data)
-      const blobUrl = URL.createObjectURL(blob)
+      // Para PDFs em cache, sempre usar o proxy (mais confiável)
+      const proxyUrl = this.getProxyUrl(url)
 
-      const ageHours = Math.round((Date.now() - entry.data.timestamp) / (60 * 60 * 1000))
-      const sizeInMB = (entry.data.size / (1024 * 1024)).toFixed(2)
+      const ageHours = Math.round((Date.now() - cacheData.timestamp) / (60 * 60 * 1000))
+      this.logWithThrottle("cache-hit", `✅ [PDF-CACHE] PDF encontrado no cache (${ageHours}h), usando proxy`)
 
-      return blobUrl
+      return proxyUrl
     } catch (error) {
       console.error(`❌ [PDF-CACHE] Erro ao recuperar PDF do cache:`, error)
       return null
@@ -261,10 +177,40 @@ class PdfCache {
     if (!cached) return false
 
     try {
-      const entry = JSON.parse(cached)
-      return this.isValidCache(entry)
+      const cacheData: PdfCacheData = JSON.parse(cached)
+      return this.isValidCache(cacheData)
     } catch {
       return false
+    }
+  }
+
+  // Limpar cache antigo
+  private clearOldCache(): void {
+    if (!this.isClient()) return
+
+    const keys: string[] = []
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (key?.startsWith(this.CACHE_PREFIX)) {
+        keys.push(key)
+      }
+    }
+
+    // Remover entradas expiradas
+    for (const key of keys) {
+      try {
+        const cached = localStorage.getItem(key)
+        if (cached) {
+          const cacheData: PdfCacheData = JSON.parse(cached)
+          if (!this.isValidCache(cacheData)) {
+            localStorage.removeItem(key)
+            this.logWithThrottle("cleanup", `🗑️ [PDF-CACHE] Cache expirado removido: ${key}`)
+          }
+        }
+      } catch {
+        // Remover entradas corrompidas
+        localStorage.removeItem(key)
+      }
     }
   }
 
@@ -296,19 +242,23 @@ class PdfCache {
       const key = localStorage.key(i)
       if (key?.startsWith(this.CACHE_PREFIX)) {
         try {
-          const entry = JSON.parse(localStorage.getItem(key) || "{}")
-          if (entry.data) {
-            const age = Date.now() - entry.data.timestamp
-            const expiresIn = entry.expiresAt - Date.now()
+          const cached = localStorage.getItem(key)
+          if (cached) {
+            const cacheData: PdfCacheData = JSON.parse(cached)
 
-            pdfs.push({
-              name: entry.data.name,
-              size: `${(entry.data.size / (1024 * 1024)).toFixed(2)}MB`,
-              age: `${Math.round(age / (60 * 60 * 1000))}h`,
-              expiresIn: `${Math.round(expiresIn / (60 * 60 * 1000))}h`,
-            })
+            if (this.isValidCache(cacheData)) {
+              const age = Date.now() - cacheData.timestamp
+              const expiresIn = cacheData.expiresAt - Date.now()
 
-            totalSize += entry.data.size
+              pdfs.push({
+                name: cacheData.name,
+                size: `${(cacheData.size / (1024 * 1024)).toFixed(2)}MB`,
+                age: `${Math.round(age / (60 * 60 * 1000))}h`,
+                expiresIn: `${Math.round(expiresIn / (60 * 60 * 1000))}h`,
+              })
+
+              totalSize += cacheData.size
+            }
           }
         } catch {
           // Ignorar entradas corrompidas
@@ -342,17 +292,12 @@ class PdfCache {
   // Pré-carregar PDF em background
   async preloadPdf(url: string, name: string): Promise<void> {
     if (this.isPdfCached(url)) {
-      this.logWithThrottle("preload-skip", `⚡ [PDF-CACHE] PDF já em cache, não é necessário pré-carregar: ${name}`)
+      this.logWithThrottle("preload-skip", `⚡ [PDF-CACHE] PDF já em cache: ${name}`)
       return
     }
 
-    this.logWithThrottle("preload", `🚀 [PDF-CACHE] Pré-carregando PDF em background: ${name}`)
+    this.logWithThrottle("preload", `🚀 [PDF-CACHE] Pré-carregando PDF: ${name}`)
     await this.cachePdf(url, name)
-  }
-
-  // Obter URL do proxy para uso direto (quando cache falha)
-  getProxyUrlForDirect(url: string): string {
-    return this.getProxyUrl(url)
   }
 }
 
@@ -367,6 +312,6 @@ export function usePdfCache() {
     getCacheInfo: pdfCache.getCacheInfo.bind(pdfCache),
     clearAllCache: pdfCache.clearAllCache.bind(pdfCache),
     preloadPdf: pdfCache.preloadPdf.bind(pdfCache),
-    getProxyUrl: pdfCache.getProxyUrlForDirect.bind(pdfCache),
+    getProxyUrl: pdfCache.getProxyUrl.bind(pdfCache),
   }
 }
