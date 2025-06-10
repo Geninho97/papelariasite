@@ -58,7 +58,6 @@ export default function Hero() {
           const cached = getCachedPdf(latestPdf.url)
 
           if (cached) {
-            logWithThrottle("hero-cache-hit", `⚡ [HERO] Usando PDF do cache de 24h`)
             setCachedPdfUrl(cached)
           } else {
             logWithThrottle("hero-cache-miss", `📄 [HERO] PDF não está em cache, iniciando download...`)

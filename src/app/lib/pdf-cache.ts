@@ -244,11 +244,6 @@ class PdfCache {
       const ageHours = Math.round((Date.now() - entry.data.timestamp) / (60 * 60 * 1000))
       const sizeInMB = (entry.data.size / (1024 * 1024)).toFixed(2)
 
-      this.logWithThrottle(
-        "cache-retrieve",
-        `✅ [PDF-CACHE] PDF recuperado do cache: ${entry.data.name} (${sizeInMB}MB, ${ageHours}h de idade)`,
-      )
-
       return blobUrl
     } catch (error) {
       console.error(`❌ [PDF-CACHE] Erro ao recuperar PDF do cache:`, error)
