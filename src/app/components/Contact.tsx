@@ -40,7 +40,7 @@ export default function Contact() {
                 <div className="flex flex-col pt-1 sm:pt-2">
                   <div className="flex items-center space-x-2">
                     <Phone className="h-4 w-4 text-red-600" />
-                    <span className="font-medium">255720225</span>
+                    <a href="tel:255720225" className="font-medium">255720225</a>
                   </div>
                   <span className="text-xs text-gray-500 ml-6">(Chamada para rede fixa nacional)</span>
                 </div>
@@ -52,7 +52,7 @@ export default function Contact() {
                   </div>
                   <div className="ml-6 space-y-1 text-xs sm:text-sm">
                     <p>Segunda a Sábado: </p>
-                    <p>9h às 12:30h & 14:30h às 19h</p>
+                    <p>9h às 12:30h e das 14:30h às 19h</p>
                     <p>Domingos: Encerrados</p>
                   </div>
                 </div>
@@ -78,7 +78,7 @@ export default function Contact() {
                 <div className="flex flex-col pt-1 sm:pt-2">
                   <div className="flex items-center space-x-2">
                     <Phone className="h-4 w-4 text-green-600" />
-                    <span className="font-medium">255213418</span>
+                    <a href="tel:255213418" className="font-medium">255213418</a>
                   </div>
                   <span className="text-xs text-gray-500 ml-6">(Chamada para rede fixa nacional)</span>
                 </div>
