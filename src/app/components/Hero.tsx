@@ -272,24 +272,24 @@ export default function Hero() {
                         {/* PDF Display Area */}
                         <div className="relative bg-white rounded-xl shadow-lg h-full w-full overflow-hidden">
                           {/* PDF Object com permissões explícitas */}
-                          <object
-                            data={`${pdfUrlToUse}#page=1&view=FitH&toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&zoom=page-fit`}
-                            type="application/pdf"
-                            className="w-full h-full pdf-no-scrollbar"
+                          <iframe
+                            src={`${pdfUrlToUse}#page=1&view=FitH&toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&zoom=page-fit`}
                             allow="fullscreen"
-                            style={{
-                              overflow: "hidden",
-                              pointerEvents: "none",
-                              border: "none",
-                              outline: "none",
+                            className="w-full h-full pdf-no-scrollbar"
+                              style={{
+                            overflow: "hidden",
+                            pointerEvents: "none",
+                            border: "none",
+                            outline: "none",
                             }}
-                          >
+                            >
                             <div className="w-full h-full flex items-center justify-center bg-gray-100">
                               <div className="text-gray-600 text-sm">
                                 Seu navegador não suporta visualização de PDF.
                               </div>
                             </div>
-                          </object>
+                          </iframe>
+
 
                           {/* Hover overlay */}
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 flex items-center justify-center rounded-xl">
