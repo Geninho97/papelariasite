@@ -209,14 +209,6 @@ export default function Hero() {
                       <div>
                         <h3 className="font-bold text-sm sm:text-base line-clamp-1">{latestPdf.name}</h3>
                         <div className="flex items-center space-x-2">
-                          {/* Badge de cache */}
-                          {cachedPdfUrl &&
-                            cachedPdfUrl !== latestPdf.url &&
-                            !cachedPdfUrl.includes("/api/pdf-proxy") && (
-                              <span className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-                                📱 CACHE 24H
-                              </span>
-                            )}
                           {/* Badge de proxy */}
                           {cachedPdfUrl && cachedPdfUrl.includes("/api/pdf-proxy") && (
                             <span className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold">
