@@ -102,7 +102,7 @@ export default function Contact() {
                 <div className="bg-red-100 p-2 sm:p-3 rounded-full">
                   <MapPin className="h-5 w-5 sm:h-6 sm:w-6 text-red-600" />
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold text-gray-800">Coutyfil - Online</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-gray-800">Coutyfil - On-Line</h3>
               </div>
 
               <div className="space-y-3 sm:space-y-4 text-gray-700">
