@@ -1,13 +1,13 @@
 "use client"
 
-import { Star, ChevronDown, FileText } from 'lucide-react'
+import { Star, ChevronDown, FileText } from "lucide-react"
 import { useWeeklyPdfs } from "@/app/hooks/useWeeklyPdfs"
 import { usePdfCache } from "@/app/lib/pdf-cache"
 import { useEffect, useState } from "react"
 
 export default function Hero() {
   const { latestPdf, loading } = useWeeklyPdfs()
-  const { getCachedPdf, cachePdf, isPdfCached } = usePdfCache()
+  const { getCachedPdf, cachePdf, isPdfCached, getProxyUrl } = usePdfCache()
   const [isMobile, setIsMobile] = useState(false)
   const [isReady, setIsReady] = useState(false)
   const [cachedPdfUrl, setCachedPdfUrl] = useState<string | null>(null)
@@ -44,39 +44,42 @@ export default function Hero() {
         try {
           // Verificar se já está em cache
           const cached = getCachedPdf(latestPdf.url)
-          
+
           if (cached) {
             console.log(`⚡ [HERO] Usando PDF do cache de 24h`)
             setCachedPdfUrl(cached)
           } else {
             console.log(`📄 [HERO] PDF não está em cache, iniciando download...`)
             setIsCaching(true)
-            
+
             // Cachear o PDF
             const cachedUrl = await cachePdf(latestPdf.url, latestPdf.name)
-            
+
             if (cachedUrl) {
               console.log(`✅ [HERO] PDF cacheado com sucesso por 24h`)
               setCachedPdfUrl(cachedUrl)
             } else {
-              console.log(`⚠️ [HERO] Falha no cache, usando URL original`)
-              setCachedPdfUrl(latestPdf.url)
+              console.log(`⚠️ [HERO] Falha no cache, usando proxy direto`)
+              const proxyUrl = getProxyUrl(latestPdf.url)
+              setCachedPdfUrl(proxyUrl)
             }
-            
+
             setIsCaching(false)
           }
         } catch (error) {
           console.error(`❌ [HERO] Erro no cache do PDF:`, error)
-          setCachedPdfUrl(latestPdf.url)
+          // Fallback para proxy
+          const proxyUrl = getProxyUrl(latestPdf.url)
+          setCachedPdfUrl(proxyUrl)
           setIsCaching(false)
         }
       }
 
       handlePdfCache()
     }
-  }, [latestPdf, isReady, getCachedPdf, cachePdf])
+  }, [latestPdf, isReady, getCachedPdf, cachePdf, getProxyUrl])
 
-  // URL do PDF para usar (cache ou original)
+  // URL do PDF para usar (cache, proxy ou original)
   const pdfUrlToUse = cachedPdfUrl || latestPdf?.url
 
   return (
@@ -195,15 +198,29 @@ export default function Hero() {
                         <h3 className="font-bold text-sm sm:text-base line-clamp-1">{latestPdf.name}</h3>
                         <div className="flex items-center space-x-2">
                           {/* Badge de cache */}
-                          {cachedPdfUrl && cachedPdfUrl !== latestPdf.url && (
-                            <span className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-                              📱 CACHE 24H
+                          {cachedPdfUrl &&
+                            cachedPdfUrl !== latestPdf.url &&
+                            !cachedPdfUrl.includes("/api/pdf-proxy") && (
+                              <span className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                                📱 CACHE 24H
+                              </span>
+                            )}
+                          {/* Badge de proxy */}
+                          {cachedPdfUrl && cachedPdfUrl.includes("/api/pdf-proxy") && (
+                            <span className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                              🚀 PROXY
                             </span>
                           )}
                           {/* Badge de novo */}
                           {new Date(latestPdf.uploadDate) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) && (
                             <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold animate-pulse">
                               NOVO!
+                            </span>
+                          )}
+                          {/* Badge de carregamento */}
+                          {isCaching && (
+                            <span className="bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-bold animate-pulse">
+                              📥 CACHEANDO...
                             </span>
                           )}
                         </div>
@@ -267,10 +284,13 @@ export default function Hero() {
                               <div className="flex items-center space-x-2 text-gray-800 font-medium text-xs sm:text-sm">
                                 <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
                                 <span>
-                                  {cachedPdfUrl && cachedPdfUrl !== latestPdf.url 
-                                    ? "PDF em cache - Carregamento instantâneo!" 
-                                    : "Clique para abrir PDF completo"
-                                  }
+                                  {cachedPdfUrl &&
+                                  cachedPdfUrl !== latestPdf.url &&
+                                  !cachedPdfUrl.includes("/api/pdf-proxy")
+                                    ? "PDF em cache - Carregamento instantâneo!"
+                                    : cachedPdfUrl && cachedPdfUrl.includes("/api/pdf-proxy")
+                                      ? "PDF via proxy - Sem problemas de CORS!"
+                                      : "Clique para abrir PDF completo"}
                                 </span>
                               </div>
                             </div>

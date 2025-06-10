@@ -113,6 +113,12 @@ class PdfCache {
     return new Blob([byteArray], { type: mimeType })
   }
 
+  // Gerar URL do proxy para contornar CORS
+  private getProxyUrl(originalUrl: string): string {
+    const encodedUrl = encodeURIComponent(originalUrl)
+    return `/api/pdf-proxy?url=${encodedUrl}`
+  }
+
   // Armazenar PDF no cache
   async cachePdf(url: string, name: string): Promise<string | null> {
     if (!this.isClient()) return null
@@ -127,16 +133,26 @@ class PdfCache {
         return cached
       }
 
-      // Baixar o PDF
-      const response = await fetch(url)
+      // Usar proxy para contornar CORS
+      const proxyUrl = this.getProxyUrl(url)
+      console.log(`🔄 [PDF-CACHE] Usando proxy para buscar PDF: ${proxyUrl}`)
+
+      // Baixar o PDF através do proxy
+      const response = await fetch(proxyUrl, {
+        method: "GET",
+        headers: {
+          Accept: "application/pdf",
+        },
+      })
+
       if (!response.ok) {
-        throw new Error(`Erro ao baixar PDF: ${response.status}`)
+        throw new Error(`Erro ao baixar PDF via proxy: ${response.status}`)
       }
 
       const blob = await response.blob()
       const sizeInMB = (blob.size / (1024 * 1024)).toFixed(2)
 
-      console.log(`📦 [PDF-CACHE] PDF baixado: ${sizeInMB}MB`)
+      console.log(`📦 [PDF-CACHE] PDF baixado via proxy: ${sizeInMB}MB`)
 
       // Verificar se há espaço suficiente
       if (this.getCacheSize() + blob.size > this.MAX_CACHE_SIZE) {
@@ -175,7 +191,16 @@ class PdfCache {
       return blobUrl
     } catch (error) {
       console.error(`❌ [PDF-CACHE] Erro ao cachear PDF:`, error)
-      return null
+
+      // Fallback: tentar usar o proxy diretamente
+      try {
+        const proxyUrl = this.getProxyUrl(url)
+        console.log(`🔄 [PDF-CACHE] Tentando fallback com proxy: ${proxyUrl}`)
+        return proxyUrl
+      } catch (fallbackError) {
+        console.error(`❌ [PDF-CACHE] Fallback também falhou:`, fallbackError)
+        return null
+      }
     }
   }
 
@@ -314,6 +339,11 @@ class PdfCache {
     console.log(`🚀 [PDF-CACHE] Pré-carregando PDF em background: ${name}`)
     await this.cachePdf(url, name)
   }
+
+  // Obter URL do proxy para uso direto (quando cache falha)
+  getProxyUrlForDirect(url: string): string {
+    return this.getProxyUrl(url)
+  }
 }
 
 export const pdfCache = PdfCache.getInstance()
@@ -327,5 +357,6 @@ export function usePdfCache() {
     getCacheInfo: pdfCache.getCacheInfo.bind(pdfCache),
     clearAllCache: pdfCache.clearAllCache.bind(pdfCache),
     preloadPdf: pdfCache.preloadPdf.bind(pdfCache),
+    getProxyUrl: pdfCache.getProxyUrlForDirect.bind(pdfCache),
   }
 }
