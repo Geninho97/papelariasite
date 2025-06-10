@@ -206,12 +206,6 @@ export default function Hero() {
                               NOVO!
                             </span>
                           )}
-                          {/* Badge de carregamento */}
-                          {isCaching && (
-                            <span className="bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-bold animate-pulse">
-                              📥 CACHEANDO...
-                            </span>
-                          )}
                         </div>
                       </div>
                     </div>
