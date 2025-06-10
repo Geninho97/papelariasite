@@ -248,22 +248,83 @@ export function applyCompatibilityStyles(): void {
   text-align: center !important;
 }
 
-/* REMOVER TODOS OS GRADIENTES EM NAVEGADORES ANTIGOS */
-.legacy-browser .bg-gradient-to-br,
+/* ===== FORÇAR GRADIENTES DO HEADER DO FOLHETO EM NAVEGADORES ANTIGOS ===== */
+
+/* CHROME ANTIGO - FORÇAR GRADIENTE DO HEADER */
+.legacy-browser .bg-gradient-to-r.from-red-500.to-green-500,
+.windows-7 .bg-gradient-to-r.from-red-500.to-green-500,
+.legacy-chrome .bg-gradient-to-r.from-red-500.to-green-500,
+.legacy-firefox .bg-gradient-to-r.from-red-500.to-green-500 {
+  background: #ef4444 !important; /* Fallback vermelho */
+  background: -webkit-linear-gradient(left, #ef4444, #22c55e) !important;
+  background: -moz-linear-gradient(left, #ef4444, #22c55e) !important;
+  background: -o-linear-gradient(left, #ef4444, #22c55e) !important;
+  background: linear-gradient(to right, #ef4444, #22c55e) !important;
+  background-image: linear-gradient(to right, #ef4444, #22c55e) !important;
+}
+
+/* FORÇAR TODOS OS GRADIENTES EM NAVEGADORES ANTIGOS */
 .legacy-browser .bg-gradient-to-r,
-.legacy-browser .bg-gradient-to-l,
-.legacy-browser .bg-gradient-to-t,
-.legacy-browser .bg-gradient-to-b,
-.windows-7 .bg-gradient-to-br,
 .windows-7 .bg-gradient-to-r,
-.windows-7 .bg-gradient-to-l,
-.windows-7 .bg-gradient-to-t,
-.windows-7 .bg-gradient-to-b,
-.legacy-chrome .bg-gradient-to-br,
 .legacy-chrome .bg-gradient-to-r,
-.legacy-chrome .bg-gradient-to-l,
-.legacy-chrome .bg-gradient-to-t,
-.legacy-chrome .bg-gradient-to-b {
+.legacy-firefox .bg-gradient-to-r {
+  background: linear-gradient(to right, #ef4444, #22c55e) !important;
+  background-image: linear-gradient(to right, #ef4444, #22c55e) !important;
+}
+
+/* GARANTIR QUE O TEXTO SEJA BRANCO NO HEADER EM NAVEGADORES ANTIGOS */
+.legacy-browser .bg-gradient-to-r.from-red-500.to-green-500 *,
+.windows-7 .bg-gradient-to-r.from-red-500.to-green-500 *,
+.legacy-chrome .bg-gradient-to-r.from-red-500.to-green-500 *,
+.legacy-firefox .bg-gradient-to-r.from-red-500.to-green-500 * {
+  color: #ffffff !important;
+}
+
+/* FORÇAR ÍCONES BRANCOS NO HEADER */
+.legacy-browser .bg-gradient-to-r.from-red-500.to-green-500 svg,
+.windows-7 .bg-gradient-to-r.from-red-500.to-green-500 svg,
+.legacy-chrome .bg-gradient-to-r.from-red-500.to-green-500 svg,
+.legacy-firefox .bg-gradient-to-r.from-red-500.to-green-500 svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* BOTÕES NO HEADER DO FOLHETO */
+.legacy-browser .bg-white\/20,
+.legacy-browser .bg-white\/30,
+.windows-7 .bg-white\/20,
+.windows-7 .bg-white\/30,
+.legacy-chrome .bg-white\/20,
+.legacy-chrome .bg-white\/30,
+.legacy-firefox .bg-white\/20,
+.legacy-firefox .bg-white\/30 {
+  background-color: rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* BADGE "NOVO!" EM NAVEGADORES ANTIGOS */
+.legacy-browser .bg-red-500.text-white,
+.windows-7 .bg-red-500.text-white,
+.legacy-chrome .bg-red-500.text-white,
+.legacy-firefox .bg-red-500.text-white {
+  background-color: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+/* REMOVER OUTROS GRADIENTES DE FUNDO EM NAVEGADORES ANTIGOS (EXCETO HEADER DO FOLHETO) */
+.legacy-browser .bg-gradient-to-br:not(.from-red-500),
+.legacy-browser .bg-gradient-to-l:not(.from-red-500),
+.legacy-browser .bg-gradient-to-t:not(.from-red-500),
+.legacy-browser .bg-gradient-to-b:not(.from-red-500),
+.windows-7 .bg-gradient-to-br:not(.from-red-500),
+.windows-7 .bg-gradient-to-l:not(.from-red-500),
+.windows-7 .bg-gradient-to-t:not(.from-red-500),
+.windows-7 .bg-gradient-to-b:not(.from-red-500),
+.legacy-chrome .bg-gradient-to-br:not(.from-red-500),
+.legacy-chrome .bg-gradient-to-l:not(.from-red-500),
+.legacy-chrome .bg-gradient-to-t:not(.from-red-500),
+.legacy-chrome .bg-gradient-to-b:not(.from-red-500) {
   background-image: none !important;
   background: inherit !important;
 }
@@ -616,7 +677,8 @@ svg.text-yellow-500 path,
       ✅ Salmão/Verde intercalados
       ✅ Footer todo branco
       ✅ Palavra "folheto!" vermelha
-      ✅ Estrelas douradas`,
+      ✅ Estrelas douradas
+      ✅ Header do folheto com gradiente vermelho-verde`,
     )
   }
 }
