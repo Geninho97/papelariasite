@@ -51,7 +51,8 @@ export default function Contact() {
                     <span className="font-medium">Horário de Funcionamento</span>
                   </div>
                   <div className="ml-6 space-y-1 text-xs sm:text-sm">
-                    <p>Segunda a Sábado: 9h às 19h</p>
+                    <p>Segunda a Sábado: 9h às 12:30</p>
+                    <p>14:30 às 19h</p>
                     <p>Domingos: Encerrados</p>
                   </div>
                 </div>
@@ -138,10 +139,7 @@ export default function Contact() {
 
                   <div className="flex items-center space-x-2">
                     <Mail className="h-4 w-4 text-gray-600" />
-                    <a
-                      href="mailto:info@coutyfil.pt"
-                      className="font-medium hover:underline"
-                    >
+                    <a href="mailto:info@coutyfil.pt" className="font-medium hover:underline">
                       info@coutyfil.pt
                     </a>
                   </div>
