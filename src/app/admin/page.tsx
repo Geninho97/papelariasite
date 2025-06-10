@@ -30,6 +30,7 @@ import ImageUpload from "./components/ImageUpload"
 import LogoutButton from "./components/LogoutButton"
 import { useWeeklyPdfs } from "../hooks/useWeeklyPdfs"
 import PdfUpload from "./components/PdfUpload"
+import PdfCacheInfo from "./components/PdfCacheInfo"
 
 export default function AdminPage() {
   const { isAuthenticated, loading: authLoading, error: authError, login, logout } = useAuth()
@@ -317,6 +318,11 @@ export default function AdminPage() {
               {saving || pdfsSaving ? "Atualizando dados..." : "Dados atualizados"}
             </p>
           </div>
+        </div>
+
+        {/* PDF Cache Info */}
+        <div className="mb-8">
+          <PdfCacheInfo />
         </div>
 
         {/* PDF Management Section */}

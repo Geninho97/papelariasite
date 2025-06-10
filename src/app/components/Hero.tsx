@@ -1,13 +1,17 @@
 "use client"
 
-import { Star, ChevronDown, FileText } from "lucide-react"
+import { Star, ChevronDown, FileText } from 'lucide-react'
 import { useWeeklyPdfs } from "@/app/hooks/useWeeklyPdfs"
+import { usePdfCache } from "@/app/lib/pdf-cache"
 import { useEffect, useState } from "react"
 
 export default function Hero() {
   const { latestPdf, loading } = useWeeklyPdfs()
+  const { getCachedPdf, cachePdf, isPdfCached } = usePdfCache()
   const [isMobile, setIsMobile] = useState(false)
   const [isReady, setIsReady] = useState(false)
+  const [cachedPdfUrl, setCachedPdfUrl] = useState<string | null>(null)
+  const [isCaching, setIsCaching] = useState(false)
 
   // Detectar tamanho da tela para ajustes responsivos
   useEffect(() => {
@@ -15,20 +19,14 @@ export default function Hero() {
       setIsMobile(window.innerWidth < 768)
     }
 
-    // Verificar no carregamento inicial
     checkMobile()
-
-    // Adicionar listener para redimensionamento
     window.addEventListener("resize", checkMobile)
-
-    // Cleanup
     return () => window.removeEventListener("resize", checkMobile)
   }, [])
 
   // Controlar quando o conteúdo está pronto para ser mostrado
   useEffect(() => {
     if (!loading) {
-      // Pequeno delay para garantir que o estado está estável
       const timer = setTimeout(() => {
         setIsReady(true)
       }, 100)
@@ -38,6 +36,48 @@ export default function Hero() {
       setIsReady(false)
     }
   }, [loading])
+
+  // Gerenciar cache do PDF
+  useEffect(() => {
+    if (latestPdf && isReady) {
+      const handlePdfCache = async () => {
+        try {
+          // Verificar se já está em cache
+          const cached = getCachedPdf(latestPdf.url)
+          
+          if (cached) {
+            console.log(`⚡ [HERO] Usando PDF do cache de 24h`)
+            setCachedPdfUrl(cached)
+          } else {
+            console.log(`📄 [HERO] PDF não está em cache, iniciando download...`)
+            setIsCaching(true)
+            
+            // Cachear o PDF
+            const cachedUrl = await cachePdf(latestPdf.url, latestPdf.name)
+            
+            if (cachedUrl) {
+              console.log(`✅ [HERO] PDF cacheado com sucesso por 24h`)
+              setCachedPdfUrl(cachedUrl)
+            } else {
+              console.log(`⚠️ [HERO] Falha no cache, usando URL original`)
+              setCachedPdfUrl(latestPdf.url)
+            }
+            
+            setIsCaching(false)
+          }
+        } catch (error) {
+          console.error(`❌ [HERO] Erro no cache do PDF:`, error)
+          setCachedPdfUrl(latestPdf.url)
+          setIsCaching(false)
+        }
+      }
+
+      handlePdfCache()
+    }
+  }, [latestPdf, isReady, getCachedPdf, cachePdf])
+
+  // URL do PDF para usar (cache ou original)
+  const pdfUrlToUse = cachedPdfUrl || latestPdf?.url
 
   return (
     <section
@@ -153,16 +193,30 @@ export default function Hero() {
                       <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
                       <div>
                         <h3 className="font-bold text-sm sm:text-base line-clamp-1">{latestPdf.name}</h3>
-                        {/* Verificar se o PDF é recente (últimos 7 dias) */}
-                        {new Date(latestPdf.uploadDate) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) && (
-                          <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold animate-pulse">
-                            NOVO!
-                          </span>
-                        )}
+                        <div className="flex items-center space-x-2">
+                          {/* Badge de cache */}
+                          {cachedPdfUrl && cachedPdfUrl !== latestPdf.url && (
+                            <span className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                              📱 CACHE 24H
+                            </span>
+                          )}
+                          {/* Badge de novo */}
+                          {new Date(latestPdf.uploadDate) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) && (
+                            <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold animate-pulse">
+                              NOVO!
+                            </span>
+                          )}
+                          {/* Badge de carregamento */}
+                          {isCaching && (
+                            <span className="bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-bold animate-pulse">
+                              📥 CACHEANDO...
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <a
-                      href={latestPdf.url}
+                      href={pdfUrlToUse}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="bg-white/20 hover:bg-white/30 px-2 py-1 sm:px-3 sm:py-2 rounded-lg transition-colors text-xs sm:text-sm font-medium"
@@ -187,7 +241,7 @@ export default function Hero() {
                     <div className="bg-black rounded-2xl p-1 h-full w-full relative overflow-hidden">
                       {/* PDF Container */}
                       <a
-                        href={latestPdf.url}
+                        href={pdfUrlToUse}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="block relative group h-full w-full"
@@ -196,7 +250,7 @@ export default function Hero() {
                         <div className="relative bg-white rounded-xl shadow-lg h-full w-full overflow-hidden">
                           {/* PDF Object */}
                           <object
-                            data={`${latestPdf.url}#page=1&view=FitH&toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&zoom=page-fit`}
+                            data={`${pdfUrlToUse}#page=1&view=FitH&toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&zoom=page-fit`}
                             type="application/pdf"
                             className="w-full h-full pdf-no-scrollbar"
                             style={{
@@ -218,7 +272,12 @@ export default function Hero() {
                             <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/95 backdrop-blur-sm px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg shadow-lg">
                               <div className="flex items-center space-x-2 text-gray-800 font-medium text-xs sm:text-sm">
                                 <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
-                                <span>Clique para abrir PDF completo</span>
+                                <span>
+                                  {cachedPdfUrl && cachedPdfUrl !== latestPdf.url 
+                                    ? "PDF em cache - Carregamento instantâneo!" 
+                                    : "Clique para abrir PDF completo"
+                                  }
+                                </span>
                               </div>
                             </div>
                           </div>
