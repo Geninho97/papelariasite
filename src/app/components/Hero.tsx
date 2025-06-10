@@ -44,22 +44,44 @@ export default function Hero() {
         <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
           {/* Content */}
           <div className="space-y-6 md:space-y-8 text-center md:text-left">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 leading-tight flex flex-col">
-              <span>Descubra os destaques</span>
-              <span>
-                no nosso{" "}
-                <span className="text-red-600 bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent animate-pulse">
-                  folheto!
-                </span>
-              </span>
-            </h1>
+            {latestPdf ? (
+              <>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 leading-tight flex flex-col">
+                  <span>Descubra os destaques</span>
+                  <span>
+                    no nosso{" "}
+                    <span className="text-red-600 bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent animate-pulse">
+                      folheto!
+                    </span>
+                  </span>
+                </h1>
 
-            <div className="text-xl sm:text-2xl text-gray-700 leading-relaxed">
-              Já está disponível o nosso novo folheto ! 
-            </div>
-            <div className="text-xl sm:text-2xl text-gray-700 leading-relaxed">
-              Repleto de produtos incríveis, com preços imperdíveis e descontos especiais só por tempo limitado.
-            </div>
+                <div className="text-xl sm:text-2xl text-gray-700 leading-relaxed">
+                  Já está disponível o nosso novo folheto !
+                </div>
+                <div className="text-xl sm:text-2xl text-gray-700 leading-relaxed">
+                  Repleto de produtos incríveis, com preços imperdíveis e descontos especiais só por tempo limitado.
+                </div>
+              </>
+            ) : (
+              <>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 leading-tight flex flex-col">
+                  <span>Não perca, já na próxima semana</span>
+                  <span>
+                    estará disponível o nosso{" "}
+                    <span className="text-red-600 bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent animate-pulse">
+                      folheto!
+                    </span>
+                  </span>
+                </h1>
+
+                <div className="text-xl sm:text-2xl text-gray-700 leading-relaxed">
+                  Prepare-se para ofertas incríveis, descontos especiais e muitas surpresas!
+                </div>
+                <div className="text-xl sm:text-2xl text-gray-700 leading-relaxed">Fique atento e não perca!</div>
+              </>
+            )}
+
             <div className="flex items-center justify-center md:justify-start space-x-2">
               <div className="flex text-yellow-500">
                 {[...Array(5)].map((_, i) => (
@@ -92,8 +114,8 @@ export default function Hero() {
                       <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
                       <div>
                         <h3 className="font-bold text-sm sm:text-base line-clamp-1">{latestPdf.name}</h3>
-                        {/* Verificar se o PDF é recente (últimos 7 dias) */}
-                        {new Date(latestPdf.uploadDate) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) && (
+                        {/* Verificar se o PDF é recente (últimos 15 dias) */}
+                        {new Date(latestPdf.uploadDate) > new Date(Date.now() - 15 * 24 * 60 * 60 * 1000) && (
                           <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold animate-pulse">
                             NOVO!
                           </span>
@@ -175,11 +197,67 @@ export default function Hero() {
                 </div>
               </div>
             ) : (
-              <div className="w-full max-w-[460px] h-[400px] sm:h-[500px] md:h-[600px] flex items-center justify-center bg-gray-100 rounded-2xl border-8 border-gray-300 shadow-2xl">
-                <div className="text-center px-4">
-                  <FileText className="h-12 w-12 sm:h-16 sm:w-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2">Nenhum catálogo disponível</h3>
-                  <div className="text-gray-600 text-sm sm:text-base">O catálogo semanal será carregado em breve</div>
+              <div className="relative w-full max-w-[460px]">
+                {/* Header flutuante para "Em breve" */}
+                <div className="bg-gradient-to-r from-orange-500 to-yellow-500 text-white p-2 sm:p-3 rounded-xl mb-4 shadow-lg relative z-20">
+                  <div className="flex items-center justify-center">
+                    <div className="flex items-center space-x-2 sm:space-x-3">
+                      <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
+                      <div>
+                        <h3 className="font-bold text-sm sm:text-base">Folheto em Preparação</h3>
+                        <span className="bg-orange-600 text-white px-2 py-1 rounded-full text-xs font-bold animate-pulse">
+                          EM BREVE!
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tablet Container */}
+                <div className="relative">
+                  {/* Tablet Frame */}
+                  <div
+                    className="bg-gradient-to-b from-gray-200 to-gray-400 rounded-3xl p-3 sm:p-6 shadow-2xl border-2 border-gray-300 mx-auto"
+                    style={{
+                      width: "100%",
+                      maxWidth: "460px",
+                      height: isMobile ? "400px" : "600px",
+                    }}
+                  >
+                    {/* Tablet Screen */}
+                    <div className="bg-black rounded-2xl p-1 h-full w-full relative overflow-hidden">
+                      {/* Imagem de Espera */}
+                      <div className="relative bg-white rounded-xl shadow-lg h-full w-full overflow-hidden flex items-center justify-center">
+                        <img
+                          src="/images/wait.png"
+                          alt="Aguarde o próximo folheto"
+                          className="w-full h-full object-contain p-4"
+                          onError={(e) => {
+                            // Fallback se a imagem não carregar
+                            const target = e.currentTarget
+                            const parent = target.parentElement
+                            if (parent) {
+                              target.style.display = "none"
+                              parent.innerHTML = `
+                                <div class="text-center p-8">
+                                  <div class="text-6xl mb-4">⏰</div>
+                                  <h3 class="text-xl font-bold text-gray-800 mb-2">Em Breve</h3>
+                                  <p class="text-gray-600">Novo folheto chegando!</p>
+                                </div>
+                              `
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Tablet Home Button */}
+                    <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-8 sm:w-12 h-1 bg-gray-600 rounded-full"></div>
+                  </div>
+
+                  {/* Tablet Shadow/Stand Effect */}
+                  <div className="absolute -bottom-4 -right-4 w-full h-full bg-gray-400/30 rounded-3xl -z-10 blur-sm"></div>
+                  <div className="absolute -bottom-6 -right-6 w-full h-full bg-gray-500/20 rounded-3xl -z-20 blur-md"></div>
                 </div>
               </div>
             )}
