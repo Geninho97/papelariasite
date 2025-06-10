@@ -3,7 +3,7 @@
 import { Star, ChevronDown, FileText } from "lucide-react"
 import { useWeeklyPdfs } from "@/app/hooks/useWeeklyPdfs"
 import { usePdfCache } from "@/app/lib/pdf-cache"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 
 export default function Hero() {
   const { latestPdf, loading } = useWeeklyPdfs()
@@ -12,6 +12,18 @@ export default function Hero() {
   const [isReady, setIsReady] = useState(false)
   const [cachedPdfUrl, setCachedPdfUrl] = useState<string | null>(null)
   const [isCaching, setIsCaching] = useState(false)
+  const logTimestamps = useRef<Record<string, number>>({})
+
+  // Função para controlar logs repetitivos
+  const logWithThrottle = (key: string, message: string, minInterval = 5000) => {
+    const now = Date.now()
+    const lastLog = logTimestamps.current[key] || 0
+
+    if (now - lastLog >= minInterval) {
+      console.log(message)
+      logTimestamps.current[key] = now
+    }
+  }
 
   // Detectar tamanho da tela para ajustes responsivos
   useEffect(() => {
@@ -46,20 +58,20 @@ export default function Hero() {
           const cached = getCachedPdf(latestPdf.url)
 
           if (cached) {
-            console.log(`⚡ [HERO] Usando PDF do cache de 24h`)
+            logWithThrottle("hero-cache-hit", `⚡ [HERO] Usando PDF do cache de 24h`)
             setCachedPdfUrl(cached)
           } else {
-            console.log(`📄 [HERO] PDF não está em cache, iniciando download...`)
+            logWithThrottle("hero-cache-miss", `📄 [HERO] PDF não está em cache, iniciando download...`)
             setIsCaching(true)
 
             // Cachear o PDF
             const cachedUrl = await cachePdf(latestPdf.url, latestPdf.name)
 
             if (cachedUrl) {
-              console.log(`✅ [HERO] PDF cacheado com sucesso por 24h`)
+              logWithThrottle("hero-cache-success", `✅ [HERO] PDF cacheado com sucesso por 24h`)
               setCachedPdfUrl(cachedUrl)
             } else {
-              console.log(`⚠️ [HERO] Falha no cache, usando proxy direto`)
+              logWithThrottle("hero-cache-fail", `⚠️ [HERO] Falha no cache, usando proxy direto`)
               const proxyUrl = getProxyUrl(latestPdf.url)
               setCachedPdfUrl(proxyUrl)
             }
