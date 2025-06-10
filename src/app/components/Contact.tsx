@@ -70,9 +70,11 @@ export default function Contact() {
 
               <div className="space-y-3 sm:space-y-4 text-gray-700">
                 <div className="space-y-1">
+                <a href="https://maps.app.goo.gl/jgNXMdBGJJcAebxr9" target="_blank">
                   <p className="font-medium">R. Abílio Miranda, Edf. Estádio, Loja Q/R</p>
                   <p>4560-501 Penafiel</p>
                   <p>Portugal</p>
+                </a>
                 </div>
 
                 <div className="flex flex-col pt-1 sm:pt-2">
