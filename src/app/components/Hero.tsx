@@ -103,7 +103,7 @@ function HeroContent({ latestPdf }: { latestPdf: any }) {
           de produtos criada a pensar em si! 
         </span>
       </h1>
-      <div className="text-2xl sm:text-2xl text-gray-700 leading-relaxed">
+      <div className="text-3xl sm:text-3xl text-gray-700 leading-relaxed">
         <p>No nosso folheto encontra:</p>
         <p>Os melhores produtos, com preços imperdíveis e descontos especiais.</p>
       </div>
