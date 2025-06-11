@@ -94,7 +94,7 @@ function HeroSkeleton() {
 function HeroContent({ latestPdf }: { latestPdf: any }) {
   return (
     <>
-      <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-gray-800 leading-tight">
+      <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-bold text-gray-800 leading-tight">
         <span className="whitespace-nowrap">
           Conheça a nossa <span className="text-red-600">seleção</span>
         </span>
@@ -103,7 +103,7 @@ function HeroContent({ latestPdf }: { latestPdf: any }) {
           de produtos criada a pensar em si! 
         </span>
       </h1>
-      <div className="text-3xl sm:text-3xl text-gray-700 leading-relaxed">
+      <div className="text-xl sm:text-2xl text-gray-700 leading-relaxed">
         <p>No nosso folheto encontra:</p>
         <p>Os melhores produtos, com preços imperdíveis e descontos especiais.</p>
       </div>
