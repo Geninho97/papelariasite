@@ -94,7 +94,7 @@ function HeroSkeleton() {
 function HeroContent({ latestPdf }: { latestPdf: any }) {
   return (
     <>
-      <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-bold text-gray-800 leading-tight">
+      <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 leading-tight">
         <span className="whitespace-nowrap">
           Conheça a nossa <span className="text-red-600">seleção</span>
         </span>
