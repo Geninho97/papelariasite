@@ -95,14 +95,14 @@ function HeroContent({ latestPdf }: { latestPdf: any }) {
   return (
     <>
       <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 leading-tight">
-        <span>
-          Conheça a nossa <span className="text-red-600">seleção</span>
-        </span>
-        <br />
-        <span>
-          de produtos criada a pensar em si! 
-        </span>
-      </h1>
+  <div>
+    Conheça a nossa <span className="text-red-600">seleção</span>
+  </div>
+  <div>
+    de produtos criada a pensar em si!
+  </div>
+</h1>
+
       <div className="text-xl sm:text-2xl text-gray-700 leading-relaxed">
         <p>Já está disponível o nosso novo folheto!</p>
         <p>Repleto de produtos incríveis, com preços imperdíveis e descontos especiais.</p>
