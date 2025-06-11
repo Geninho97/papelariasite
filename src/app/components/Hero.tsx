@@ -95,10 +95,11 @@ function HeroContent({ latestPdf }: { latestPdf: any }) {
   return (
     <>
       <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 leading-tight">
-        <span>Descubra os destaques</span>
+        <span>Conheça a nossa </span>
+        <span className="text-red-600">seleção</span>
         <br />
         <span>
-          no nosso <span className="text-red-600">folheto!</span>
+          de produtos criada a pensar em si! 
         </span>
       </h1>
       <div className="text-xl sm:text-2xl text-gray-700 leading-relaxed">

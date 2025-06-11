@@ -13,7 +13,7 @@ export default function Contact() {
         <div className="text-center mb-10 sm:mb-16">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800 mb-3 sm:mb-4">Venha-nos conhecer</h2>
           <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto">
-            Estamos disponíveis para o ajudar nas nossas lojas físicas:
+            Temos uma equipa disponível para o ajudar.
           </p>
           <div className="w-16 sm:w-24 h-1 bg-gradient-to-r from-red-500 to-green-500 mx-auto mt-3 sm:mt-4 rounded-full"></div>
         </div>
@@ -112,7 +112,7 @@ export default function Contact() {
               <div className="space-y-3 sm:space-y-4 text-gray-700">
                 <div className="space-y-1">
                   <p className="font-medium">Espaço destinado a venda</p>
-                  <p className="font-medium">exclusiva de <span style={{ textDecorationLine: 'underline' }}>Alimentação Sem Gluten</span></p>
+                  <p className="font-medium">exclusiva de <span style={{ textDecorationLine: 'underline' }}>Alimentação Sem Glúten</span></p>
                   <p></p>
                 </div>
 
