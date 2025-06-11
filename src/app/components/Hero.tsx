@@ -104,8 +104,8 @@ function HeroContent({ latestPdf }: { latestPdf: any }) {
         </span>
       </h1>
       <div className="text-xl sm:text-2xl text-gray-700 leading-relaxed">
-        <p>Já está disponível o nosso novo folheto!</p>
-        <p>Repleto de produtos incríveis, com preços imperdíveis e descontos especiais.</p>
+        <p>No nosso folheto encontra:</p>
+        <p>Os melhores produtos, com preços imperdíveis e descontos especiais.</p>
       </div>
     </>
   )
