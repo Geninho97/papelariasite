@@ -34,7 +34,7 @@ export default function Contact() {
                 <div className="space-y-1">
                   <a href="https://maps.app.goo.gl/9NywXPgtkRrrm4Lj8" target="_blank">
                   <p className="font-medium">Avenida São Miguel de Bustelo, 2835</p>
-                  <p>4560-042 - Bustelo - Penafiel</p>
+                  <p>4560 - 042 - Bustelo</p>
                   <p>Portugal</p>
                   </a>
                 </div>
@@ -74,7 +74,7 @@ export default function Contact() {
                 <div className="space-y-1">
                 <a href="https://maps.app.goo.gl/D92pvzPqkWcGMqzw9" target="_blank">
                   <p className="font-medium">R. Abílio Miranda, Edf. Estádio, Loja Q/R</p>
-                  <p>4560-501 Penafiel</p>
+                  <p>4560 - 501 Penafiel</p>
                   <p>Portugal</p>
                 </a>
                 </div>
