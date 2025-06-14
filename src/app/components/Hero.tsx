@@ -95,7 +95,7 @@ function HeroContent({ latestPdf }: { latestPdf: any }) {
   return (
     <>
       <h1 className="text-3xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 leading-tight">
-        <span className="whitespace-nowrap">
+        <span>
           Conheça a nossa <span className="text-red-600">seleção</span>
         </span>
         <br />
